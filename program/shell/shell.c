@@ -58,6 +58,8 @@ U8** argv;
 U8* info = "Copyright (c) 2026 Zhoski. Licensed under the MIT License.\n"
            "Type 'help' to get a list of commands.\n\n";
 
+U8* test = "Mops\n";
+
 U32 cmd_help() {
     U8* help_msg =   "\n"
                         "[BASE]\n"
@@ -102,7 +104,6 @@ U32 cmd_read() {
     fclose(f);*/
 
     uint8* temp_buffer = malloc(4096);
-    memset(temp_buffer, 0, 4096);
     U32 read_status = sys_read(argv[1], 4096, temp_buffer);
 
     if(read_status) {
@@ -127,19 +128,6 @@ U32 cmd_check() {
  */
 U32 cmd_write() {
     putchar('\n');
-    /*int size = 0;
-    File* f = fopen(argv[1], FWRITE);
-    if(!f) {
-        printf("%[12Can't write [%s]%[15",argv[1]);
-        return;
-    }else {
-        U32 s = 0;
-        while (argv[2][s++]);
-        
-        //sys_write(f->name, argv[2], s);
-        fwrite(f, s, argv[2]);
-    }
-    fclose(f);*/
     if(sys_write(argv[1], argv[2], strlen(argv[2])) == 0x01) {
         printf("[  %[10OK%[07  ] File %s overwrite", argv[1]);
     }else {
@@ -178,7 +166,6 @@ U32 cmd_sys() {
     memcpy(0x1008, cpu, 48);
 
     printf("\n");
-    printf("-----------------\n");
     printf("OS: NFOS86 Demo\n"); 
     printf("Kernel: v0.0.1-custom\n");
     printf("CPU: %s\n", cpu); 
@@ -235,8 +222,8 @@ void execute() {
 
     if(!is_found) {
         U32 err = sys_run(argv[0]);
-        if(err) {
-            printf("\n%[12NFOS86: Unknown command%[07");
+        if(!err) {
+            printf("\n%[12NFOS86: Unknown command %s%[07",argv[0]);
         }
     }
 
@@ -290,41 +277,6 @@ void shell_main() {
  */
 void main() {
     command_buffer = malloc(COMMAND_BUFFER_SIZE);
-
-    //uint8* user_cfg = malloc(512);
-
-    //sys_read("/home/user.cfg", 512, user_cfg);
-    
-    /*File* fUser = fopen("/home/user.cfg", FREAD);
-    if(!fUser) {
-        printf("Error\n");
-    }
-
-    printf("AAA%s", fUser->name);
-    
-    while (1)
-    {
-        /* code 
-    }
-    
-
-    U8* user_cfg = malloc(fUser->bytes);
-    //fread(fUser, fUser->bytes, user_cfg);
-    /*fclose(fUser);*/
-
-    /*U32 i = 0;
-    U32 j = 0;
-    if(user_cfg[i]) {
-        while (user_cfg[i] != ':')
-            i++;
-        i++;
-        while (user_cfg[i] != '\n')
-        {
-            user[j] = user_cfg[i];
-            j++;
-            i++;
-        }
-    }*/
 
     shell_main();
 }

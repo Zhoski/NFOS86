@@ -30,12 +30,6 @@ start:
 
     call KERNEL_LOAD
 
-    mov si, continue_msg
-    call print
-
-    mov ah, 0x00
-    int 0x16
-
     call kernel_launch  ; Запуск ядра
 
     jmp $        

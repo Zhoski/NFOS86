@@ -4,6 +4,7 @@
 #include <kernel/program.h>
 #include <drivers/video/video.h>
 #include <lib/string.h>
+#include <kernel/loader.h>
 
 #define FILE_NOT_FOUND          0x00
 #define FILE_FOUND              0x01
@@ -247,8 +248,8 @@ u32 fluidfs_fopen(u8* file) {
     }
 
     u32 offset = 0;
-    u32 stack = 0x400000;
-    u32 entry = 0x300000;
+    u32 stack = 0x500000;
+    u32 entry = 0x435000;
 
     io_disk_packet_t packet0 = {
         .command = IO_READ,
@@ -269,6 +270,10 @@ u32 fluidfs_fopen(u8* file) {
         offset += super_block->sec_p_block * 512;
     }
 
+    
+    if(*(u8*)(entry + 1) == 'N') {
+        execute_file(entry, stack, NDF);
+    }
     program_execute(entry, stack);
 }
 

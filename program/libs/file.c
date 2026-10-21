@@ -111,8 +111,8 @@ unsigned int sys_run(const unsigned char* __restrict__ file) {
 
 unsigned int sys_died() {
     asm volatile(
-        "movl $6, %%eax\n"
-        "movl $60, %%ebx\n"
+        "movl $0x06, %%eax\n"
+        "movl $0x60, %%ebx\n"
         "int $0x80"
         :
         : 

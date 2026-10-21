@@ -70,6 +70,8 @@ void* malloc(U32 size) {
             }
 
             current->next = (struct Heap*)current_address;
+
+            memset(current_address - size, 0, size);
             
             return (void*)(current_address - size);
         }

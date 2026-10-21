@@ -110,7 +110,7 @@ void syscall_handler(int eax, int ebx,int ecx, int edx, char* esi, char* edi) {
             switch (ebx)
             {
             case SYS_RUN:
-                fs->open(esi);
+                eax = fs->open(esi);
                 break;
             case SYS_DIED:
                 asm volatile (
@@ -120,6 +120,7 @@ void syscall_handler(int eax, int ebx,int ecx, int edx, char* esi, char* edi) {
                     :
                     : [exit] "r"(kernel_return_ptr), [stack_top] "r"(kernel_stack_ptr), [stack_base] "r" (kernel_stack_base)
                 );
+                break;
             default:
                 break;
             }

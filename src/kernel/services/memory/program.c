@@ -49,7 +49,7 @@ void exit() {
         : "eax", "ebx", "ecx", "edx", "esi", "edi"
     );
 
-    fs->open("SHELL   BIN");
+    fs->open("/home/shell.bin");
     for(;;) {
         asm("hlt");
     }

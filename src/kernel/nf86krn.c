@@ -48,7 +48,7 @@ void kmain() {
 
     init_vga(VGA_640_480);          // Инициализация vga             
     
-    video->kprintf("Kernel v 0.0.2\n");
+    video->kprintf("Kernel v 0.0.3\n");
 
     u8* disk_info = (u8*)malloc(512);
     u32 disk_status = disk_init((u16*)disk_info);
@@ -76,7 +76,7 @@ void kmain() {
     memcpy((void*)0x1008, cpuid, 48);
     video->kprintf("[ INFO ] CPU: %s\n", cpuid);
 
-    fs->open("/home/shell.bin");
+    fs->open("/home/shell.ndf");
 
 	for(;;) {
         halt();
