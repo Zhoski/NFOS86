@@ -6,9 +6,14 @@
 #include <lib/string.h>
 #include <kernel/loader.h>
 
-#define FILE_NOT_FOUND          0x00
-#define FILE_FOUND              0x01
+#define FCHECK_NOT_FOUND        0x00
+#define FCHECK_FOUND            0x01
+
+#define FILE_NOT_FOUND          0x01
+#define FILE_FOUND              0x00
+
 #define NODE_CREATED            0x02
+#define CNODE_ERR               0x03
 
 #define FILE_OVERWRITE          0x01
 
@@ -168,7 +173,7 @@ u32 fluidfs_fcheck(u8* file) {
 
             if(cur_node_dir->p_block[i] == 0) {
                 free(cur_node_dir);
-                return FILE_NOT_FOUND;
+                return FCHECK_NOT_FOUND;
             }
 
             packet0.lba_start = cur_node_dir->p_block[i] * super_block->sec_p_block;
@@ -179,7 +184,7 @@ u32 fluidfs_fcheck(u8* file) {
 
             if(!cur_node->name[0]) {
                 free(cur_node_dir);
-                return FILE_NOT_FOUND;
+                return FCHECK_NOT_FOUND;
             }
 
             for(u32 j = 0; j < node_p_block; j++) {
@@ -201,7 +206,7 @@ u32 fluidfs_fcheck(u8* file) {
 
         if(!dir_found) {
             free(cur_node_dir);
-            return FILE_NOT_FOUND;
+            return FCHECK_NOT_FOUND;
         }
     }
 
@@ -223,23 +228,23 @@ u32 fluidfs_fcheck(u8* file) {
                 g_cur_node = cur_node;
                 g_cur_block = cur_node_dir->p_block[i];
                 free(cur_node_dir);
-                return FILE_FOUND;
+                return FCHECK_FOUND;
             }
 
             cur_node = (node_t*)((u8*)cur_node + 128);
 
             if(cur_node->name[0] == 0) {
                 free(cur_node_dir);
-                return 0;
+                return FCHECK_NOT_FOUND;
             }
         }
     }
 
-    return 0;
+    return FCHECK_NOT_FOUND;
 }
 
 /**
- *  Возвращает 0 если файл не найден
+ *  Возвращает 1 если файл не найден
  *  Загружает файл на 0x300000 после чего передает ему управление
  */
 u32 fluidfs_fopen(u8* file) {
@@ -248,8 +253,8 @@ u32 fluidfs_fopen(u8* file) {
     }
 
     u32 offset = 0;
-    u32 stack = 0x500000;
-    u32 entry = 0x435000;
+    u32 stack = 0x400000;
+    u32 entry = 0x300000;
 
     io_disk_packet_t packet0 = {
         .command = IO_READ,
@@ -314,6 +319,8 @@ u32 fluidfs_fread(u8* file, u8* dest, u32 n) {
     }
 
     free(temp_buffer);
+
+    return 0;
 }
 
 /**
@@ -397,7 +404,7 @@ u32 fluidfs_fwrite(u8* file, u8* src, u32 n) {
 
     free(temp_buffer);
 
-    return FILE_OVERWRITE;
+    return 0;
 }
 
 /**
@@ -446,6 +453,8 @@ u32 fluidfs_fdel(u8* file) {
     disk->dispather(&packet1);
 
     free(temp_buffer);
+
+    return 0;
 }
 
 /**
@@ -548,12 +557,14 @@ u32 fluidfs_cnode(u8* node, u8 flag) {
                 disk->dispather(&packet1);
 
                 free(cur_node_dir);
-                return NODE_CREATED;
+                return 0;
             }
 
             cur_node = (node_t*)((u8*)cur_node + 128);
         }
     }
+
+    return CNODE_ERR;
 }
 
 u32 fluidfs_write_dir(u8* dir) {
@@ -655,4 +666,6 @@ u32 fluidfs_write_dir(u8* dir) {
             }
         }
     }
+
+    return 0;
 }

@@ -30,7 +30,6 @@ unsigned int sys_check(const unsigned char* __restrict__ file_name) {
 }
 
 unsigned int sys_write(const unsigned char* __restrict__ file_name, unsigned char* __restrict__ in, unsigned int count) {
-    int ret = 0;
     asm volatile(
         "movl $5, %%eax\n"
         "movl $2, %%ebx\n"
@@ -42,13 +41,9 @@ unsigned int sys_write(const unsigned char* __restrict__ file_name, unsigned cha
         : [c] "m" (count), [file] "m" ((int)file_name), [in] "m" ((int)in)
         : "eax", "ebx", "ecx", "esi", "edi", "memory"
     );
-    asm volatile(
-        "movl %0, %%eax"
-        : "=a" (ret)
-    );
 }
 
-unsigned char sys_create(const unsigned char* __restrict__ file_name, const unsigned int s) {
+unsigned int sys_create(const unsigned char* __restrict__ file_name, const unsigned int s) {
     asm volatile(
         "movl $5, %%eax\n"
         "movl $3, %%ebx\n"
@@ -61,7 +56,7 @@ unsigned char sys_create(const unsigned char* __restrict__ file_name, const unsi
     );
 }
 
-unsigned char sys_delete(const unsigned char* __restrict__ file) {
+unsigned int sys_delete(const unsigned char* __restrict__ file) {
     int ret = 0;
     asm volatile(
         "movl $5, %%eax\n"
@@ -78,7 +73,7 @@ unsigned char sys_delete(const unsigned char* __restrict__ file) {
     );
 }
 
-unsigned char write_root(unsigned char *__restrict__ dir) {
+unsigned int write_root(unsigned char *__restrict__ dir) {
     asm volatile(
         "movl $5, %%eax\n"
         "movl $6, %%ebx\n"

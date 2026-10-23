@@ -105,10 +105,10 @@ U32 cmd_read() {
     memset(temp_buffer, 0, 4096);
     U32 read_status = sys_read(argv[1], 4096, temp_buffer);
 
-    if(read_status) {
+    if(read_status == 0) {
         printf("%s", temp_buffer);
     }else {
-        printf("[ %[12FAIL%[07 ] File %s not found", argv[1]);
+        printf("[ %[04FAIL%[07 ] File %s not found", argv[1]);
     }
     free(temp_buffer);
 }
@@ -140,35 +140,38 @@ U32 cmd_write() {
         fwrite(f, s, argv[2]);
     }
     fclose(f);*/
-    if(sys_write(argv[1], argv[2], strlen(argv[2])) == 0x01) {
-        printf("[  %[10OK%[07  ] File %s overwrite", argv[1]);
+    if(sys_write(argv[1], argv[2], strlen(argv[2])) == 0x00) {
+        printf("[  %[02OK%[07  ] File %s overwrite", argv[1]);
     }else {
-        printf("[ %[12FAIL%[07 ] File %s not found", argv[1]);
+        printf("[ %[04FAIL%[07 ] File %s not found", argv[1]);
     }
 }
 
 U32 cmd_delete() {
     putchar('\n');
     int ret = sys_delete(argv[1]);
-    if(!ret) {
-        printf("[ %[12FAIL%[07 ] File %s not found", argv[1]);
+    if(!ret == 0) {
+        printf("[ %[04FAIL%[07 ] File %s not found", argv[1]);
     }else {
-        printf("[  %[10OK%[07  ] File %s succes deleted", argv[1]);
+        printf("[  %[02OK%[07  ] File %s succes deleted", argv[1]);
     }
 }
 
 U32 cmd_create() {
     putchar('\n');
-    if(sys_create(argv[1], 512)) {
-        printf("[  %[10OK%[07  ] File %s succes created", argv[1]);
+    if(sys_create(argv[1], 512) == 0) {
+        printf("[  %[02OK%[07  ] File %s succes created", argv[1]);
     } else {
-        printf("\n[ %[12FAIL%[07 ] File %s create error", argv[1]);
+        printf("\n[ %[04FAIL%[07 ] File %s create error", argv[1]);
     }
 }
 
 U32 cmd_dir() {
     printf("\n");
     write_root(argv[1]);
+    command_index = 0;
+    memset(&command_buffer, 0, COMMAND_BUFFER_SIZE);
+
 }
 
 U32 cmd_sys() {
@@ -230,12 +233,12 @@ void execute() {
         }
     }
 
-    memset(command_buffer[0], 0, COMMAND_BUFFER_SIZE);
+    memset(&command_buffer, 0, COMMAND_BUFFER_SIZE);
 
     if(!is_found) {
         U32 err = sys_run(argv[0]);
-        if(!err) {
-            printf("\n%[12NFOS86: Unknown command %s%[07",argv[0]);
+        if(err) {
+            printf("\n%[04NFOS86: Unknown command %s%[07",argv[0]);
         }
     }
 
@@ -254,6 +257,8 @@ void shell_main() {
     for(U32 i = 0;i < COMMAND_BUFFER_SIZE;i++) {
         command_buffer[i] = 0;
     }
+
+    command_index = 0;
 
     U8 c = '\0';
     while (1)
@@ -284,9 +289,6 @@ void shell_main() {
     }
 }
 
-/**
- *  FIX: Исправить на fopen в будущем
- */
 void main() {
     /*asm volatile(
         "movl $1, %%eax\n"
@@ -310,7 +312,7 @@ void main() {
         printf("Relocation fail\n");
     }*/
 
-    printf("TEST: %s", info);
+    //printf("TEST: %s", info);
 
     /*for(;;) {
         asm("hlt");

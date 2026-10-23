@@ -105,11 +105,11 @@ cd ..
 cd ..
 
 echo '=================== Disk assembly ==================='
-./utilities/FluidFSPacker/packer.elf -c out.img -M 4 -bs 4096 -b boot.bin -mb rootFS/stage2.bin
-./utilities/FluidFSPacker/packer.elf -d out.img -p rootFS/nf86krn.bin rootFS/setup.bin -o /system/
-./utilities/FluidFSPacker/packer.elf -d out.img -p license.txt -o /
-./utilities/FluidFSPacker/packer.elf -d out.img -p about.txt -o /
-./utilities/FluidFSPacker/packer.elf -d out.img -p rootFS/shell.bin rootFS/shell.ndf rootFS/notepad.bin -o /home/
+./utilities/ffspack/ffspack.elf -c out.img -M 4 -bs 4096 -b boot.bin -mb rootFS/stage2.bin
+./utilities/ffspack/ffspack.elf -d out.img -p rootFS/nf86krn.bin rootFS/setup.bin -o /system/
+./utilities/ffspack/ffspack.elf -d out.img -p license.txt -o /
+./utilities/ffspack/ffspack.elf -d out.img -p about.txt -o /
+./utilities/ffspack/ffspack.elf -d out.img -p rootFS/shell.bin rootFS/shell.ndf rootFS/notepad.bin -o /home/
 
 qemu-system-x86_64 -m 16M -no-reboot \
                    -device ich9-ahci,id=ahci \
