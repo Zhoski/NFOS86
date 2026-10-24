@@ -68,6 +68,7 @@ void free_block(u32 block) {
 void raw_filename_to_std_format(u8* raw_name) {
     u32 j = 0, n = 0, k = 0;
     u32 last_slash = 0;
+    u32 raw_name_len = strlen(raw_name);
     slash_count = 0;
 
     memset((void*)&g_node, 0, 128);
@@ -76,7 +77,7 @@ void raw_filename_to_std_format(u8* raw_name) {
         free(path);
     }
 
-    while (k < 32 && raw_name[k])
+    while (k < raw_name_len && raw_name[k])
     { 
         if(raw_name[k] == '/') {
             last_slash = k;
@@ -95,14 +96,14 @@ void raw_filename_to_std_format(u8* raw_name) {
         raw_name++;
     }
 
-    while (j < 32 && raw_name[j] && raw_name[j] != '.')
+    while (j < raw_name_len && raw_name[j] && raw_name[j] != '.')
     {
         g_node.name[j] = raw_name[j];
         j++;
     }
 
     j++;
-    while (j < 32 && raw_name[j])
+    while (j < raw_name_len && raw_name[j])
     {
         g_node.ext[n] = raw_name[j];
         j++;
@@ -150,6 +151,8 @@ u32 fluidfs_init() {
  */
 u32 fluidfs_fcheck(u8* file) {
     raw_filename_to_std_format(file);
+
+    //video->kprintf("Search entry: %s\n", file);
 
     io_disk_packet_t packet0 = {
         .command = IO_READ,
@@ -254,7 +257,7 @@ u32 fluidfs_fopen(u8* file) {
 
     u32 offset = 0;
     u32 stack = 0x400000;
-    u32 entry = 0x300000;
+    u32 entry = 0x450000;
 
     io_disk_packet_t packet0 = {
         .command = IO_READ,

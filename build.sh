@@ -90,14 +90,6 @@ cd shell
 make
 make clean
 cd ..
-#cd init
-#make
-#make clean
-#cd ..
-#cd setup
-#make
-#make clean
-#cd ..
 cd notepad
 make
 make clean
@@ -109,7 +101,7 @@ echo '=================== Disk assembly ==================='
 ./utilities/ffspack/ffspack.elf -d out.img -p rootFS/nf86krn.bin rootFS/setup.bin -o /system/
 ./utilities/ffspack/ffspack.elf -d out.img -p license.txt -o /
 ./utilities/ffspack/ffspack.elf -d out.img -p about.txt -o /
-./utilities/ffspack/ffspack.elf -d out.img -p rootFS/shell.bin rootFS/shell.ndf rootFS/notepad.bin -o /home/
+./utilities/ffspack/ffspack.elf -d out.img -p rootFS/shell.ndf rootFS/notepad.bin -o /home/
 
 qemu-system-x86_64 -m 16M -no-reboot \
                    -device ich9-ahci,id=ahci \

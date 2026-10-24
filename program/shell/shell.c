@@ -5,7 +5,7 @@
 #include <slib/types.h>
 
 #define COMMAND_BUFFER_SIZE    128
-#define COMMAND_COUNT           10
+#define COMMAND_COUNT           11
 
 #define SHIFT 0x01
 #define CAPS  0x02
@@ -36,6 +36,7 @@ U32 cmd_create();
 U32 cmd_delete();
 U32 cmd_check();
 U32 cmd_sys();
+U32 cmd_cd();
 
 struct Command cmd[] = {
     {"help", cmd_help},
@@ -48,6 +49,7 @@ struct Command cmd[] = {
     {"rm", cmd_delete},
     {"is",cmd_check},
     {"sys",cmd_sys},
+    {"cd", cmd_cd},
 };
 U32 command_index = 0;
 U8 *command_buffer;
@@ -58,7 +60,7 @@ U8** argv;
 U8* info = "Copyright (c) 2026 Zhoski. Licensed under the MIT License.\n"
            "Type 'help' to get a list of commands.\n\n";
 
-U8* test = "Mops\n";
+U8* cur_dir;
 
 U32 cmd_help() {
     U8* help_msg =   "\n"
@@ -69,6 +71,8 @@ U32 cmd_help() {
                         "   rm     [file]        -- deletes file\n"
                         "   cat    [file]        -- read file\n"
                         "   write  [file] [data] -- write in file\n"
+                        "   rmdir  [dir]         -- deletes dir\n"
+                        "   mkdir  [dir]         -- creates dir\n"
                         "   ls                   -- displays all files in a directory\n"
                         "[SYSTEM]\n"
                         "   sys                  -- show system info\n"
@@ -103,24 +107,37 @@ U32 cmd_read() {
     }
     fclose(f);*/
 
-    uint8* temp_buffer = malloc(4096);
-    U32 read_status = sys_read(argv[1], 4096, temp_buffer);
+    U8* full_path = malloc(strlen(cur_dir) + strlen(argv[1]) + 1);
+    strcat(full_path, cur_dir + 1);
+    strcat(full_path, argv[1]);
 
-    if(read_status) {
+    uint8* temp_buffer = malloc(4096);
+    memset(temp_buffer, 0, 4096);
+    U32 read_status = sys_read(full_path, 4096, temp_buffer);
+
+    if(read_status == 0) {
         printf("%s", temp_buffer);
     }else {
-        printf("[ %[12FAIL%[07 ] File %s not found", argv[1]);
+        printf("[ %[04FAIL%[07 ] File %s not found", argv[1]);
     }
     free(temp_buffer);
+
+    free(full_path);
 }
 
 U32 cmd_check() {
     putchar('\n');
-    if(!sys_check(argv[1])) {
+    U8* full_path = malloc(strlen(cur_dir) + strlen(argv[1]) + 1);
+    strcat(full_path, cur_dir + 1);
+    strcat(full_path, argv[1]);
+
+    if(!sys_check(full_path)) {
         printf("File %s not found", argv[1]);
     }else {
         printf("File %s found", argv[1]);
     }
+
+    free(full_path);
 }
 
 /**
@@ -128,35 +145,75 @@ U32 cmd_check() {
  */
 U32 cmd_write() {
     putchar('\n');
-    if(sys_write(argv[1], argv[2], strlen(argv[2])) == 0x01) {
-        printf("[  %[10OK%[07  ] File %s overwrite", argv[1]);
+    /*int size = 0;
+    File* f = fopen(argv[1], FWRITE);
+    if(!f) {
+        printf("%[12Can't write [%s]%[15",argv[1]);
+        return;
     }else {
-        printf("[ %[12FAIL%[07 ] File %s not found", argv[1]);
+        U32 s = 0;
+        while (argv[2][s++]);
+        
+        //sys_write(f->name, argv[2], s);
+        fwrite(f, s, argv[2]);
     }
+    fclose(f);*/
+    U8* full_path = malloc(strlen(cur_dir) + strlen(argv[1]) + 1);
+    strcat(full_path, cur_dir + 1);
+    strcat(full_path, argv[1]);
+
+    if(sys_write(full_path, argv[2], strlen(argv[2])) == 0x00) {
+        printf("[  %[02OK%[07  ] File %s overwrite", argv[1]);
+    }else {
+        printf("[ %[04FAIL%[07 ] File %s not found", argv[1]);
+    }
+
+    free(full_path);
 }
 
 U32 cmd_delete() {
     putchar('\n');
-    int ret = sys_delete(argv[1]);
-    if(!ret) {
-        printf("[ %[12FAIL%[07 ] File %s not found", argv[1]);
+    U8* full_path = malloc(strlen(cur_dir) + strlen(argv[1]) + 1);
+    strcat(full_path, cur_dir + 1);
+    strcat(full_path, argv[1]);
+
+    int ret = sys_delete(full_path);
+    if(!ret == 0) {
+        printf("[ %[04FAIL%[07 ] File %s not found", argv[1]);
     }else {
-        printf("[  %[10OK%[07  ] File %s succes deleted", argv[1]);
+        printf("[  %[02OK%[07  ] File %s succes deleted", argv[1]);
     }
+
+    free(full_path);
 }
 
 U32 cmd_create() {
     putchar('\n');
-    if(sys_create(argv[1], 512)) {
-        printf("[  %[10OK%[07  ] File %s succes created", argv[1]);
+    U8* full_path = malloc(strlen(cur_dir) + strlen(argv[1]) + 1);
+    strcat(full_path, cur_dir + 1);
+    strcat(full_path, argv[1]);
+
+    if(sys_create(argv[1], 512) == 0) {
+        printf("[  %[02OK%[07  ] File %s succes created", argv[1]);
     } else {
-        printf("\n[ %[12FAIL%[07 ] File %s create error", argv[1]);
+        printf("\n[ %[04FAIL%[07 ] File %s create error", argv[1]);
     }
+
+    free(full_path);
 }
 
 U32 cmd_dir() {
     printf("\n");
-    write_root(argv[1]);
+    U8* full_path = malloc(strlen(cur_dir) + strlen(argv[1]) + 1);
+    strcat(full_path, cur_dir + 1);
+    strcat(full_path, argv[1]);
+
+    write_root(full_path);
+
+    command_index = 0;
+    memset(&command_buffer, 0, COMMAND_BUFFER_SIZE);
+
+    free(full_path);
 }
 
 U32 cmd_sys() {
@@ -176,6 +233,24 @@ U32 cmd_sys() {
     printf("\n%[01\xDB\xDB%[02\xDB\xDB%[03\xDB\xDB%[04\xDB\xDB%[05\xDB\xDB"
         "%[06\xDB\xDB%[07\xDB\xDB%[08\xDB\xDB%[09\xDB\xDB%[10\xDB\xDB%[11\xDB\xDB"
         "%[12\xDB\xDB%[13\xDB\xDB%[14\xDB\xDB%[15\xDB\xDB%[07\n");
+}
+
+U32 cmd_cd() {
+    printf("\n");
+    if(sys_check(argv[1])) {
+        //U8* tmp = malloc(strlen(cur_dir));
+        //free(cur_dir);
+
+        //cur_dir = malloc(strlen(tmp) + strlen(argv[1]) + 2);
+        strcat(cur_dir, argv[1]);
+        strcat(cur_dir, "/");
+
+        //free(tmp);
+
+        printf("[%[02  OK  %[07] Directory changed");
+    }else {
+        printf("[%[04 FAIL %[07] Directory not found");
+    }
 }
 
 void execute() {
@@ -218,12 +293,12 @@ void execute() {
         }
     }
 
-    memset(command_buffer[0], 0, COMMAND_BUFFER_SIZE);
+    memset(&command_buffer, 0, COMMAND_BUFFER_SIZE);
 
     if(!is_found) {
         U32 err = sys_run(argv[0]);
-        if(!err) {
-            printf("\n%[12NFOS86: Unknown command %s%[07",argv[0]);
+        if(err) {
+            printf("\n%[04NFOS86: Unknown command %s%[07",argv[0]);
         }
     }
 
@@ -238,10 +313,12 @@ void shell_main() {
     clear_screen(0);
 
     printf(info);
-    printf("NFOS86/> ");
+    printf("NFOS86$%s> ", cur_dir);
     for(U32 i = 0;i < COMMAND_BUFFER_SIZE;i++) {
         command_buffer[i] = 0;
     }
+
+    command_index = 0;
 
     U8 c = '\0';
     while (1)
@@ -250,7 +327,7 @@ void shell_main() {
         if(c) {
             if(c == ENTER) {
                 execute();
-                printf("\nNFOS86/> ");
+                printf("\nNFOS86$%s> ", cur_dir);
             }else if(c == BACKSPACE && command_index != 0) {
                 U32 x;
                 U32 y;
@@ -272,10 +349,9 @@ void shell_main() {
     }
 }
 
-/**
- *  FIX: Исправить на fopen в будущем
- */
 void main() {
+    cur_dir = malloc(256);
+    cur_dir[0] = '/';
     command_buffer = malloc(COMMAND_BUFFER_SIZE);
 
     shell_main();
