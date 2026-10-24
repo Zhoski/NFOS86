@@ -5,7 +5,7 @@
 #include <slib/types.h>
 
 #define COMMAND_BUFFER_SIZE    128
-#define COMMAND_COUNT           11
+#define COMMAND_COUNT           12
 
 #define SHIFT 0x01
 #define CAPS  0x02
@@ -37,6 +37,7 @@ U32 cmd_delete();
 U32 cmd_check();
 U32 cmd_sys();
 U32 cmd_cd();
+U32 cmd_mkdir();
 
 struct Command cmd[] = {
     {"help", cmd_help},
@@ -50,6 +51,7 @@ struct Command cmd[] = {
     {"is",cmd_check},
     {"sys",cmd_sys},
     {"cd", cmd_cd},
+    {"mkdir", cmd_mkdir},
 };
 U32 command_index = 0;
 U8 *command_buffer;
@@ -71,7 +73,6 @@ U32 cmd_help() {
                         "   rm     [file]        -- deletes file\n"
                         "   cat    [file]        -- read file\n"
                         "   write  [file] [data] -- write in file\n"
-                        "   rmdir  [dir]         -- deletes dir\n"
                         "   mkdir  [dir]         -- creates dir\n"
                         "   ls                   -- displays all files in a directory\n"
                         "[SYSTEM]\n"
@@ -108,7 +109,7 @@ U32 cmd_read() {
     fclose(f);*/
 
     U8* full_path = malloc(strlen(cur_dir) + strlen(argv[1]) + 1);
-    strcat(full_path, cur_dir + 1);
+    strcat(full_path, cur_dir);
     strcat(full_path, argv[1]);
 
     uint8* temp_buffer = malloc(4096);
@@ -127,9 +128,12 @@ U32 cmd_read() {
 
 U32 cmd_check() {
     putchar('\n');
+
     U8* full_path = malloc(strlen(cur_dir) + strlen(argv[1]) + 1);
-    strcat(full_path, cur_dir + 1);
+    strcat(full_path, cur_dir);
     strcat(full_path, argv[1]);
+
+    printf("Full path: %s\n", full_path);
 
     if(!sys_check(full_path)) {
         printf("File %s not found", argv[1]);
@@ -158,8 +162,9 @@ U32 cmd_write() {
         fwrite(f, s, argv[2]);
     }
     fclose(f);*/
+
     U8* full_path = malloc(strlen(cur_dir) + strlen(argv[1]) + 1);
-    strcat(full_path, cur_dir + 1);
+    strcat(full_path, cur_dir);
     strcat(full_path, argv[1]);
 
     if(sys_write(full_path, argv[2], strlen(argv[2])) == 0x00) {
@@ -173,8 +178,9 @@ U32 cmd_write() {
 
 U32 cmd_delete() {
     putchar('\n');
+
     U8* full_path = malloc(strlen(cur_dir) + strlen(argv[1]) + 1);
-    strcat(full_path, cur_dir + 1);
+    strcat(full_path, cur_dir);
     strcat(full_path, argv[1]);
 
     int ret = sys_delete(full_path);
@@ -189,11 +195,12 @@ U32 cmd_delete() {
 
 U32 cmd_create() {
     putchar('\n');
+
     U8* full_path = malloc(strlen(cur_dir) + strlen(argv[1]) + 1);
-    strcat(full_path, cur_dir + 1);
+    strcat(full_path, cur_dir);
     strcat(full_path, argv[1]);
 
-    if(sys_create(argv[1], 512) == 0) {
+    if(sys_create(full_path, 512) == 0) {
         printf("[  %[02OK%[07  ] File %s succes created", argv[1]);
     } else {
         printf("\n[ %[04FAIL%[07 ] File %s create error", argv[1]);
@@ -202,11 +209,29 @@ U32 cmd_create() {
     free(full_path);
 }
 
+U32 cmd_mkdir() {
+    putchar('\n');
+
+    U8* full_path = malloc(strlen(cur_dir) + strlen(argv[1]) + 1);
+    strcat(full_path, cur_dir);
+    strcat(full_path, argv[1]);
+
+    if(sys_create(full_path, 0xFF) == 0) {
+        printf("[  %[02OK%[07  ] Dir %s succes created", argv[1]);
+    } else {
+        printf("\n[ %[04FAIL%[07 ] Dir %s create error", argv[1]);
+    }
+
+    free(full_path);
+}
+
 U32 cmd_dir() {
     printf("\n");
+
     U8* full_path = malloc(strlen(cur_dir) + strlen(argv[1]) + 1);
-    strcat(full_path, cur_dir + 1);
-    strcat(full_path, argv[1]);
+    strcat(full_path, cur_dir);
+
+    printf("A:%s\n", full_path);
 
     write_root(full_path);
 
@@ -236,20 +261,40 @@ U32 cmd_sys() {
 }
 
 U32 cmd_cd() {
-    printf("\n");
-    if(sys_check(argv[1])) {
-        //U8* tmp = malloc(strlen(cur_dir));
-        //free(cur_dir);
+    if(strcmp(argv[1], "..") != 0) {
+        printf("\n");
 
-        //cur_dir = malloc(strlen(tmp) + strlen(argv[1]) + 2);
-        strcat(cur_dir, argv[1]);
-        strcat(cur_dir, "/");
+        U8* full_path = malloc(strlen(cur_dir) + strlen(argv[1]) + 1);
+        strcat(full_path, cur_dir);
+        strcat(full_path, argv[1]);
 
-        //free(tmp);
+        //printf("Full path: %s\n", full_path);
 
-        printf("[%[02  OK  %[07] Directory changed");
+        if(sys_check(full_path)) {
+            strcat(cur_dir, argv[1]);
+            strcat(cur_dir, "/");
+
+            printf("[%[02  OK  %[07] Directory changed");
+        }else {
+            printf("[%[04 FAIL %[07] Directory not found");
+        }
+
+        free(full_path);
     }else {
-        printf("[%[04 FAIL %[07] Directory not found");
+        U32 cur_dir_len = strlen(cur_dir);
+        if(cur_dir_len > 1) {
+            U32 i = cur_dir_len;
+
+            //printf("cur_dir len: %d\n", cur_dir_len);
+
+            cur_dir[i - 1] = 0;
+            
+            while (cur_dir[i] != '/')
+            {
+                cur_dir[i] = 0;
+                i--;
+            }
+        }
     }
 }
 

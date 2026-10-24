@@ -76,8 +76,6 @@ void kmain() {
     memcpy((void*)0x1008, cpuid, 48);
     video->kprintf("[ INFO ] CPU: %s\n", cpuid);
 
-    fs->create("/system/kernel", 0xFF);
-
     fs->open("/home/shell.ndf");
 
 	for(;;) {
