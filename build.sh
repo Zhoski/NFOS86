@@ -89,10 +89,10 @@ cd program
 cd shell
 make
 make clean
-cd ..
-cd notepad
-make
-make clean
+#cd ..
+#cd notepad
+#make
+#make clean
 cd ..
 cd ..
 

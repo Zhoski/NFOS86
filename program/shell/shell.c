@@ -1,4 +1,4 @@
-#include <slib/strio.h>
+#include <slib/stdio.h>
 #include <slib/string.h>
 #include <slib/file.h>
 #include <slib/memory.h>
@@ -112,7 +112,7 @@ U32 cmd_read() {
     strcat(full_path, cur_dir);
     strcat(full_path, argv[1]);
 
-    uint8* temp_buffer = malloc(4096);
+    U8* temp_buffer = malloc(4096);
     memset(temp_buffer, 0, 4096);
     U32 read_status = sys_read(full_path, 4096, temp_buffer);
 
@@ -353,8 +353,8 @@ void execute() {
 }
 
 void shell_main() {
-    SetBGColor(0);
-    SetFGColor(7);
+    bg_set_color(0);
+    fg_set_color(7);
     clear_screen(0);
 
     printf(info);

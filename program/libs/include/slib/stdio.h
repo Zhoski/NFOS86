@@ -1,12 +1,8 @@
 #ifndef STRIO_H
 #define STRIO_H
 
-typedef unsigned char   uint8;
-typedef unsigned short uint16;
-typedef unsigned int   uint32;
-
-void SetFGColor(unsigned char color);
-void SetBGColor(unsigned char color);
+void fg_set_color(unsigned char color);
+void bg_set_color(unsigned char color);
 void printf(const unsigned char *format, ...);
 void putchar(unsigned char c);
 void clear_screen(unsigned char color);

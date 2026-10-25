@@ -1,73 +1,73 @@
-#include <slib/strio.h>
+#include <slib/stdio.h>
 #include <stdarg.h>
 
 void sequence_black() {
-    SetFGColor(0);
+    fg_set_color(0);
 }
 
 void sequence_blue() {
-    SetFGColor(1);
+    fg_set_color(1);
 }
 
 void sequence_green() {
-    SetFGColor(2);
+    fg_set_color(2);
 }
 
 
 void sequence_cyan() {
-    SetFGColor(3);
+    fg_set_color(3);
 }
 
 void sequence_red() {
-    SetFGColor(4);
+    fg_set_color(4);
 }
 
 void sequence_magenta() {
-    SetFGColor(5);
+    fg_set_color(5);
 }
 
 void sequence_brown() {
-    SetFGColor(6);
+    fg_set_color(6);
 }
 
 void sequence_light_grey() {
-    SetFGColor(7);
+    fg_set_color(7);
 }
 
 void sequence_dark_grey() {
-    SetFGColor(8);
+    fg_set_color(8);
 }
 
 void sequence_light_blue() {
-    SetFGColor(9);
+    fg_set_color(9);
 }
 
 void sequence_light_green() {
-    SetFGColor(10);
+    fg_set_color(10);
 }
 
 void sequence_light_cyan() {
-    SetFGColor(11);
+    fg_set_color(11);
 }
 
 void sequence_light_red() {
-    SetFGColor(12);
+    fg_set_color(12);
 }
 
 void sequence_light_magenta() {
-    SetFGColor(13);
+    fg_set_color(13);
 }
 
 void sequence_light_brown() {
-    SetFGColor(14);
+    fg_set_color(14);
 }
 
 void sequence_white() {
-    SetFGColor(15);
+    fg_set_color(15);
 }
 
 typedef struct {
-    uint8* sequence;
+    unsigned char* sequence;
     void (*handler)();
 }control_sequence;
 
@@ -106,26 +106,26 @@ int __strlen(const char s[]) {
     return i;
 }
 
-void SetFGColor(unsigned char color) {
+void fg_set_color(unsigned char color) {
     asm volatile(
         "movl $1, %%eax\n"
         "movl $6, %%ebx\n"
         "movl %0, %%ecx\n"
         "int $0x80"
         :
-        : "r"((uint32)color)
+        : "r"((unsigned int)color)
         : "eax", "ebx", "ecx", "memory"
     );
 }
 
-void SetBGColor(unsigned char color) {
+void bg_set_color(unsigned char color) {
     asm volatile(
         "movl $1, %%eax\n"
         "movl $5, %%ebx\n"
         "movl %0, %%ecx\n"
         "int $0x80"
         :
-        : "r"((uint32)color)
+        : "r"((unsigned int)color)
         : "eax", "ebx", "ecx", "memory"
     );
 }
@@ -243,13 +243,13 @@ void clear_screen(unsigned char color) {
         "movl %0, %%edx\n"
         "int $0x80"
         :
-        : "r" ((uint32)color)
+        : "r" ((unsigned int)color)
         : "eax", "ebx", "edx", "memory"
     );
 }
 
 void set_cursor(const unsigned short x, const unsigned short y) {
-    uint32 pos = x;
+    unsigned int pos = x;
     pos <<= 16;
     pos |= y;
     
@@ -277,8 +277,8 @@ void get_cursor(unsigned int* x, unsigned int* y) {
     );
 }
 
-uint8 get_char() {
-    uint32 out; 
+unsigned char get_char() {
+    unsigned char out; 
     asm volatile (
         "movl $2, %%eax\n"
         "movl $1, %%ebx\n"
@@ -289,5 +289,5 @@ uint8 get_char() {
         : 
         : "ebx", "ecx", "edx", "memory"
     );
-    return (uint8)out;
+    return out;
 }

@@ -1,7 +1,7 @@
 #include <slib/file.h>
 
 unsigned int sys_read(const unsigned char* __restrict__ file_name, unsigned int n, unsigned char* __restrict__ out) {
-    int ret = 0;
+    unsigned int ret = 0;
     asm volatile(
         "int $0x80"
         : "=a" (ret)
@@ -12,19 +12,12 @@ unsigned int sys_read(const unsigned char* __restrict__ file_name, unsigned int 
 }
 
 unsigned int sys_check(const unsigned char* __restrict__ file_name) {
-    int ret = 0;
+    unsigned int ret = 0;
     asm volatile(
-        "movl $5, %%eax\n"
-        "movl $5, %%ebx\n"
-        "movl %[file], %%esi\n"
         "int $0x80"
-        :
-        : [file] "r"(file_name)
-        : "eax", "ebx", "ecx", "edx", "memory"
-    );
-    asm volatile(
-        "movl %0, %%eax"
         : "=a" (ret)
+        : "a" (5), "b" (5), "S" (file_name)
+        : "memory"
     );
     return ret;
 }
@@ -48,62 +41,48 @@ unsigned int sys_write(const unsigned char* __restrict__ file_name, unsigned cha
     );
 }
 
-unsigned char sys_create(const unsigned char* __restrict__ file_name, unsigned char flag) {
+unsigned int sys_create(const unsigned char* __restrict__ file_name, unsigned char flag) {
+    unsigned int ret = 0;
     asm volatile(
-        "movl $5, %%eax\n"
-        "movl $3, %%ebx\n"
-        "movl %[flag], %%ecx\n"
-        "movl %[file], %%esi\n"
         "int $0x80"
-        :
-        : [file] "m" ((int)file_name), [flag] "m" (flag)
-        : "eax", "ebx", "ecx", "esi", "edi", "memory"
+        : "=a" (ret)
+        : "a" (5), "b" (3), "c"(flag), "S" (file_name)
+        : "memory"
     );
+    return ret;
 }
 
-unsigned char sys_delete(const unsigned char* __restrict__ file) {
+unsigned int sys_delete(const unsigned char* __restrict__ node) {
     int ret = 0;
     asm volatile(
-        "movl $5, %%eax\n"
-        "movl $4, %%ebx\n"
-        "movl %[file], %%esi\n"
         "int $0x80"
-        :
-        : [file] "m" ((int)file)
-        : "eax", "ebx", "ecx", "esi", "edi", "memory"
-    );
-    asm volatile(
-        "movl %0, %%eax"
         : "=a" (ret)
+        : "a" (5), "b" (4), "S" (node)
+        : "memory"
     );
+
+    return ret;
 }
 
-unsigned char write_root(unsigned char *__restrict__ dir) {
+unsigned int write_root(unsigned char *__restrict__ dir) {
+    unsigned int ret = 0;
     asm volatile(
-        "movl $5, %%eax\n"
-        "movl $6, %%ebx\n"
-        "movl %0, %%esi\n"
         "int $0x80"
-        :
-        : "r"((unsigned int)dir)
-        : "eax", "ebx", "ecx", "memory"
+        : "=a" (ret)
+        : "a" (5), "b" (6), "S" (dir)
+        : "memory"
     );
+
+    return ret;
 }
 
 unsigned int sys_run(const unsigned char* __restrict__ file) {
     int ret = 0;
     asm volatile(
-        "movl $6, %%eax\n"
-        "movl $1, %%ebx\n"
-        "movl %0, %%esi\n"
         "int $0x80"
-        :
-        : "r"((unsigned int)file)
-        : "eax", "ebx", "esi", "memory"
-    );
-    asm volatile(
-        "movl %0, %%eax"
         : "=a" (ret)
+        : "a" (6), "b" (1), "S" (file)
+        : "memory"
     );
 
     return ret;
