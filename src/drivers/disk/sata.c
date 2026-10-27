@@ -3,14 +3,11 @@
 #include <drivers/video/video.h>
 #include <drivers/timer/timer.h>
 #include <kernel/memory.h>
+#include <kernel/pmm.h>
 
 #define SUCCES                0x00
 #define TFD_ERROR             0x01
 #define SERR_ERROR            0x02
-
-#define CLB_MEM_BASE       (HBA_cmd_header_t*)0x10000
-#define FIS_MEM_BASE       (HBA_fis_layout_t*)0x20000
-#define CMD_MEM_BASE       (HBA_cmd_table_t*)0x30000
 
 #define SATA_SIG_ATA    0x00000101
 #define SATA_SIG_ATAPI  0xEB140101
@@ -25,7 +22,11 @@
 
 #define AHCI_DRIVER_V_MAJOR      0
 #define AHCI_DRIVER_V_MINOR      2        
-#define AHCI_DRIVER_V_PATCH      0        
+#define AHCI_DRIVER_V_PATCH      0      
+
+u32 CLB_MEM_BASE;
+u32 FIS_MEM_BASE;
+u32 CMD_MEM_BASE;
 
 HBA_mem_t* hba_mem;
 HBA_cmd_header_t* cmd_header;
@@ -264,6 +265,10 @@ void anci_identify_device(void* buffer, u32 ncs) {
  */
 u32 init_sata(void* buffer) {
     video->kprintf("AHCI driver v %d.%d.%d\n", AHCI_DRIVER_V_MAJOR, AHCI_DRIVER_V_MINOR, AHCI_DRIVER_V_PATCH);
+
+    CLB_MEM_BASE = pg_alloc();
+    FIS_MEM_BASE = pg_alloc();
+    CMD_MEM_BASE = pg_alloc();
 
     hba_mem = (HBA_mem_t*)ahci_mem_base;
     cmd_header = (HBA_cmd_header_t*)CLB_MEM_BASE;

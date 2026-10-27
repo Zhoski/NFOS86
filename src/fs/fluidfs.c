@@ -65,6 +65,10 @@ void free_block(u32 block) {
     block_bitmap[byte] &= ~(1 << bit_in_byte);
 }
 
+/**
+ *  Достает из raw_name путь а также имя и расширение
+ *  которые записываются в g_node.name и g_node.ext
+ */
 void raw_filename_to_std_format(u8* raw_name) {
     u32 j = 0, n = 0, k = 0;
     u32 last_slash = 0;
@@ -122,6 +126,11 @@ void raw_filename_to_std_format(u8* raw_name) {
     }
 }
 
+/**
+ *  Инициализация файловой системы
+ *  Получает супер блок с информацией о фс
+ *  Получает битовую карту диска а также корень
+ */
 u32 fluidfs_init() {
     u8* super_block_buffer = malloc(512);
     block_bitmap = malloc(512);
@@ -247,7 +256,7 @@ u32 fluidfs_fcheck(u8* file) {
 }
 
 /**
- *  Возвращает 1 если файл не найден
+ *  Возвращает 0 в случаи успеха
  *  Загружает файл на 0x300000 после чего передает ему управление
  */
 u32 fluidfs_fopen(u8* file) {
@@ -257,7 +266,7 @@ u32 fluidfs_fopen(u8* file) {
 
     u32 offset = 0;
     u32 stack = 0x400000;
-    u32 entry = 0x450000;
+    u32 entry = 0x300000;
 
     io_disk_packet_t packet0 = {
         .command = IO_READ,
@@ -286,7 +295,8 @@ u32 fluidfs_fopen(u8* file) {
 }
 
 /**
- *  Читает n количество байт file в out
+ *  Читает n байт file в out
+ *  В случаи успеха возвращает 0 иначе код ошибки
  */
 u32 fluidfs_fread(u8* file, u8* dest, u32 n) {
     if(!fluidfs_fcheck(file)) {
@@ -328,6 +338,7 @@ u32 fluidfs_fread(u8* file, u8* dest, u32 n) {
 
 /**
  *  Записывает в file из src n байт
+ *  В случаи успеха возвращает 0 иначе код ошибки
  */
 u32 fluidfs_fwrite(u8* file, u8* src, u32 n) {
     if(!fluidfs_fcheck(file)) {
@@ -411,10 +422,11 @@ u32 fluidfs_fwrite(u8* file, u8* src, u32 n) {
 }
 
 /**
- *  Удаляет file
+ *  Удаляет node
+ *  В случаи успеха возвращает 0 иначе код ошибки
  */
-u32 fluidfs_fdel(u8* file) {
-    if(!fluidfs_fcheck(file)) {
+u32 fluidfs_fdel(u8* node) {
+    if(!fluidfs_fcheck(node)) {
         return FILE_NOT_FOUND;
     }
 
@@ -462,6 +474,7 @@ u32 fluidfs_fdel(u8* file) {
 
 /**
  *  Создает ноду node с атрибутом flag
+ *  В случаи успеха возвращает 0 иначе код ошибки
  */
 u32 fluidfs_cnode(u8* node, u8 flag) {
     raw_filename_to_std_format(node);
@@ -570,6 +583,11 @@ u32 fluidfs_cnode(u8* node, u8 flag) {
     return CNODE_ERR;
 }
 
+/**
+ *  TODO: драйвер фс лично выводит все ноды директории
+ *  так дело не пойдет необходимо вынести логику в юзерспейс
+ *  и убрать соответсвующее прерывание
+ */
 u32 fluidfs_write_dir(u8* dir) {
     raw_filename_to_std_format(dir);
 

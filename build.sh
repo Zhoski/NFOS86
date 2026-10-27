@@ -39,6 +39,9 @@ gcc -m32 -ffreestanding -c src/cpu/idt.c -o idt.o \
 gcc -m32 -ffreestanding -c src/cpu/pic.c -o pic.o \
     -I./src/cpu/include -I./src/drivers/include -I./src/kernel/include -I./src/lib/include -I./src/fs/include
 
+gcc -m32 -ffreestanding -c src/cpu/paging.c -o paging.o \
+    -I./src/cpu/include -I./src/drivers/include -I./src/kernel/include -I./src/lib/include -I./src/fs/include
+
 
 nasm -f elf32 src/interrupts/isr8.asm -o isr8.o
 nasm -f elf32 src/interrupts/isr32.asm -o isr32.o
@@ -56,6 +59,12 @@ gcc -m32 -ffreestanding -c src/kernel/services/services.c -o services.o \
     -I./src/cpu/include -I./src/drivers/include -I./src/kernel/include -I./src/lib/include -I./src/fs/include
 
 gcc -m32 -ffreestanding -c src/kernel/services/memory/memory.c -o memory.o \
+    -I./src/cpu/include -I./src/drivers/include -I./src/kernel/include -I./src/lib/include -I./src/fs/include
+
+gcc -m32 -ffreestanding -c src/kernel/services/memory/mm.c -o mm.o \
+    -I./src/cpu/include -I./src/drivers/include -I./src/kernel/include -I./src/lib/include -I./src/fs/include
+
+gcc -m32 -ffreestanding -c src/kernel/services/memory/pmm.c -o pmm.o \
     -I./src/cpu/include -I./src/drivers/include -I./src/kernel/include -I./src/lib/include -I./src/fs/include
 
 gcc -m32 -ffreestanding -c src/kernel/services/memory/program.c -o program.o \
@@ -81,7 +90,7 @@ gcc -m32 -ffreestanding -c src/fs/fluidfs.c -w -o fluidfs.o \
 # ==============================================================================
 ld -m elf_i386 -T linker.ld nf86krn.o services.o vga_640_480.o video.o keyboard.o \
                  sata.o disk.o timer.o pci.o idt.o pic.o isr8.o isr32.o isr33.o isr46.o isr80.o panic.o memory.o \
-                 syscall.o fluidfs.o fs.o program.o loader.o -w -Os -o nf86krn.elf
+                 mm.o pmm.o paging.o syscall.o fluidfs.o fs.o program.o loader.o -w -Os -o nf86krn.elf
 
 objcopy -O binary nf86krn.elf rootFS/nf86krn.bin
 
@@ -103,7 +112,7 @@ echo '=================== Disk assembly ==================='
 ./utilities/ffspack/ffspack.elf -d out.img -p about.txt -o /
 ./utilities/ffspack/ffspack.elf -d out.img -p rootFS/shell.ndf rootFS/notepad.bin -o /home/
 
-qemu-system-x86_64 -m 16M -no-reboot \
+qemu-system-i386 -m 8M -no-reboot \
                    -device ich9-ahci,id=ahci \
                    -drive file=out.img,if=none,id=disk \
                    -device ide-hd,bus=ahci.0,drive=disk

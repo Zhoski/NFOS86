@@ -11,7 +11,9 @@
 #include <kernel/program.h>
 #include <kernel/syscall.h>
 #include <kernel/memory.h>
-#include <kernel/panic.h>
+#include <cpu/paging.h>
+#include <kernel/mm.h>
+#include <kernel/pmm.h>
 
 #define BOOT_SECTOR         0
 #define BOOT_INFO_ADRESS    0x1000      // Сюда загрузчик поместит таблицу BOOT_INFO
@@ -25,6 +27,9 @@ extern void isr46();
 //services service;
 
 void kmain() {
+    /*for(;;) {
+        asm("hlt");
+    }*/
     idt_load();                     // Загрузить IDT
        
     idt_set(0x08, 0x08, 0x8E, (uint32_t)isr8); 
@@ -46,12 +51,22 @@ void kmain() {
    
     init_keyboard();                // Инициализация клавиатуры              
 
-    init_vga(VGA_640_480);          // Инициализация vga             
-    
+    init_vga(VGA_640_480);          // Инициализация vga  
+
+    mm_map_mk(16 * *(u16*)(0x1002) + *(u16*)(0x1004), *(u16*)(0x1006));
+    pg_mk_alloc(g_mm.krn_alloc, g_mm.krn_alloc_len);
+
+    pg_mapping();
+
     video->kprintf("Kernel v 0.0.3\n");
 
     u8* disk_info = (u8*)malloc(512);
+
     u32 disk_status = disk_init((u16*)disk_info);
+
+    /*for(;;) {
+        asm("hlt");
+    }*/
 
     if(disk_status == SUCCES_INIT_DISK) {
         video->kprintf("[  %f10OK%f15  ] ATA driver initialized successfully\n");
@@ -77,7 +92,7 @@ void kmain() {
     video->kprintf("[ INFO ] CPU: %s\n", cpuid);
 
     fs->open("/home/shell.ndf");
-
+    
 	for(;;) {
         halt();
     }

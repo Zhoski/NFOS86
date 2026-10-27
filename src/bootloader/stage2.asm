@@ -162,21 +162,6 @@ get_memmap:
     jmp .ram_loop
 
 .done_read:
-    mov si, info_msg
-    call print
-
-    mov si, memmap_total_ram_usable
-    call print
-
-    mov ax, [total_usable_ram_k]
-    call print_ax
-
-    mov ah, 0x0E
-    mov al, 'k'
-    int 0x10
-
-    mov si, parren_close
-    call print
 
     ; Записываем в bootInfo количество свободной оперативной памяти
     xor ax, ax
@@ -187,9 +172,12 @@ get_memmap:
 
     ; Записываем в bootInfo где искать карту памяти для ядра
     mov ax, [memmap_segment]                   
-    mov [es:bx+4], ax
+    mov [es:bx+2], ax
     
     mov ax, [memmap_buffer]
+    mov [es:bx+4], ax
+
+    mov ax, [memmap_block_count]
     mov [es:bx+6], ax
 
     popa
@@ -337,13 +325,12 @@ compare_strings:
 
 ; ================= Драйвер для работы с файлами ==================
 
-; FIX:
-; Код загрузки ядра требует исправления костыли!!!
+; TODO:
+; Код загрузки ядра требует исправления костылей!!!
 ; Загрузчик не найдет ядро если папка system будет находиться не в 1 блоке корня
 ; А также ядро будет находиться не в 1 блоке папки system
 ; Загрузчик сможет загрузить ядро чей размер равен не более 64кб
 ; Всю функцию под снос и исправления в будущем
-; Все захардкожено код в демку не впускать
 KERNEL_LOAD:
     ; Чтение суперблока
     mov si, LBA
@@ -477,7 +464,7 @@ system_not_found: db "System dir not found",13,10,0
 ; Адреса
 
 ; E820 карта памяти
-memmap_buffer: dw 0x0500
+memmap_buffer: dw 0x2000
 memmap_segment: dw 0x0000
 
 memmap_block_count: dw 0
@@ -561,12 +548,12 @@ gdt_start:
     dq 0x0000000000000000
 
     ; Kernel Mode Code Segment
-    dw 0xFFFF   ; Limit Low
-    dw 0x0000   ; Base Low
-    db 0x00     ; Base Mid
+    dw 0xFFFF       ; Limit Low
+    dw 0x0000       ; Base Low
+    db 0x00         ; Base Mid
     db 0b10011010   ; Acces
     db 0b11001111   ; Flags
-    db 0x00     ; Base High
+    db 0x00         ; Base High
 
     ; Kernel Mode Data Segment
     dw 0xFFFF       ; Limit Low
@@ -611,7 +598,7 @@ switch_to_PM:
 
     lgdt [gdt_ptr]  ; gdt в проц
     mov eax, cr0    ; cr0 в 1
-    or eax, 1
+    or eax, 1       
     mov cr0, eax
     jmp 0x8:PMentry ; Прыжок в защищенный режим
 

@@ -3,6 +3,8 @@
 #include <drivers/disk/ata.h>
 #include <drivers/pci/pci.h>
 #include <drivers/video/video.h>
+#include <kernel/mm.h>
+#include <cpu/paging.h>
 
 static Disk ATA_PIO = {
     
@@ -30,6 +32,7 @@ uint8_t disk_init(uint16_t disk_info[256]) {
         else if(pci_devices[device].class == 0x01 && pci_devices[device].subclass == 0x06) {
             sata_detect = 1;
             ahci_mem_base = pci_devices[device].bar5;
+            pg_map(ahci_mem_base, g_mm.sata_ahci, 3);
             break;
         }
     }
