@@ -20,7 +20,7 @@ extern void isr13();
 extern void isr14();
 extern void isr32();
 extern void isr33();
-extern void isr80();
+extern void isr64();
 extern void isr46();
 
 void kmain() {
@@ -31,7 +31,7 @@ void kmain() {
     idt_set(0x20, 0x08, 0x8E, (uint32_t)isr32); 
     idt_set(0x21, 0x08, 0x8E, (uint32_t)isr33); 
     idt_set(0x2E, 0x08, 0x8E, (uint32_t)isr46);
-    idt_set(0x80, 0x08, 0xEE, (uint32_t)isr80);
+    idt_set(0x40, 0x08, 0xEE, (uint32_t)isr64);
     pic_remap();  
     pic_irq_mask(0x21, 0b11111000); 
     pic_irq_mask(0xA1, 0b10111111); 

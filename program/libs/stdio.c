@@ -111,7 +111,7 @@ void fg_set_color(unsigned char color) {
         "movl $1, %%eax\n"
         "movl $6, %%ebx\n"
         "movl %0, %%ecx\n"
-        "int $0x80"
+        "int $0x40"
         :
         : "r"((unsigned int)color)
         : "eax", "ebx", "ecx", "memory"
@@ -123,7 +123,7 @@ void bg_set_color(unsigned char color) {
         "movl $1, %%eax\n"
         "movl $5, %%ebx\n"
         "movl %0, %%ecx\n"
-        "int $0x80"
+        "int $0x40"
         :
         : "r"((unsigned int)color)
         : "eax", "ebx", "ecx", "memory"
@@ -140,7 +140,7 @@ void printf(const unsigned char *format, ...) {
                 "movl $1, %%eax\n"
                 "movl $2, %%ebx\n"
                 "movl %0, %%ecx\n"
-                "int $0x80"
+                "int $0x40"
                 :
                 : "r" ((unsigned int)*p)
                 : "eax", "ebx","ecx", "memory"
@@ -189,7 +189,7 @@ void printf(const unsigned char *format, ...) {
                 "movl $1, %%eax\n"
                 "movl $1, %%ebx\n"
                 "movl %0, %%ecx\n"
-                "int $0x80"
+                "int $0x40"
                 :
                 : "r" (buffer)
                 : "eax", "ebx","ecx", "memory"
@@ -202,7 +202,7 @@ void printf(const unsigned char *format, ...) {
                 "movl $1, %%eax\n"
                 "movl $1, %%ebx\n"
                 "movl %0, %%ecx\n"
-                "int $0x80"
+                "int $0x40"
                 :
                 : "r" (s)
                 : "eax", "ebx","ecx", "memory"
@@ -229,7 +229,7 @@ void putchar(unsigned char c) {
         "movl $1, %%eax\n"
         "movl $2, %%ebx\n"
         "movl %0, %%ecx\n"
-        "int $0x80"
+        "int $0x40"
         :
         : "r" ((unsigned int)c)
         : "eax", "ebx","ecx", "memory"
@@ -241,7 +241,7 @@ void clear_screen(unsigned char color) {
         "movl $1, %%eax\n"
         "movl $7, %%ebx\n"
         "movl %0, %%edx\n"
-        "int $0x80"
+        "int $0x40"
         :
         : "r" ((unsigned int)color)
         : "eax", "ebx", "edx", "memory"
@@ -257,7 +257,7 @@ void set_cursor(const unsigned short x, const unsigned short y) {
         "movl $1, %%eax\n"
         "movl $8, %%ebx\n"
         "movl %0, %%ecx\n"
-        "int $0x80"
+        "int $0x40"
         :
         : "r" (pos)
         : "eax", "ebx", "ecx", "memory"
@@ -270,7 +270,7 @@ void get_cursor(unsigned int* x, unsigned int* y) {
         "movl $9, %%ebx\n"
         "movl %0, %%ecx\n"
         "movl %1, %%edx\n"
-        "int $0x80"
+        "int $0x40"
         :
         : "r" (x), "r" (y)
         : "eax", "ebx", "ecx", "edx", "memory"
@@ -284,7 +284,7 @@ unsigned char get_char() {
         "movl $1, %%ebx\n"
         "movl $0, %%ecx\n"
         "movl $0, %%edx\n"
-        "int $0x80"
+        "int $0x40"
         : "=a"(out) 
         : 
         : "ebx", "ecx", "edx", "memory"

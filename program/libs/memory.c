@@ -41,7 +41,7 @@ unsigned char* malloc(unsigned int size) {
         "movl $4, %%eax\n"
         "movl $1, %%ebx\n"
         "movl %0, %%ecx\n"
-        "int $0x80"
+        "int $0x40"
         :
         : "r"(size)
         : "eax", "ebx", "ecx", "memory"
@@ -64,7 +64,7 @@ unsigned char free(unsigned char *__restrict__ data) {
         "movl $4, %%eax\n"
         "movl $2, %%ebx\n"
         "movl %0, %%ecx\n"
-        "int $0x80"
+        "int $0x40"
         :
         : "r"((unsigned int)data)
         : "eax", "ebx", "ecx", "memory"

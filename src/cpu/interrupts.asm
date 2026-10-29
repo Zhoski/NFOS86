@@ -5,21 +5,17 @@ extern timer_handler
 extern keyboard_handler
 extern disk_handler
 
-global  isr8
-global isr13
-global isr34
-global isr32
-global isr33
-global isr46
-global isr80
+global isr64
 
 %macro ISRERRCODE 2
+global %1
 %1:
     push %2
     jmp faults_handler
 %endmacro
 
 %macro IRQINT 2
+global %1
 %1:
     cli
 
@@ -56,7 +52,7 @@ ISRERRCODE isr8,   8
 ISRERRCODE isr13, 13
 ISRERRCODE isr14, 14
 
-isr80: 
+isr64: 
     cli                        
     push edi
     push esi
