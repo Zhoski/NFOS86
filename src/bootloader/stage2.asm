@@ -552,7 +552,7 @@ gdt_start:
     dw 0x0000       ; Base Low
     db 0x00         ; Base Mid
     db 0b10011010   ; Acces
-    db 0b11001111   ; Flags
+    db 0b11111100   ; Limit & Flags
     db 0x00         ; Base High
 
     ; Kernel Mode Data Segment
@@ -560,9 +560,24 @@ gdt_start:
     dw 0x0000       ; Base Low
     db 0x00         ; Base Mid
     db 0b10010010   ; Acces
-    db 0b11001111   ; Flags
+    db 0b11111100   ; Limit & Flags
+    db 0x00         ; Base High
+
+    ; User Mode Code Segment
+    dw 0xFFFF       ; Limit Low
+    dw 0x0000       ; Base Low
+    db 0x00         ; Base Mid
+    db 0x11111010   ; Acess
+    db 0b11111100   ; Limit & Flags
     db 0x00         ; Base High
     
+    ; User Mode Data Segment
+    dw 0xFFFF       ; Limit Low
+    dw 0x0000       ; Base Low
+    db 0x00         ; Base Mid
+    db 0x11110010   ; Acess
+    db 0b11111100   ; Limit & Flags
+    db 0x00         ; Base High
 
 gdt_end:    
 

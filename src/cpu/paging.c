@@ -11,8 +11,6 @@ void pg_enable() {
         "movl %%cr0, %%eax\n"
         "orl $0x80000000, %%eax\n"
         "movl %%eax, %%cr0\n"
-        "jmp 1f\n"
-        "1:"
         :
         :
         : "eax", "cc"
@@ -37,16 +35,14 @@ void pg_mapping() {
     }
 
     for(u32 k = 0; k < 1024; k++) {
-        page_tbl0[k] = (k * 0x1000) | 3;
+        page_tbl0[k] = (k * 0x1000) | 7;
     }
 
-    page_dir[0] = ((u32)page_tbl0) | 3;
+    page_dir[0] = ((u32)page_tbl0) | 7;
 
     pdbr_load(page_dir);
 
     pg_enable();
-
-    //video->kprintf("%x", page_dir[0]);
 }
 
 void* get_physaddr(void* virtaddr) {
@@ -81,7 +77,7 @@ void pg_map(void* physaddr, void* virtaddr, u32 flag) {
 
     //video->kprintf("%x", *(ptr + page));
 
-    *(ptr + page) = (u32)physaddr | 3;
+    *(ptr + page) = (u32)physaddr | flag;
 
     //video->kprintf("Dir: %d     Page: %d\n", dir, page);
 

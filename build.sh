@@ -42,6 +42,15 @@ gcc -m32 -ffreestanding -c src/cpu/pic.c -o pic.o \
 gcc -m32 -ffreestanding -c src/cpu/paging.c -o paging.o \
     -I./src/cpu/include -I./src/drivers/include -I./src/kernel/include -I./src/lib/include -I./src/fs/include
 
+gcc -m32 -ffreestanding -c src/cpu/gdt.c -o gdt.o \
+    -I./src/cpu/include -I./src/drivers/include -I./src/kernel/include -I./src/lib/include -I./src/fs/include
+
+gcc -m32 -ffreestanding -c src/cpu/faults_handler.c -o faults_handler.o \
+    -I./src/cpu/include -I./src/drivers/include -I./src/kernel/include -I./src/lib/include -I./src/fs/include
+
+nasm -f elf32 src/cpu/gdt_rel.asm -o gdt_rel.o
+nasm -f elf32 src/cpu/jmp_usrmode.asm -o jmp_usrmode.o
+nasm -f elf32 src/cpu/faults.asm -o faults.o
 
 nasm -f elf32 src/interrupts/isr8.asm -o isr8.o
 nasm -f elf32 src/interrupts/isr32.asm -o isr32.o
@@ -89,7 +98,7 @@ gcc -m32 -ffreestanding -c src/fs/fluidfs.c -w -o fluidfs.o \
 # ЛИНКОВКА 
 # ==============================================================================
 ld -m elf_i386 -T linker.ld nf86krn.o services.o vga_640_480.o video.o keyboard.o \
-                 sata.o disk.o timer.o pci.o idt.o pic.o isr8.o isr32.o isr33.o isr46.o isr80.o panic.o memory.o \
+                 sata.o disk.o timer.o pci.o idt.o pic.o jmp_usrmode.o faults.o gdt_rel.o  gdt.o faults_handler.o isr8.o isr32.o isr33.o isr46.o isr80.o panic.o memory.o \
                  mm.o pmm.o paging.o syscall.o fluidfs.o fs.o program.o loader.o -w -Os -o nf86krn.elf
 
 objcopy -O binary nf86krn.elf rootFS/nf86krn.bin
@@ -110,7 +119,7 @@ echo '=================== Disk assembly ==================='
 ./utilities/ffspack/ffspack.elf -d out.img -p rootFS/nf86krn.bin rootFS/setup.bin -o /system/
 ./utilities/ffspack/ffspack.elf -d out.img -p license.txt -o /
 ./utilities/ffspack/ffspack.elf -d out.img -p about.txt -o /
-./utilities/ffspack/ffspack.elf -d out.img -p rootFS/shell.ndf rootFS/notepad.bin -o /home/
+./utilities/ffspack/ffspack.elf -d out.img -p rootFS/shell.ndf rootFS/hello.ndf rootFS/notepad.bin -o /home/
 
 qemu-system-i386 -m 8M -no-reboot \
                    -device ich9-ahci,id=ahci \

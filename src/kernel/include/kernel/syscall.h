@@ -54,5 +54,5 @@
 #define SUCCES_READ             0
 #define KERNEL_BASE             0x110000
 
-void syscall_handler(int eax, int ebx,int ecx, int edx, char* esi, char* edi);
+void syscall_handler(unsigned int eax, unsigned int ebx, unsigned int ecx, unsigned int edx, char* esi, char* edi);
 #endif

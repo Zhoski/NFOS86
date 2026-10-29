@@ -6,94 +6,52 @@
 #include <cpu/cpu.h>
 #include <cpu/idt.h>
 #include <cpu/pic.h>
+#include <cpu/gdt.h>
 #include <cpu/io.h>
 #include <fs/fs.h>
-#include <kernel/program.h>
 #include <kernel/syscall.h>
 #include <kernel/memory.h>
 #include <cpu/paging.h>
 #include <kernel/mm.h>
 #include <kernel/pmm.h>
 
-#define BOOT_SECTOR         0
-#define BOOT_INFO_ADRESS    0x1000      // Сюда загрузчик поместит таблицу BOOT_INFO
-
 extern void isr8();
+extern void isr13();
+extern void isr14();
 extern void isr32();
 extern void isr33();
 extern void isr80();
 extern void isr46();
 
-//services service;
-
 void kmain() {
-    /*for(;;) {
-        asm("hlt");
-    }*/
-    idt_load();                     // Загрузить IDT
-       
+    idt_load();                    
     idt_set(0x08, 0x08, 0x8E, (uint32_t)isr8); 
+    idt_set(0x08, 0x08, 0x8E, (uint32_t)isr13); 
+    idt_set(0x08, 0x08, 0x8E, (uint32_t)isr14); 
     idt_set(0x20, 0x08, 0x8E, (uint32_t)isr32); 
     idt_set(0x21, 0x08, 0x8E, (uint32_t)isr33); 
     idt_set(0x2E, 0x08, 0x8E, (uint32_t)isr46);
-    idt_set(0x80, 0x08, 0x8E, (uint32_t)isr80);
-
-    pic_remap();                    // Установка PIC
-    pic_irq_mask(0x21, 0b11111000); // Включить IRQ
-    pic_irq_mask(0xA1, 0b10111111); // PATA включить
-
+    idt_set(0x80, 0x08, 0xEE, (uint32_t)isr80);
+    pic_remap();  
+    pic_irq_mask(0x21, 0b11111000); 
+    pic_irq_mask(0xA1, 0b10111111); 
     sti();
-
     pci_scan_bus0();
-
-    init_memory();                  // Инициализация памяти
-    create_heap();                  // Создание кучи
-   
-    init_keyboard();                // Инициализация клавиатуры              
-
-    init_vga(VGA_640_480);          // Инициализация vga  
-
-    mm_map_mk(16 * *(u16*)(0x1002) + *(u16*)(0x1004), *(u16*)(0x1006));
+    init_memory();                 
+    create_heap();
+    init_keyboard();                         
+    init_vga(VGA_640_480);
+    mm_map_mk();
     pg_mk_alloc(g_mm.krn_alloc, g_mm.krn_alloc_len);
-
+    gdt_init();
     pg_mapping();
 
-    video->kprintf("Kernel v 0.0.3\n");
-
     u8* disk_info = (u8*)malloc(512);
+    disk_init((u16*)disk_info);
 
-    u32 disk_status = disk_init((u16*)disk_info);
-
-    /*for(;;) {
-        asm("hlt");
-    }*/
-
-    if(disk_status == SUCCES_INIT_DISK) {
-        video->kprintf("[  %f10OK%f15  ] ATA driver initialized successfully\n");
-    }else {
-        if(disk_status == DISK_NOT_FOUND) {
-            video->kprintf("[ %f12FAIL%f15 ] ATA driver init: Disk not found\n");
-        }
-        else if(disk_status == DISK_DONT_SUPPORT_PATA) {
-            video->kprintf("[ %f12FAIL%f15 ] ATA driver init: Unsupported device type\n");
-        }else if(disk_status == DISK_ERROR) {
-            video->kprintf("[ %f12FAIL%f15 ] ATA driver init: ATA driver init: Disk I/O error\n");
-        }else if(disk_status == DISK_TIMEOUT) {
-            video->kprintf("[ %f12FAIL%f15 ] ATA driver init: ATA driver init: Disk timeout\n");
-        }
-    }
-
-    u32 fs_status = init_fs(FLUIDFS_T);    
+    init_fs(FLUIDFS_T);    
 
     init_timer(100);
 
-    u8* cpuid = malloc(48);
-    memcpy((void*)0x1008, cpuid, 48);
-    video->kprintf("[ INFO ] CPU: %s\n", cpuid);
-
     fs->open("/home/shell.ndf");
-    
-	for(;;) {
-        halt();
-    }
 }

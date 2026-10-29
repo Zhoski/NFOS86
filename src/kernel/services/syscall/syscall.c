@@ -10,7 +10,7 @@
 
 extern uint32_t kernel_stack_base;
 
-void syscall_handler(int eax, int ebx,int ecx, int edx, char* esi, char* edi) { 
+void syscall_handler(unsigned int eax, unsigned int ebx, unsigned int ecx, unsigned int edx, char* esi, char* edi) { 
     __asm__ volatile("sti"); 
     switch(eax) {
         case SYSCALL_VIDEO:

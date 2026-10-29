@@ -6,6 +6,7 @@
 typedef void (*entry_point)();
 
 void exit();
+extern void jmp_usrmode();
 
 void execute_file(void* entry, void* stack, ext_t ext) {
     ndf_header_t ndf_header;
@@ -26,19 +27,13 @@ void execute_file(void* entry, void* stack, ext_t ext) {
 
     kernel_return_ptr = (uint32_t)&exit;
    
+    // Не имею понятния почему именно + 28, но без этого все падает
     entry_point program = (entry_point)((u32)entry + ndf_header.entry - sizeof(ndf_header_t) + 28);
-
-    /*video->kprintf("Fsize: %d\n", ndf_header.fsize);
-    video->kprintf("Data entry before: %x\n", a);
-    video->kprintf("Data entry after: %x\n", *(u32*)program);
-    video->kprintf("Entry: %x\n", program);*/
-
-    /*for(;;) {
-        asm("hlt");
-    }*/
 
     asm volatile("movl %%esp, %0":"=r" (kernel_stack_ptr));
     asm volatile("movl %%ebp, %0":"=r" (kernel_stack_base));
+
+    //jmp_usrmode();
 
     asm volatile (   
         "push %%eax\n"

@@ -15,7 +15,7 @@ typedef struct {
     u32 other_m_len;
 } g_memory_map;
 
-void mm_map_mk(void* mmap, u16 mmapbc);
+void mm_map_mk();
 
 extern g_memory_map g_mm;
 
