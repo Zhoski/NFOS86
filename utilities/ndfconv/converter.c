@@ -40,24 +40,24 @@ u32 convert_to_ndf(u8* elf, u8* out) {
     Elf32 elf32 = get_elf(elf);
     RelTable relt;
 
-    printf("--- ELF ---\n");
+    /*printf("--- ELF ---\n");
     printf("File: %s\n", elf);
     printf("Ident: %s\n", elf32.ehdr->e_ident);
     printf("Type: %d\n", elf32.ehdr->e_type);
     printf("Entry: %d\n", elf32.ehdr->e_entry);
     printf("Shoff: %d\n", elf32.ehdr->e_shoff);
     printf("Shnum: %d\n", elf32.ehdr->e_shnum);
-    printf("Shstrndx: %d\n", elf32.ehdr->e_shstrndx);
+    printf("Shstrndx: %d\n", elf32.ehdr->e_shstrndx);*/
 
     printf("--- SECTIONS ---\n");
     for(u32 k = 0; k < elf32.ehdr->e_shnum; k++) {
         Elf32_Shdr* shdr_head = (Elf32_Shdr*)(elf32.src + elf32.ehdr->e_shoff + elf32.ehdr->e_shentsize * k);
-        printf("SECTION %d\n", k);
+        /*printf("SECTION %d\n", k);
         printf("    name: %s\n", elf32.strtable + shdr_head->sh_name);
         printf("    type: %d\n", shdr_head->sh_type);
         printf("    offset: %d\n", shdr_head->sh_offset);
         printf("    size: %d\n", shdr_head->sh_size);
-        printf("    flag: %x\n", shdr_head->sh_flags);
+        printf("    flag: %x\n", shdr_head->sh_flags);*/
 
         if(shdr_head->sh_type == SHT_REL) {
             Elf32_Rel* elf32_rel = shdr_head->sh_offset;
@@ -65,11 +65,11 @@ u32 convert_to_ndf(u8* elf, u8* out) {
             relt.entrysz = total * 4;
             relt.entry = malloc(relt.entrysz);
 
-            printf("    Total: %d\n", total);
+            //printf("    Total: %d\n", total);
             for(u32 i = 0; i < total; i++) {
                 elf32_rel = (Elf32_Rel*)(elf32.src + shdr_head->sh_offset + 8 * i);
                 relt.entry[i] = elf32_rel->r_offset + sizeof(ndf_header);
-                printf("        Offset: %d      Type: %d\n", elf32_rel->r_offset, (u8)(elf32_rel->r_info & 0xFF));
+                //printf("        Offset: %d      Type: %d\n", elf32_rel->r_offset, (u8)(elf32_rel->r_info & 0xFF));
             }
         }
     }

@@ -6,17 +6,15 @@
 #define AFS_T       0x01
 #define FLUIDFS_T   0x02
 
-typedef struct File;
-
 typedef struct FileSystem
 {
-    u32* (*check)(const u8 *__restrict__ file_name); // Возвращает 1 в случаи если файл есть и 0 в ином
-    u8 (*open)(const u8 *__restrict__ file_name);
-    u8 (*read)(const u8 *__restrict__ file_name, u8 *__restrict__ dest, u32 n);
-    u8 (*create)(const u8 *__restrict__ file_name, u8 flag);
-    u8 (*delete)(const u8 *__restrict__ file_name);
-    u8 (*update) (const u8 *__restrict__ file_name, u8* src, u32 n);
-    u32 (*write_dir) (u8 *__restrict__ out);
+    u32 (*check)(u8* file_name);
+    u32 (*open)(u8* file_name);
+    u32 (*read)(u8* file_name, u8* dest, u32 n);
+    u32 (*create)(u8* file_name, u8 flag);
+    u32 (*delete)(u8* file_name);
+    u32 (*update) (u8* file_name, u8* src, u32 n);
+    u32 (*write_dir) (u8 * dest);
     u32 (*init)();
 } FileSystem_t;
 

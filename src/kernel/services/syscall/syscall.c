@@ -8,8 +8,6 @@
 #include <cpu/registers.h>
 #include <lib/string.h>
 
-extern uint32_t kernel_stack_base;
-
 void syscall_handler(unsigned int eax, unsigned int ebx, unsigned int ecx, unsigned int edx, char* esi, char* edi) { 
     __asm__ volatile("sti"); 
     switch(eax) {
@@ -40,7 +38,7 @@ void syscall_handler(unsigned int eax, unsigned int ebx, unsigned int ecx, unsig
                     video->terminal_set_cursor_position((u16)(ecx >> 16) & 0xFF, (u16)ecx);
                     break;
                 case GET_CURSOR:
-                    video->terminal_get_cursor_position(ecx, edx);
+                    video->terminal_get_cursor_position((u16*)ecx, (u16*)edx);
                     break;
                 default:
                     break;

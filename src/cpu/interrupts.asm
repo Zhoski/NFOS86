@@ -1,4 +1,4 @@
-extern faults_handler
+extern c_faults_handler
 extern syscall_handler
 
 extern timer_handler
@@ -11,6 +11,23 @@ global isr64
 global %1
 %1:
     push %2
+    push eax
+    push ebx
+    push ecx
+    push edx
+    push esi
+    push edi
+    mov eax, cr0
+    push eax
+    mov eax, cr2
+    push eax
+    mov eax, cr3
+    push eax
+    mov eax, cr4
+    push eax
+    mov eax, esp
+    push eax
+
     jmp faults_handler
 %endmacro
 
@@ -100,3 +117,6 @@ isr64:
     
     sti                         
     iret 
+
+faults_handler:
+    call c_faults_handler

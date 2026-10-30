@@ -29,7 +29,8 @@ void ltr(u16 selector) {
         "movw %0, %%ax\n"
         "ltr %%ax"
         :
-        : "r" ((u16)((selector * 8) | 0))
+        : "r" ((u16)((selector << 3) | 0))
+        : "eax"
     );
 }
 
@@ -40,14 +41,14 @@ void gdt_init() {
     ptr.base = (u32)gdt_addr;
 
     tss_t tss0;
-    tss0.esp0 = pg_alloc() + 0x1000;
+    tss0.esp0 = (u32)(pg_alloc() + 0xFF0);
     tss0.ss0 = 0x10;
 
     gdt_add_seg(0, 0xFFFFF, 0x9A, 0x0C);                // Kernel code segment
     gdt_add_seg(0, 0xFFFFF, 0x92, 0x0C);                // Kernel data segment
     gdt_add_seg(0, 0xFFFFF, 0xFA, 0x0C);                // User code segment
     gdt_add_seg(0, 0xFFFFF, 0xF2, 0x0C);                // User data segment
-    gdt_add_seg(&tss0, sizeof(tss_t) - 1, 0x89, 0x00);  // TSS
+    gdt_add_seg((u32)&tss0, sizeof(tss_t) - 1, 0x89, 0x00);  // TSS
 
     gdt_reload_addr(&ptr);
     ltr(5);

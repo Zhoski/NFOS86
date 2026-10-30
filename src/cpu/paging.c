@@ -40,7 +40,7 @@ void pg_mapping() {
 
     page_dir[0] = ((u32)page_tbl0) | 7;
 
-    pdbr_load(page_dir);
+    pdbr_load((u32)page_dir);
 
     pg_enable();
 }
@@ -50,7 +50,7 @@ void* get_physaddr(void* virtaddr) {
     u32 page = (u32)virtaddr >> 12 & 0x3FF;
     u32 offset = (u32)virtaddr & 0xFFF;
 
-    u32* physaddr = page_dir[dir] & ~0xFFF;
+    u32* physaddr = (u32*)(page_dir[dir] & ~0xFFF);
 
     //video->kprintf("%x", *(u32*)(physaddr + page) & ~0xFFF + offset);
 
@@ -73,7 +73,7 @@ void pg_map(void* physaddr, void* virtaddr, u32 flag) {
         //video->kprintf("pg tbl: %x\n", pg_tbl[page]);
     }
 
-    u32* ptr = page_dir[dir] & ~0xFFF;
+    u32* ptr = (u32*)(page_dir[dir] & ~0xFFF);
 
     //video->kprintf("%x", *(ptr + page));
 

@@ -25,9 +25,9 @@ extern void isr46();
 
 void kmain() {
     idt_load();                    
-    idt_set(0x08, 0x08, 0x8E, (uint32_t)isr8); 
-    idt_set(0x08, 0x08, 0x8E, (uint32_t)isr13); 
-    idt_set(0x08, 0x08, 0x8E, (uint32_t)isr14); 
+    idt_set(0x08, 0x08, 0x8F, (uint32_t)isr8); 
+    idt_set(0x0D, 0x08, 0x8F, (uint32_t)isr13); 
+    idt_set(0x0E, 0x08, 0x8F, (uint32_t)isr14); 
     idt_set(0x20, 0x08, 0x8E, (uint32_t)isr32); 
     idt_set(0x21, 0x08, 0x8E, (uint32_t)isr33); 
     idt_set(0x2E, 0x08, 0x8E, (uint32_t)isr46);
@@ -35,6 +35,7 @@ void kmain() {
     pic_remap();  
     pic_irq_mask(0x21, 0b11111000); 
     pic_irq_mask(0xA1, 0b10111111); 
+    init_timer(100);
     sti();
     pci_scan_bus0();
     init_memory();                 
@@ -51,7 +52,9 @@ void kmain() {
 
     init_fs(FLUIDFS_T);    
 
-    init_timer(100);
-
     fs->open("/home/shell.ndf");
+
+    for(;;) {
+        asm("hlt");
+    }
 }

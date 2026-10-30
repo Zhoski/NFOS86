@@ -25,7 +25,7 @@ typedef struct Command
 {
     U8* cmd_name;
     U32 (*handler)();
-};
+}Cmd;
 
 U32 cmd_help();
 U32 cmd_clear();
@@ -200,7 +200,7 @@ U32 cmd_create() {
     strcat(full_path, cur_dir);
     strcat(full_path, argv[1]);
 
-    if(sys_create(full_path, 512) == 0) {
+    if(sys_create(full_path, 0) == 0) {
         printf("[  %[02OK%[07  ] File %s succes created", argv[1]);
     } else {
         printf("\n[ %[04FAIL%[07 ] File %s create error", argv[1]);
@@ -236,7 +236,7 @@ U32 cmd_dir() {
     write_root(full_path);
 
     command_index = 0;
-    memset(&command_buffer, 0, COMMAND_BUFFER_SIZE);
+    memset((void*)&command_buffer, 0, COMMAND_BUFFER_SIZE);
 
     free(full_path);
 }
@@ -245,7 +245,7 @@ U32 cmd_sys() {
     printf("\n");
     U16* ram = (U16*)0x1000;
     U8*  cpu = malloc(48);
-    memcpy(0x1008, cpu, 48);
+    memcpy((void*)0x1008, cpu, 48);
 
     printf("\n");
     printf("OS: NFOS86 Demo\n"); 
@@ -313,8 +313,8 @@ void execute() {
         n++;
     }
 
-    argv_buff = (U32)malloc(argc * 4);
-    argv = argv_buff;
+    argv_buff = (U32*)malloc(argc * 4);
+    argv = (U8**)argv_buff;
 
     n = 0;
     argc = 1;
@@ -338,7 +338,7 @@ void execute() {
         }
     }
 
-    memset(&command_buffer, 0, COMMAND_BUFFER_SIZE);
+    memset((void*)&command_buffer, 0, COMMAND_BUFFER_SIZE);
 
     if(!is_found) {
         U32 err = sys_run(argv[0]);
@@ -347,7 +347,7 @@ void execute() {
         }
     }
 
-    free(argv_buff);
+    free((void*)argv_buff);
 
     command_index = 0;
 }

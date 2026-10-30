@@ -14,7 +14,7 @@ typedef struct {
     u8 ver_maj;
     u8 ver_min;
     u16 reserved;
-} ndf_header_t;
+} __attribute__((packed)) ndf_header_t;
 
 typedef enum {
     NDF,

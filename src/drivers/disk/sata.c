@@ -34,9 +34,8 @@ HBA_cmd_table_t* cmd_table;
 HBA_fis_layout_t* fis_layout;
 FIS_H2D_t* fis_h2d;
 
-/**
- *  Проверяет статус устройства на порту считывая регистр ssts
- */
+u32 ahci_mem_base = 0;
+
 u8* ahci_port_get_status(u32 port) {
     u32 status = hba_mem->port[port].ssts & 0x0F;
 
@@ -49,10 +48,6 @@ u8* ahci_port_get_status(u32 port) {
     }
 }
 
-/**
- *  Выключает DMA-движок комманд порта (ST = 0)
- *  И ожидает сброса регистра CR
- */
 void ahci_port_dma_disable(u32 port) {
     hba_mem->port[port].cmd &= ~0x10;
 
@@ -63,10 +58,6 @@ void ahci_port_dma_disable(u32 port) {
     while (hba_mem->port[0].cmd & 0x8000);
 }
 
-/**
- *  Запускает DMA-движок комманд порта (ST = 1)
- *  И ожидает взвода регистра CR
- */
 void ahci_port_dma_enable(u32 port) {
     hba_mem->port[port].cmd |= 0x10;
 
@@ -77,10 +68,6 @@ void ahci_port_dma_enable(u32 port) {
     while (!(hba_mem->port[0].cmd & 0x8000));
 }
 
-/**
- *   Выполняет аппаратный сброс SATA-порта (COMRESET)
- *   Останавливает DMA-движок порта и вызывает физический сброс линии 
- */
 void ahci_port_reset(u32 port) {
     hba_mem->port[port].cmd &= ~0x01;
 
@@ -118,8 +105,8 @@ void ahci_port_scan() {
             video->kprintf("[ INFO ] AHCI: Device found port: %d    Type: ", port);
             if(hba_mem->port[port].sig == SATA_SIG_ATA) {
                 video->kprintf("SATA DEVICE\n");
-                memset(CLB_MEM_BASE, 0, 1024);
-                memset(FIS_MEM_BASE, 0, 256);
+                memset((void*)CLB_MEM_BASE, 0, 1024);
+                memset((void*)FIS_MEM_BASE, 0, 256);
 
                 hba_mem->port[port].cmd &= ~0x01;
 
@@ -170,7 +157,6 @@ void ahci_port_scan() {
 
 /**
  * Составляет и отправляет команду 0xEC для идентификации устройства
- * Паспорт устройства приходит на 0x400000
  */
 void anci_identify_device(void* buffer, u32 ncs) {
     u8* port_status = ahci_port_get_status(0);
@@ -266,9 +252,9 @@ void anci_identify_device(void* buffer, u32 ncs) {
 u32 init_sata(void* buffer) {
     video->kprintf("AHCI driver v %d.%d.%d\n", AHCI_DRIVER_V_MAJOR, AHCI_DRIVER_V_MINOR, AHCI_DRIVER_V_PATCH);
 
-    CLB_MEM_BASE = pg_alloc();
-    FIS_MEM_BASE = pg_alloc();
-    CMD_MEM_BASE = pg_alloc();
+    CLB_MEM_BASE = (u32)pg_alloc();
+    FIS_MEM_BASE = (u32)pg_alloc();
+    CMD_MEM_BASE = (u32)pg_alloc();
 
     hba_mem = (HBA_mem_t*)ahci_mem_base;
     cmd_header = (HBA_cmd_header_t*)CLB_MEM_BASE;
@@ -276,7 +262,7 @@ u32 init_sata(void* buffer) {
     cmd_table = (HBA_cmd_table_t*)CMD_MEM_BASE;
     fis_h2d = (FIS_H2D_t*)cmd_table->cfis;
 
-    memset(CMD_MEM_BASE, 0, 256);
+    memset((void*)CMD_MEM_BASE, 0, 256);
 
     hba_mem->ghc |= 0x80000000;
 

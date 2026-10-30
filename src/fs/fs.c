@@ -14,7 +14,6 @@ static FileSystem_t FluidFS = {
 };
 
 FileSystem_t* fs;
-
 u32 init_fs(u32 type) {
     fs = &FluidFS;
 

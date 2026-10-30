@@ -294,7 +294,7 @@ void vga_640_480_kprintf(const u8 *format, ...) {
             break;
         case 'c':
             u8 *c = va_arg(args, u8*);
-            vga_640_480_draw_char(c);
+            vga_640_480_draw_char(*c);
             break;
         case 'f': {
             const u8 code[2] = {*(p+1), *(p+2)};

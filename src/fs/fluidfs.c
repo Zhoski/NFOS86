@@ -134,7 +134,7 @@ void raw_filename_to_std_format(u8* raw_name) {
 u32 fluidfs_init() {
     u8* super_block_buffer = malloc(512);
     block_bitmap = malloc(512);
-    super_block = super_block_buffer;
+    super_block = (super_block_t*)super_block_buffer;
     root_node = (node_t*)(super_block_buffer + 128);
 
     io_disk_packet_t packet = {
@@ -168,7 +168,7 @@ u32 fluidfs_fcheck(u8* file) {
         .buffer = g_fcheck_buffer,
     };
 
-    node_t* cur_node = g_fcheck_buffer;
+    node_t* cur_node = (node_t*)g_fcheck_buffer;
     node_t* cur_node_dir = (node_t*)malloc(128);
     u32 path_offset = 1;
     u32 dir_found = 0;
@@ -183,7 +183,7 @@ u32 fluidfs_fcheck(u8* file) {
             }
 
             if(cur_node_dir->p_block[i] == 0) {
-                free(cur_node_dir);
+                free((void*)cur_node_dir);
                 return FCHECK_NOT_FOUND;
             }
 
@@ -191,10 +191,10 @@ u32 fluidfs_fcheck(u8* file) {
 
             disk->dispather(&packet0);
 
-            cur_node = g_fcheck_buffer;
+            cur_node = (node_t*)g_fcheck_buffer;
 
             if(!cur_node->name[0]) {
-                free(cur_node_dir);
+                free((void*)cur_node_dir);
                 return FCHECK_NOT_FOUND;
             }
 
@@ -216,7 +216,7 @@ u32 fluidfs_fcheck(u8* file) {
         }
 
         if(!dir_found) {
-            free(cur_node_dir);
+            free((void*)cur_node_dir);
             return FCHECK_NOT_FOUND;
         }
     }
@@ -226,10 +226,10 @@ u32 fluidfs_fcheck(u8* file) {
 
         disk->dispather(&packet0);
 
-        cur_node = g_fcheck_buffer;
+        cur_node = (node_t*)g_fcheck_buffer;
 
         if(cur_node->name[0] == 0) {;
-            free(cur_node_dir);
+            free((void*)cur_node_dir);
             return 0;
         }
 
@@ -239,14 +239,14 @@ u32 fluidfs_fcheck(u8* file) {
                 memcpy(cur_node, &g_node, 128);
                 g_cur_node = cur_node;
                 g_cur_block = cur_node_dir->p_block[i];
-                free(cur_node_dir);
+                free((void*)cur_node_dir);
                 return FCHECK_FOUND;
             }
 
             cur_node = (node_t*)((u8*)cur_node + 128);
 
             if(cur_node->name[0] == 0) {
-                free(cur_node_dir);
+                free((void*)cur_node_dir);
                 return FCHECK_NOT_FOUND;
             }
         }
@@ -270,7 +270,7 @@ u32 fluidfs_fopen(u8* file) {
 
     io_disk_packet_t packet0 = {
         .command = IO_READ,
-        .buffer = entry,
+        .buffer = (void*)entry,
         .sec_count = super_block->sec_p_block
     };
 
@@ -280,7 +280,7 @@ u32 fluidfs_fopen(u8* file) {
         }
 
         packet0.lba_start = g_node.p_block[k] * super_block->sec_p_block;
-        packet0.buffer = entry + offset;
+        packet0.buffer = (void*)(entry + offset);
 
         disk->dispather(&packet0);
 
@@ -289,7 +289,7 @@ u32 fluidfs_fopen(u8* file) {
 
     
     if(*(u8*)(entry + 1) == 'N') {
-        execute_file(entry, stack, NDF);
+        execute_file((void*)entry, (void*)stack, NDF);
     }
     program_execute(entry, stack);
 }
@@ -485,7 +485,7 @@ u32 fluidfs_cnode(u8* node, u8 flag) {
         .buffer = g_fcheck_buffer,
     };
 
-    node_t* cur_node = g_fcheck_buffer;
+    node_t* cur_node = (node_t*)g_fcheck_buffer;
     node_t* cur_node_dir = (node_t*)malloc(128);
     u32 path_offset = 1;
     u32 dir_found = 0;
@@ -500,7 +500,7 @@ u32 fluidfs_cnode(u8* node, u8 flag) {
             }
 
             if(cur_node_dir->p_block[i] == 0) {
-                free(cur_node_dir);
+                free((void*)cur_node_dir);
                 return FILE_NOT_FOUND;
             }
 
@@ -508,10 +508,10 @@ u32 fluidfs_cnode(u8* node, u8 flag) {
 
             disk->dispather(&packet0);
 
-            cur_node = g_fcheck_buffer;
+            cur_node = (node_t*)g_fcheck_buffer;
 
             if(!cur_node->name[0]) {
-                free(cur_node_dir);
+                free((void*)cur_node_dir);
                 return FILE_NOT_FOUND;
             }
 
@@ -533,7 +533,7 @@ u32 fluidfs_cnode(u8* node, u8 flag) {
         }
 
         if(!dir_found) {
-            free(cur_node_dir);
+            free((void*)cur_node_dir);
             return FILE_NOT_FOUND;
         }
     }
@@ -543,7 +543,7 @@ u32 fluidfs_cnode(u8* node, u8 flag) {
 
         disk->dispather(&packet0);
 
-        cur_node = g_fcheck_buffer;
+        cur_node = (node_t*)g_fcheck_buffer;
 
         /*if(cur_node->name[0] == 0) {;
             free(cur_node_dir);
@@ -572,7 +572,7 @@ u32 fluidfs_cnode(u8* node, u8 flag) {
 
                 disk->dispather(&packet1);
 
-                free(cur_node_dir);
+                free((void*)cur_node_dir);
                 return 0;
             }
 
@@ -597,7 +597,7 @@ u32 fluidfs_write_dir(u8* dir) {
         .buffer = g_fcheck_buffer,
     };
 
-    node_t* cur_node = g_fcheck_buffer;
+    node_t* cur_node = (node_t*)g_fcheck_buffer;
     node_t* cur_node_dir = (node_t*)malloc(128);
     u32 path_offset = 1;
     u32 dir_found = 0;
@@ -612,7 +612,7 @@ u32 fluidfs_write_dir(u8* dir) {
             }
 
             if(cur_node_dir->p_block[i] == 0) {
-                free(cur_node_dir);
+                free((void*)cur_node_dir);
                 return FILE_NOT_FOUND;
             }
 
@@ -620,10 +620,10 @@ u32 fluidfs_write_dir(u8* dir) {
 
             disk->dispather(&packet0);
 
-            cur_node = g_fcheck_buffer;
+            cur_node = (node_t*)g_fcheck_buffer;
 
             if(!cur_node->name[0]) {
-                free(cur_node_dir);
+                free((void*)cur_node_dir);
                 return FILE_NOT_FOUND;
             }
 
@@ -645,7 +645,7 @@ u32 fluidfs_write_dir(u8* dir) {
         }
 
         if(!dir_found) {
-            free(cur_node_dir);
+            free((void*)cur_node_dir);
             return FILE_NOT_FOUND;
         }
     }
@@ -655,10 +655,10 @@ u32 fluidfs_write_dir(u8* dir) {
 
         disk->dispather(&packet0);
 
-        cur_node = g_fcheck_buffer;
+        cur_node = (node_t*)g_fcheck_buffer;
 
         if(cur_node->name[0] == 0) {;
-            free(cur_node_dir);
+            free((void*)cur_node_dir);
             return 0;
         }
 
@@ -681,7 +681,7 @@ u32 fluidfs_write_dir(u8* dir) {
             cur_node = (node_t*)((u8*)cur_node + 128);
 
             if(cur_node->name[0] == 0) {
-                free(cur_node_dir);
+                free((void*)cur_node_dir);
 
                 return 0;
             }

@@ -8,8 +8,9 @@ jmp_usrmode:
 	mov fs, ax 
 	mov gs, ax
 
+    mov eax, esp
     push (4 * 8) | 3
-    push 0x3FFFF0
+    push eax
     pushf
     push (3 * 8) | 3
     push 0x300000

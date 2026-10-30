@@ -5,7 +5,7 @@
 
 typedef void (*entry_point)();
 
-void exit();
+void _exit();
 extern void jmp_usrmode();
 
 void execute_file(void* entry, void* stack, ext_t ext) {
@@ -13,8 +13,6 @@ void execute_file(void* entry, void* stack, ext_t ext) {
     memcpy(entry, &ndf_header, sizeof(ndf_header));
     
     u32 entry_addr = (u32)entry;
-
-    u32 a = *(u32*)(entry_addr + ndf_header.entry);
 
     memcpy((void*)(entry_addr + sizeof(ndf_header_t)), (void*)(entry_addr), ndf_header.fsize - sizeof(ndf_header_t));
 
@@ -25,10 +23,17 @@ void execute_file(void* entry, void* stack, ext_t ext) {
         *addr_patch = *addr_patch + entry_addr;
     }
 
-    kernel_return_ptr = (uint32_t)&exit;
+    //video->kprintf("Stop point\n");
+    //video->kprintf("krn: %x\n", kernel_return_ptr);
+
+    kernel_return_ptr = (uint32_t)&_exit;
+
+    video->kprintf("%x", kernel_return_ptr);
    
-    // Не имею понятния почему именно + 28, но без этого все падает
-    entry_point program = (entry_point)((u32)entry + ndf_header.entry - sizeof(ndf_header_t) + 28);
+    // +28 потому что это размер призрачной секции которая почему то остается в ndf
+    volatile entry_point program = (entry_point)(entry_addr + ndf_header.entry - sizeof(ndf_header_t) + 28);
+
+    video->kprintf("%x\n", program);
 
     asm volatile("movl %%esp, %0":"=r" (kernel_stack_ptr));
     asm volatile("movl %%ebp, %0":"=r" (kernel_stack_base));
@@ -50,7 +55,7 @@ void execute_file(void* entry, void* stack, ext_t ext) {
     );
 }
 
-void exit() {
+void _exit() {
     asm volatile(
         "sti\n"
         "pop %%esi\n"

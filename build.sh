@@ -5,47 +5,46 @@ nasm -f bin src/bootloader/stage2.asm -o rootFS/stage2.bin
 # ==============================================================================
 # ДРАЙВЕРЫ 
 # ==============================================================================
-gcc -m32 -ffreestanding -c src/drivers/video/vga_640_480.c -o vga_640_480.o \
+gcc -m32 -ffreestanding -c src/drivers/video/vga_640_480.c -Werror -Os -o vga_640_480.o \
     -I./src/cpu/include -I./src/drivers/include -I./src/kernel/include -I./src/lib/include -I./src/fs/include
 
-gcc -m32 -ffreestanding -c src/drivers/video/video.c -o video.o \
+gcc -m32 -ffreestanding -c src/drivers/video/video.c -Werror -Os -o video.o \
     -I./src/cpu/include -I./src/drivers/include -I./src/kernel/include -I./src/lib/include -I./src/fs/include
 
-gcc -m32 -ffreestanding -c src/drivers/keyboard/keyboard.c -o keyboard.o \
+gcc -m32 -ffreestanding -c src/drivers/keyboard/keyboard.c -Werror -Os -o keyboard.o \
     -I./src/cpu/include -I./src/drivers/include -I./src/kernel/include -I./src/lib/include -I./src/fs/include
 
-gcc -m32 -ffreestanding -c src/drivers/disk/ata.c -o ata.o \
+gcc -m32 -ffreestanding -c src/drivers/disk/ata.c -Werror -Os -o ata.o \
     -I./src/cpu/include -I./src/drivers/include -I./src/kernel/include -I./src/lib/include -I./src/fs/include
 
-gcc -m32 -ffreestanding -c src/drivers/disk/sata.c -o sata.o \
+gcc -m32 -ffreestanding -c src/drivers/disk/sata.c -Werror -o sata.o \
     -I./src/cpu/include -I./src/drivers/include -I./src/kernel/include -I./src/lib/include -I./src/fs/include
 
-
-gcc -m32 -ffreestanding -c src/drivers/disk/disk.c -w -o disk.o \
+gcc -m32 -ffreestanding -c src/drivers/disk/disk.c -Werror -Os -o disk.o \
     -I./src/cpu/include -I./src/drivers/include -I./src/kernel/include -I./src/lib/include -I./src/fs/include
 
-gcc -m32 -ffreestanding -c src/drivers/timer/timer.c -o timer.o \
+gcc -m32 -ffreestanding -c src/drivers/timer/timer.c -Werror -Os -o timer.o \
     -I./src/cpu/include -I./src/drivers/include -I./src/kernel/include -I./src/lib/include -I./src/fs/include
 
-gcc -m32 -ffreestanding -c src/drivers/pci/pci.c -o pci.o \
+gcc -m32 -ffreestanding -c src/drivers/pci/pci.c -Werror -Os -o pci.o \
     -I./src/cpu/include -I./src/drivers/include -I./src/kernel/include -I./src/lib/include -I./src/fs/include
 
 # ==============================================================================
 # ПРОЦЕССОР И ПРЕРЫВАНИЯ
 # ==============================================================================
-gcc -m32 -ffreestanding -c src/cpu/idt.c -o idt.o \
+gcc -m32 -ffreestanding -c src/cpu/idt.c -Werror -o idt.o \
     -I./src/cpu/include -I./src/drivers/include -I./src/kernel/include -I./src/lib/include -I./src/fs/include
 
-gcc -m32 -ffreestanding -c src/cpu/pic.c -o pic.o \
+gcc -m32 -ffreestanding -c src/cpu/pic.c -Werror -o pic.o \
     -I./src/cpu/include -I./src/drivers/include -I./src/kernel/include -I./src/lib/include -I./src/fs/include
 
-gcc -m32 -ffreestanding -c src/cpu/paging.c -o paging.o \
+gcc -m32 -ffreestanding -c src/cpu/paging.c -Werror -o paging.o \
     -I./src/cpu/include -I./src/drivers/include -I./src/kernel/include -I./src/lib/include -I./src/fs/include
 
-gcc -m32 -ffreestanding -c src/cpu/gdt.c -o gdt.o \
+gcc -m32 -ffreestanding -c src/cpu/gdt.c -Werror -o gdt.o \
     -I./src/cpu/include -I./src/drivers/include -I./src/kernel/include -I./src/lib/include -I./src/fs/include
 
-gcc -m32 -ffreestanding -c src/cpu/faults_handler.c -o faults_handler.o \
+gcc -m32 -ffreestanding -c src/cpu/faults_handler.c -Werror -o faults_handler.o \
     -I./src/cpu/include -I./src/drivers/include -I./src/kernel/include -I./src/lib/include -I./src/fs/include
 
 nasm -f elf32 src/cpu/interrupts.asm -o interrupts.o
@@ -55,37 +54,37 @@ nasm -f elf32 src/cpu/jmp_usrmode.asm -o jmp_usrmode.o
 # ==============================================================================
 # ЯДРО И ВНУТРЕННИЕ СЕРВИСЫ
 # ==============================================================================
-gcc -m32 -ffreestanding -c src/kernel/nf86krn.c -o nf86krn.o \
+gcc -m32 -ffreestanding -c src/kernel/nf86krn.c -Werror -Os -o nf86krn.o \
     -I./src/cpu/include -I./src/drivers/include -I./src/kernel/include -I./src/lib/include -I./src/fs/include
 
-gcc -m32 -ffreestanding -c src/kernel/services/services.c -o services.o \
+gcc -m32 -ffreestanding -c src/kernel/services/services.c -Werror -o services.o \
     -I./src/cpu/include -I./src/drivers/include -I./src/kernel/include -I./src/lib/include -I./src/fs/include
 
-gcc -m32 -ffreestanding -c src/kernel/services/memory/memory.c -o memory.o \
+gcc -m32 -ffreestanding -c src/kernel/services/memory/memory.c -Werror -o memory.o \
     -I./src/cpu/include -I./src/drivers/include -I./src/kernel/include -I./src/lib/include -I./src/fs/include
 
-gcc -m32 -ffreestanding -c src/kernel/services/memory/mm.c -o mm.o \
+gcc -m32 -ffreestanding -c src/kernel/services/memory/mm.c -Werror -o mm.o \
     -I./src/cpu/include -I./src/drivers/include -I./src/kernel/include -I./src/lib/include -I./src/fs/include
 
-gcc -m32 -ffreestanding -c src/kernel/services/memory/pmm.c -o pmm.o \
+gcc -m32 -ffreestanding -c src/kernel/services/memory/pmm.c -Werror -o pmm.o \
     -I./src/cpu/include -I./src/drivers/include -I./src/kernel/include -I./src/lib/include -I./src/fs/include
 
-gcc -m32 -ffreestanding -c src/kernel/services/memory/program.c -o program.o \
+gcc -m32 -ffreestanding -c src/kernel/services/memory/program.c -Werror -Os -o program.o \
     -I./src/cpu/include -I./src/drivers/include -I./src/kernel/include -I./src/lib/include -I./src/fs/include
 
-gcc -m32 -ffreestanding -c src/kernel/services/loader/loader.c -o loader.o \
+gcc -m32 -ffreestanding -c src/kernel/services/loader/loader.c -Werror -Os -o loader.o \
     -I./src/cpu/include -I./src/drivers/include -I./src/kernel/include -I./src/lib/include -I./src/fs/include
 
-gcc -m32 -ffreestanding -c src/kernel/services/syscall/syscall.c -o syscall.o \
+gcc -m32 -ffreestanding -c src/kernel/services/syscall/syscall.c -Werror -Os -o syscall.o \
     -I./src/cpu/include -I./src/drivers/include -I./src/kernel/include -I./src/lib/include -I./src/fs/include
 
-gcc -m32 -ffreestanding -c src/kernel/services/panic/panic.c -o panic.o \
+gcc -m32 -ffreestanding -c src/kernel/services/panic/panic.c -Werror -Os -o panic.o \
     -I./src/cpu/include -I./src/drivers/include -I./src/kernel/include -I./src/lib/include -I./src/fs/include
 
-gcc -m32 -ffreestanding -c src/fs/fs.c -o  fs.o \
+gcc -m32 -ffreestanding -c src/fs/fs.c -Werror -Os -o fs.o \
     -I./src/cpu/include -I./src/drivers/include -I./src/kernel/include -I./src/lib/include -I./src/fs/include
 
-gcc -m32 -ffreestanding -c src/fs/fluidfs.c -w -o fluidfs.o \
+gcc -m32 -ffreestanding -c src/fs/fluidfs.c -Werror -Os -o fluidfs.o \
     -I./src/cpu/include -I./src/drivers/include -I./src/kernel/include -I./src/lib/include -I./src/fs/include
 
 # ==============================================================================
@@ -93,7 +92,7 @@ gcc -m32 -ffreestanding -c src/fs/fluidfs.c -w -o fluidfs.o \
 # ==============================================================================
 ld -m elf_i386 -T linker.ld nf86krn.o services.o vga_640_480.o video.o keyboard.o \
                  sata.o disk.o timer.o pci.o idt.o pic.o jmp_usrmode.o gdt_rel.o interrupts.o  gdt.o faults_handler.o panic.o memory.o \
-                 mm.o pmm.o paging.o syscall.o fluidfs.o fs.o program.o loader.o -w -Os -o nf86krn.elf
+                 mm.o pmm.o paging.o syscall.o fluidfs.o fs.o program.o loader.o -o nf86krn.elf
 
 objcopy -O binary nf86krn.elf rootFS/nf86krn.bin
 
@@ -115,7 +114,7 @@ echo '=================== Disk assembly ==================='
 ./utilities/ffspack/ffspack.elf -d out.img -p about.txt -o /
 ./utilities/ffspack/ffspack.elf -d out.img -p rootFS/shell.ndf rootFS/hello.ndf rootFS/notepad.bin -o /home/
 
-qemu-system-i386 -m 8M -no-reboot \
+qemu-system-i386 -m 4M -no-reboot \
                    -device ich9-ahci,id=ahci \
                    -drive file=out.img,if=none,id=disk \
                    -device ide-hd,bus=ahci.0,drive=disk

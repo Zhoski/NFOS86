@@ -22,10 +22,10 @@ static memory mem = {
 };
 
 typedef struct {
-    int size;
-    char is_free;
+    u32 size;
+    u8 is_free;
     struct Heap* next;
-} Heap;
+} __attribute__((packed)) Heap;
 
 Heap* block_heap = (Heap*)HEAP_BASE;
 
@@ -71,7 +71,7 @@ void* malloc(U32 size) {
 
             current->next = (struct Heap*)current_address;
 
-            memset(current_address - size, 0, size);
+            memset((void*)(current_address - size), 0, size);
             
             return (void*)(current_address - size);
         }

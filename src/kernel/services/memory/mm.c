@@ -19,7 +19,7 @@ g_memory_map g_mm;
  *  Записывает в g_mm размер и начало каждого блока в памяти
  */
 void mm_map_mk() {
-    void* mmap_addr = 16 * *(u16*)(BOOT_INFO_ADDR + 2) + *(u16*)(BOOT_INFO_ADDR + 4);
+    void* mmap_addr = (void*)(16 * *(u16*)(BOOT_INFO_ADDR + 2) + *(u16*)(BOOT_INFO_ADDR + 4));
     u16 mmapbc = *(u16*)(BOOT_INFO_ADDR + 6);
     u32 largest_bl_len = 0;
     u32 largest_bl_addr = 0;

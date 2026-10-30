@@ -124,6 +124,6 @@ struct FIS_H2D {
 
 void ahci_dispatcher_io(io_disk_packet_t* packet);
 
-u32 ahci_mem_base = 0;
+extern u32 ahci_mem_base;
 
 #endif
