@@ -37,8 +37,7 @@ void kmain() {
     pic_irq_mask(0xA1, 0b10111111); 
     init_timer(100);
     sti();
-    pci_scan_bus0();
-    init_memory();                 
+    pci_scan_bus0();               
     create_heap();
     init_keyboard();                         
     init_vga(VGA_640_480);

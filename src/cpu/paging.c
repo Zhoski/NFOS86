@@ -42,6 +42,8 @@ void pg_mapping() {
         page_tbl0[k] = (k * 0x1000) | 7;
     }
 
+    page_tbl0[1] = 0x1000 | 5;      // Разрешить всем читать эту страницу, но не изменять
+
     page_dir[0] = ((u32)page_tbl0) | 7;
 
     pdbr_load((u32)page_dir);

@@ -10,6 +10,5 @@ U32 memread_dd(U32* __restrict__ from);
 void* malloc(U32 size);
 void free(U8* __restrict__ ptr);
 void create_heap();
-void init_memory();
 
 #endif

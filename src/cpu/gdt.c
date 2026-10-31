@@ -23,8 +23,6 @@ void gdt_add_seg(u32 base, u32 limit, u32 acess, u32 flag) {
 
     memcpy(&descriptor, gdt_addr + gdt_offset, sizeof(gdt_t));
     gdt_offset += 8;
-
-    video->kprintf("Base: %x\n", (u32)(descriptor.base_high << 24 | descriptor.base_mid << 16 | descriptor.base_low));
 }
 
 void ltr(u16 selector) {

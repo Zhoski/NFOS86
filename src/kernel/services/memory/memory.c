@@ -1,5 +1,4 @@
 #include <kernel/memory.h>
-#include <kernel/services.h>
 
 /* ---------- Куча ---------- */
 #define HEAP_BASE           0x200000                // 2Мб
@@ -9,17 +8,6 @@
 #define BUSY                 0
 #define NULL                 0
 #define MEMORY_NOT_FOUND  0xFF
-
-static memory mem = {
-    .memcpy = &memcpy,
-    .memread = &memread,
-    .memread_dw = &memread_dw,
-    .memread_dd = &memread_dd,
-    .memset = &memset,
-    .malloc = &malloc,
-    .free = &free,
-    .create_heap = &create_heap
-};
 
 typedef struct {
     u32 size;
@@ -109,10 +97,6 @@ void free(U8* __restrict__ ptr) {
     }
 
     ptr = NULL;
-}
-
-void init_memory() {
-    service.memory = &mem;
 }
 
 void memset(void* __restrict__ in, U8 v, U32 c) {

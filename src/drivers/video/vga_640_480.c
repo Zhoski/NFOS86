@@ -1,7 +1,7 @@
 #include <drivers/video/vga_640_480.h>
 #include <cpu/io.h>
 #include <kernel/device.h>
-#include <kernel/services.h>
+#include <kernel/memory.h>
 
 #define FONT8x16_IMPLEMENTATION
 #include "../../font/font8x16.h"
@@ -56,7 +56,7 @@ void vga_640_480_screen_clear(u8 color) {
     outb(INDEX_REGISTER, 0x08); 
     outb(DATA_REGISTER, 0xFF);
 
-    service.memory->memset(VGA_640_480_MEMORY, color, 640*80);
+    memset(VGA_640_480_MEMORY, color, 640*80);
 
     outb(INDEX_REGISTER, GRAPHICS_MODE);
     outb(DATA_REGISTER, 0x00); 
@@ -120,7 +120,7 @@ void vga_640_480_putpixel(u32 x, u32 y, u8 color) {
  *  Прокручивает экран вниз на один символ
  */
 void vga_640_480_scroll() {
-    service.memory->memcpy((VGA_640_480_MEMORY + 80 * 16), (VGA_640_480_MEMORY), 80 * 480);
+    memcpy((VGA_640_480_MEMORY + 80 * 16), (VGA_640_480_MEMORY), 80 * 480);
 
     //service.memory->memset((VGA_640_480_MEMORY + 80), terminal_bg_vbe, 80);
 }

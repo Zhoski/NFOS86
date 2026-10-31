@@ -14,30 +14,30 @@
 #define BACKSPACE 0x08 
 
 typedef struct __attribute__((packed)) {
-    U8 name[8];
-    U8 ext[3];
-    U16 start_sec;
-    U16 size;
-    U8 flags;
+    u8 name[8];
+    u8 ext[3];
+    u16 start_sec;
+    u16 size;
+    u8 flags;
 } _File;
 
 typedef struct Command
 {
-    U8* cmd_name;
-    U32 (*handler)();
+    u8* cmd_name;
+    u32 (*handler)();
 }Cmd;
 
-U32 cmd_help();
-U32 cmd_clear();
-U32 cmd_dir();
-U32 cmd_read();
-U32 cmd_write();
-U32 cmd_create();
-U32 cmd_delete();
-U32 cmd_check();
-U32 cmd_sys();
-U32 cmd_cd();
-U32 cmd_mkdir();
+u32 cmd_help();
+u32 cmd_clear();
+u32 cmd_dir();
+u32 cmd_read();
+u32 cmd_write();
+u32 cmd_create();
+u32 cmd_delete();
+u32 cmd_check();
+u32 cmd_sys();
+u32 cmd_cd();
+u32 cmd_mkdir();
 
 struct Command cmd[] = {
     {"help", cmd_help},
@@ -53,19 +53,19 @@ struct Command cmd[] = {
     {"cd", cmd_cd},
     {"mkdir", cmd_mkdir},
 };
-U32 command_index = 0;
-U8 *command_buffer;
+u32 command_index = 0;
+u8 *command_buffer;
 
-U32 *argv_buff;
-U8** argv;
+u32 *argv_buff;
+u8** argv;
 
-U8* info = "Copyright (c) 2026 Zhoski. Licensed under the MIT License.\n"
+u8* info = "Copyright (c) 2026 Zhoski. Licensed under the MIT License.\n"
            "Type 'help' to get a list of commands.\n\n";
 
-U8* cur_dir;
+u8* cur_dir;
 
-U32 cmd_help() {
-    U8* help_msg =   "\n"
+u32 cmd_help() {
+    u8* help_msg =   "\n"
                         "[BASE]\n"
                         "   clear                -- clear screen\n"
                         "[DISK]\n"
@@ -74,15 +74,11 @@ U32 cmd_help() {
                         "   cat    [file]        -- read file\n"
                         "   write  [file] [data] -- write in file\n"
                         "   mkdir  [dir]         -- creates dir\n"
-                        "   ls                   -- displays all files in a directory\n"
-                        "[SYSTEM]\n"
-                        "   sys                  -- show system info\n"
-                        "   setdrv [type] [file] -- change driver\n"
-                        "   getdrv               -- show list cur drv";
+                        "   ls                   -- displays all files in a directory\n";
     printf(help_msg);
 }
 
-U32 cmd_clear() {
+u32 cmd_clear() {
     clear_screen(0);
 
     printf(info);
@@ -91,7 +87,7 @@ U32 cmd_clear() {
 /**
  *  FIX: Исправить на fopen в будущем
  */
-U32 cmd_read() {
+u32 cmd_read() {
     putchar('\n');
     /*File* f = fopen(argv[1], FREAD);
     if(!f) {
@@ -101,20 +97,20 @@ U32 cmd_read() {
     if(!f->cur) {
         printf("[File empty]");
     }else {
-        U8* buffer = malloc(f->bytes);
+        u8* buffer = malloc(f->bytes);
         fread(f, f->bytes, buffer);
         buffer[f->bytes] = '\0';
         printf("%s",buffer);
     }
     fclose(f);*/
 
-    U8* full_path = malloc(strlen(cur_dir) + strlen(argv[1]) + 1);
+    u8* full_path = malloc(strlen(cur_dir) + strlen(argv[1]) + 1);
     strcat(full_path, cur_dir);
     strcat(full_path, argv[1]);
 
-    U8* temp_buffer = malloc(4096);
+    u8* temp_buffer = malloc(4096);
     memset(temp_buffer, 0, 4096);
-    U32 read_status = sys_read(full_path, 4096, temp_buffer);
+    u32 read_status = sys_read(full_path, 4096, temp_buffer);
 
     if(read_status == 0) {
         printf("%s", temp_buffer);
@@ -126,10 +122,10 @@ U32 cmd_read() {
     free(full_path);
 }
 
-U32 cmd_check() {
+u32 cmd_check() {
     putchar('\n');
 
-    U8* full_path = malloc(strlen(cur_dir) + strlen(argv[1]) + 1);
+    u8* full_path = malloc(strlen(cur_dir) + strlen(argv[1]) + 1);
     strcat(full_path, cur_dir);
     strcat(full_path, argv[1]);
 
@@ -147,7 +143,7 @@ U32 cmd_check() {
 /**
  *  FIX: Исправить на fopen в будущем
  */
-U32 cmd_write() {
+u32 cmd_write() {
     putchar('\n');
     /*int size = 0;
     File* f = fopen(argv[1], FWRITE);
@@ -155,7 +151,7 @@ U32 cmd_write() {
         printf("%[12Can't write [%s]%[15",argv[1]);
         return;
     }else {
-        U32 s = 0;
+        u32 s = 0;
         while (argv[2][s++]);
         
         //sys_write(f->name, argv[2], s);
@@ -163,7 +159,7 @@ U32 cmd_write() {
     }
     fclose(f);*/
 
-    U8* full_path = malloc(strlen(cur_dir) + strlen(argv[1]) + 1);
+    u8* full_path = malloc(strlen(cur_dir) + strlen(argv[1]) + 1);
     strcat(full_path, cur_dir);
     strcat(full_path, argv[1]);
 
@@ -176,10 +172,10 @@ U32 cmd_write() {
     free(full_path);
 }
 
-U32 cmd_delete() {
+u32 cmd_delete() {
     putchar('\n');
 
-    U8* full_path = malloc(strlen(cur_dir) + strlen(argv[1]) + 1);
+    u8* full_path = malloc(strlen(cur_dir) + strlen(argv[1]) + 1);
     strcat(full_path, cur_dir);
     strcat(full_path, argv[1]);
 
@@ -193,10 +189,10 @@ U32 cmd_delete() {
     free(full_path);
 }
 
-U32 cmd_create() {
+u32 cmd_create() {
     putchar('\n');
 
-    U8* full_path = malloc(strlen(cur_dir) + strlen(argv[1]) + 1);
+    u8* full_path = malloc(strlen(cur_dir) + strlen(argv[1]) + 1);
     strcat(full_path, cur_dir);
     strcat(full_path, argv[1]);
 
@@ -209,10 +205,10 @@ U32 cmd_create() {
     free(full_path);
 }
 
-U32 cmd_mkdir() {
+u32 cmd_mkdir() {
     putchar('\n');
 
-    U8* full_path = malloc(strlen(cur_dir) + strlen(argv[1]) + 1);
+    u8* full_path = malloc(strlen(cur_dir) + strlen(argv[1]) + 1);
     strcat(full_path, cur_dir);
     strcat(full_path, argv[1]);
 
@@ -225,33 +221,24 @@ U32 cmd_mkdir() {
     free(full_path);
 }
 
-U32 cmd_dir() {
+u32 cmd_dir() {
     printf("\n");
 
-    U8* full_path = malloc(strlen(cur_dir) + strlen(argv[1]) + 1);
-    strcat(full_path, cur_dir);
+    printf("%s\n", cur_dir);
 
-    printf("A:%s\n", full_path);
-
-    write_root(full_path);
-
-    command_index = 0;
-    memset((void*)&command_buffer, 0, COMMAND_BUFFER_SIZE);
-
-    free(full_path);
+    write_root(cur_dir);
 }
 
-U32 cmd_sys() {
+u32 cmd_sys() {
     printf("\n");
-    U16* ram = (U16*)0x1000;
-    U8*  cpu = malloc(48);
-    memcpy((void*)0x1008, cpu, 48);
+    u16 ram = *(u16*)0x1000;
+    u8*  cpu = malloc(48);
+    memcpy((void*)0x1008, (void*)cpu, 48);
 
-    printf("\n");
-    printf("OS: NFOS86 Demo\n"); 
+    printf("\nOS: NFOS86 Demo\n"); 
     printf("Kernel: v0.0.1-custom\n");
     printf("CPU: %s\n", cpu); 
-    printf("Memory: %dk\n", *ram); 
+    printf("Memory: %dk\n", ram); 
     printf("Display: VGA 640x480 16 colors\n"); 
     printf("Shell: Default\n");
     printf("FS: FluidFS\n");
@@ -260,11 +247,11 @@ U32 cmd_sys() {
         "%[12\xDB\xDB%[13\xDB\xDB%[14\xDB\xDB%[15\xDB\xDB%[07\n");
 }
 
-U32 cmd_cd() {
+u32 cmd_cd() {
     if(strcmp(argv[1], "..") != 0) {
         printf("\n");
 
-        U8* full_path = malloc(strlen(cur_dir) + strlen(argv[1]) + 1);
+        u8* full_path = malloc(strlen(cur_dir) + strlen(argv[1]) + 1);
         strcat(full_path, cur_dir);
         strcat(full_path, argv[1]);
 
@@ -281,9 +268,9 @@ U32 cmd_cd() {
 
         free(full_path);
     }else {
-        U32 cur_dir_len = strlen(cur_dir);
+        u32 cur_dir_len = strlen(cur_dir);
         if(cur_dir_len > 1) {
-            U32 i = cur_dir_len;
+            u32 i = cur_dir_len;
 
             //printf("cur_dir len: %d\n", cur_dir_len);
 
@@ -304,8 +291,8 @@ void execute() {
         command_index = 0;
         return;
     }
-    U32 argc = 1;
-    U32 n = 0;
+    u32 argc = 1;
+    u32 n = 0;
     while (command_buffer[n])
     {
         if(command_buffer[n] == ' ')
@@ -313,12 +300,12 @@ void execute() {
         n++;
     }
 
-    argv_buff = (U32*)malloc(argc * 4);
-    argv = (U8**)argv_buff;
+    argv_buff = (u32*)malloc(argc * 4);
+    argv = (u8**)argv_buff;
 
     n = 0;
     argc = 1;
-    U8* cmd_head = command_buffer;
+    u8* cmd_head = command_buffer;
     argv[0] = cmd_head;
     while (*cmd_head)
     {
@@ -330,18 +317,16 @@ void execute() {
         cmd_head++;
     }
 
-    U32 is_found = 0;
-    for(U32 i = 0;i < COMMAND_COUNT;i++) {
+    u32 is_found = 0;
+    for(u32 i = 0;i < COMMAND_COUNT;i++) {
         if(strcmp(argv[0], cmd[i].cmd_name) == 0) {
             cmd[i].handler();
             is_found = 1;
         }
     }
 
-    memset((void*)&command_buffer, 0, COMMAND_BUFFER_SIZE);
-
     if(!is_found) {
-        U32 err = sys_run(argv[0]);
+        u32 err = sys_run(argv[0]);
         if(err) {
             printf("\n%[04NFOS86: Unknown command %s%[07",argv[0]);
         }
@@ -349,6 +334,7 @@ void execute() {
 
     free((void*)argv_buff);
 
+    memset((void*)command_buffer, 0, COMMAND_BUFFER_SIZE);
     command_index = 0;
 }
 
@@ -359,13 +345,13 @@ void shell_main() {
 
     printf(info);
     printf("NFOS86$%s> ", cur_dir);
-    for(U32 i = 0;i < COMMAND_BUFFER_SIZE;i++) {
+    for(u32 i = 0;i < COMMAND_BUFFER_SIZE;i++) {
         command_buffer[i] = 0;
     }
 
     command_index = 0;
 
-    U8 c = '\0';
+    u8 c = '\0';
     while (1)
     {
         c = get_char();
@@ -374,8 +360,8 @@ void shell_main() {
                 execute();
                 printf("\nNFOS86$%s> ", cur_dir);
             }else if(c == BACKSPACE && command_index != 0) {
-                U32 x;
-                U32 y;
+                u32 x;
+                u32 y;
                 get_cursor(&x, &y);
                 set_cursor(x - 1, y);
                 putchar(' ');

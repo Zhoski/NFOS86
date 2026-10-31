@@ -57,16 +57,13 @@ nasm -f elf32 src/cpu/jmp_usrmode.asm -o jmp_usrmode.o
 gcc -m32 -ffreestanding -c src/kernel/nf86krn.c -Werror -Os -o nf86krn.o \
     -I./src/cpu/include -I./src/drivers/include -I./src/kernel/include -I./src/lib/include -I./src/fs/include
 
-gcc -m32 -ffreestanding -c src/kernel/services/services.c -Werror -o services.o \
+gcc -m32 -ffreestanding -c src/kernel/services/memory/memory.c -Werror -Os -o memory.o \
     -I./src/cpu/include -I./src/drivers/include -I./src/kernel/include -I./src/lib/include -I./src/fs/include
 
-gcc -m32 -ffreestanding -c src/kernel/services/memory/memory.c -Werror -o memory.o \
+gcc -m32 -ffreestanding -c src/kernel/services/memory/mm.c -Werror -Os -o mm.o \
     -I./src/cpu/include -I./src/drivers/include -I./src/kernel/include -I./src/lib/include -I./src/fs/include
 
-gcc -m32 -ffreestanding -c src/kernel/services/memory/mm.c -Werror -o mm.o \
-    -I./src/cpu/include -I./src/drivers/include -I./src/kernel/include -I./src/lib/include -I./src/fs/include
-
-gcc -m32 -ffreestanding -c src/kernel/services/memory/pmm.c -Werror -o pmm.o \
+gcc -m32 -ffreestanding -c src/kernel/services/memory/pmm.c -Werror -Os -o pmm.o \
     -I./src/cpu/include -I./src/drivers/include -I./src/kernel/include -I./src/lib/include -I./src/fs/include
 
 gcc -m32 -ffreestanding -c src/kernel/services/memory/program.c -Werror -Os -o program.o \
@@ -90,7 +87,7 @@ gcc -m32 -ffreestanding -c src/fs/fluidfs.c -Werror -Os -o fluidfs.o \
 # ==============================================================================
 # ЛИНКОВКА 
 # ==============================================================================
-ld -m elf_i386 -T linker.ld -Map=kernel.map nf86krn.o services.o vga_640_480.o video.o keyboard.o \
+ld -m elf_i386 -T linker.ld -Map=kernel.map nf86krn.o vga_640_480.o video.o keyboard.o \
                  sata.o disk.o timer.o pci.o idt.o pic.o jmp_usrmode.o gdt_rel.o interrupts.o  gdt.o faults_handler.o panic.o memory.o \
                  mm.o pmm.o paging.o syscall.o fluidfs.o fs.o program.o loader.o -o nf86krn.elf
 

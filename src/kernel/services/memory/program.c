@@ -1,4 +1,3 @@
-#include <kernel/services.h>
 #include <fs/fs.h>
 
 uint32_t kernel_stack_ptr;

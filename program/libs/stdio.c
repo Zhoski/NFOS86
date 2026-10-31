@@ -157,7 +157,7 @@ void printf(const unsigned char *format, ...) {
             int i = 0;
             int isNegative = 0;
 
-            char *buffer;
+            char buffer[10];
 
             if (n < 0) {
                 isNegative = 1;
