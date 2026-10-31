@@ -34,7 +34,11 @@ void pg_mapping() {
         page_dir[k] = 0x00;
     }
 
-    for(u32 k = 0; k < 1024; k++) {
+    for(u32 k = 0; k < 512; k++) {
+        page_tbl0[k] = (k * 0x1000) | 3;
+    }
+
+    for(u32 k = 512; k < 1024; k++) {
         page_tbl0[k] = (k * 0x1000) | 7;
     }
 

@@ -2,6 +2,8 @@
 #define __IDT__
 #include <lib/int.h>
 
+#define TRAP    0x8F
+
 // Таблица IDT
 struct InterruptDescriptor32 {
     U16 base_low;      // Младшая часть адреса обработчика

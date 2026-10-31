@@ -395,6 +395,7 @@ void shell_main() {
 }
 
 void main() {
+    asm("nop");
     cur_dir = malloc(256);
     cur_dir[0] = '/';
     command_buffer = malloc(COMMAND_BUFFER_SIZE);

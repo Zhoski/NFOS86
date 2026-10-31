@@ -7,6 +7,7 @@ void* gdt_addr;
 u32 gdt_offset = 8;
 
 gdt_ptr_t ptr;
+volatile tss_t tss0;
 
 extern void gdt_reload_addr(void* gdt_addr);
 
@@ -22,6 +23,8 @@ void gdt_add_seg(u32 base, u32 limit, u32 acess, u32 flag) {
 
     memcpy(&descriptor, gdt_addr + gdt_offset, sizeof(gdt_t));
     gdt_offset += 8;
+
+    video->kprintf("Base: %x\n", (u32)(descriptor.base_high << 24 | descriptor.base_mid << 16 | descriptor.base_low));
 }
 
 void ltr(u16 selector) {
@@ -40,18 +43,15 @@ void gdt_init() {
     ptr.limit = 0xFFF;
     ptr.base = (u32)gdt_addr;
 
-    tss_t tss0;
-    tss0.esp0 = (u32)(pg_alloc() + 0xFF0);
+    tss0.esp0 = (u32)(pg_alloc() + 0xFFF);
     tss0.ss0 = 0x10;
 
-    gdt_add_seg(0, 0xFFFFF, 0x9A, 0x0C);                // Kernel code segment
-    gdt_add_seg(0, 0xFFFFF, 0x92, 0x0C);                // Kernel data segment
-    gdt_add_seg(0, 0xFFFFF, 0xFA, 0x0C);                // User code segment
-    gdt_add_seg(0, 0xFFFFF, 0xF2, 0x0C);                // User data segment
-    gdt_add_seg((u32)&tss0, sizeof(tss_t) - 1, 0x89, 0x00);  // TSS
+    gdt_add_seg(0, 0xFFFFF, 0x9A, 0x0C);                        // Kernel code segment
+    gdt_add_seg(0, 0xFFFFF, 0x92, 0x0C);                        // Kernel data segment
+    gdt_add_seg(0, 0xFFFFF, 0xFA, 0x0C);                        // User code segment
+    gdt_add_seg(0, 0xFFFFF, 0xF2, 0x0C);                        // User data segment
+    gdt_add_seg((u32)&tss0, sizeof(tss_t) - 1, 0x89, 0x00);     // TSS
 
     gdt_reload_addr(&ptr);
     ltr(5);
-
-    //gdt_reload(gdt_addr);
 }

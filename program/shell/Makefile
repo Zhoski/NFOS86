@@ -5,7 +5,7 @@ $(TARGET): shell.elf
 	$(CONV) shell.elf $(TARGET)
 
 shell.elf : entry.o shell.o stdio.o string.o file.o mmemory.o
-	gcc -m32 -nostdlib -static-pie \
+	gcc -m32 -nostdlib -static-pie -Wl,-Map=shell.map \
 	    -T ../general/user.ld entry.o stdio.o string.o file.o mmemory.o shell.o -o shell.elf
 
 shell.o : shell.c

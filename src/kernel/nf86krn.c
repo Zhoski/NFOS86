@@ -25,9 +25,9 @@ extern void isr46();
 
 void kmain() {
     idt_load();                    
-    idt_set(0x08, 0x08, 0x8F, (uint32_t)isr8); 
-    idt_set(0x0D, 0x08, 0x8F, (uint32_t)isr13); 
-    idt_set(0x0E, 0x08, 0x8F, (uint32_t)isr14); 
+    idt_set(0x08, 0x08, TRAP, (uint32_t)isr8); 
+    idt_set(0x0D, 0x08, TRAP, (uint32_t)isr13); 
+    idt_set(0x0E, 0x08, TRAP, (uint32_t)isr14); 
     idt_set(0x20, 0x08, 0x8E, (uint32_t)isr32); 
     idt_set(0x21, 0x08, 0x8E, (uint32_t)isr33); 
     idt_set(0x2E, 0x08, 0x8E, (uint32_t)isr46);

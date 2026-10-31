@@ -13,5 +13,5 @@ jmp_usrmode:
     push eax
     pushf
     push (3 * 8) | 3
-    push 0x300000
+    push 0x30002c       ; КОСТЫЛЬ убрать хардкод
     iret

@@ -90,7 +90,7 @@ gcc -m32 -ffreestanding -c src/fs/fluidfs.c -Werror -Os -o fluidfs.o \
 # ==============================================================================
 # ЛИНКОВКА 
 # ==============================================================================
-ld -m elf_i386 -T linker.ld nf86krn.o services.o vga_640_480.o video.o keyboard.o \
+ld -m elf_i386 -T linker.ld -Map=kernel.map nf86krn.o services.o vga_640_480.o video.o keyboard.o \
                  sata.o disk.o timer.o pci.o idt.o pic.o jmp_usrmode.o gdt_rel.o interrupts.o  gdt.o faults_handler.o panic.o memory.o \
                  mm.o pmm.o paging.o syscall.o fluidfs.o fs.o program.o loader.o -o nf86krn.elf
 

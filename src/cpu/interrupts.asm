@@ -7,16 +7,8 @@ extern disk_handler
 
 global isr64
 
-%macro ISRERRCODE 2
-global %1
-%1:
-    push %2
-    push eax
-    push ebx
-    push ecx
-    push edx
-    push esi
-    push edi
+%macro PUSHALL 0
+    pushad
     mov eax, cr0
     push eax
     mov eax, cr2
@@ -25,15 +17,27 @@ global %1
     push eax
     mov eax, cr4
     push eax
-    mov eax, esp
-    push eax
+%endmacro
 
+%macro EXCEPTIONS_NO_ERR_CODE 1
+global isr%1
+isr%1:
+    push 0
+    PUSHALL
+    jmp faults_handler
+%endmacro
+
+%macro EXCEPTIONS_ERR_CODE 1
+global isr%1
+isr%1:
+    push %1
+    PUSHALL
     jmp faults_handler
 %endmacro
 
 %macro IRQINT 2
-global %1
-%1:
+global isr%1
+isr%1:
     cli
 
     pushad
@@ -61,13 +65,13 @@ global %1
     iret
 %endmacro
 
-IRQINT isr32, timer_handler
-IRQINT isr33, keyboard_handler
-IRQINT isr46, disk_handler
+IRQINT 32, timer_handler
+IRQINT 33, keyboard_handler
+IRQINT 46, disk_handler
 
-ISRERRCODE isr8,   8
-ISRERRCODE isr13, 13
-ISRERRCODE isr14, 14
+EXCEPTIONS_ERR_CODE         8
+EXCEPTIONS_ERR_CODE         13
+EXCEPTIONS_ERR_CODE         14
 
 isr64: 
     cli                        
@@ -119,4 +123,6 @@ isr64:
     iret 
 
 faults_handler:
+    mov eax, esp
+    push eax
     call c_faults_handler

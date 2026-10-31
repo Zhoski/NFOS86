@@ -6,7 +6,7 @@
 typedef void (*entry_point)();
 
 void _exit();
-extern void jmp_usrmode();
+extern void jmp_usrmode(entry_point entry);
 
 void execute_file(void* entry, void* stack, ext_t ext) {
     ndf_header_t ndf_header;
@@ -27,20 +27,31 @@ void execute_file(void* entry, void* stack, ext_t ext) {
     //video->kprintf("krn: %x\n", kernel_return_ptr);
 
     kernel_return_ptr = (uint32_t)&_exit;
-
-    video->kprintf("%x", kernel_return_ptr);
    
     // +28 потому что это размер призрачной секции которая почему то остается в ndf
     volatile entry_point program = (entry_point)(entry_addr + ndf_header.entry - sizeof(ndf_header_t) + 28);
 
-    video->kprintf("%x\n", program);
+    //video->kprintf("%x\n", program);
 
     asm volatile("movl %%esp, %0":"=r" (kernel_stack_ptr));
     asm volatile("movl %%ebp, %0":"=r" (kernel_stack_base));
 
-    //jmp_usrmode();
+    //video->kprintf("%x", program);
 
-    asm volatile (   
+    /*for(;;) {
+        asm("hlt");
+    }*/
+
+    asm volatile(
+        "movl %0, %%esp\n"
+        "movl %0, %%ebp\n"
+        :
+        : "r" (stack)
+    );
+
+    jmp_usrmode(program);
+
+    /*asm volatile (   
         "push %%eax\n"
         "push %%ebx\n"
         "push %%ecx\n"
@@ -52,7 +63,7 @@ void execute_file(void* entry, void* stack, ext_t ext) {
         "jmp *%0"               
         : 
         : "r" (program), "r" (stack)
-    );
+    );*/
 }
 
 void _exit() {
