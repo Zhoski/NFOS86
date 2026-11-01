@@ -2,11 +2,14 @@
 #include <drivers/video/video.h>
 #include <kernel/program.h>
 #include <kernel/memory.h>
+#include <fs/fs.h>
 
 typedef void (*entry_point)();
 
 void _exit();
 extern void jmp_usrmode(entry_point entry);
+
+volatile u32 debug = 0;
 
 void execute_file(void* entry, void* stack, ext_t ext) {
     ndf_header_t ndf_header;
@@ -19,7 +22,9 @@ void execute_file(void* entry, void* stack, ext_t ext) {
     u32* patch_offset = (u32*)(entry_addr + ndf_header.reloff - sizeof(ndf_header_t));
     for(u32 k = 0; k < ndf_header.relsz / 4; k++) {
         u32* addr_patch = (u32*)(entry_addr + patch_offset[k] - sizeof(ndf_header_t));
-        //video->kprintf("[ INFO ] Patching addr: %x  Offset: %x  Data: %x\n", addr_patch, patch_offset[k], *addr_patch);
+        if(debug) {
+            video->kprintf("[ INFO ] Patching addr: %x  Offset: %x  Data: %x\n", addr_patch, patch_offset[k], *addr_patch);
+        }
         *addr_patch = *addr_patch + entry_addr;
     }
 
@@ -49,9 +54,17 @@ void execute_file(void* entry, void* stack, ext_t ext) {
         : "r" (stack)
     );
 
-    jmp_usrmode(program);
+    /*if(debug) {
+        video->kprintf("Entry: %x\n", program);
+        for(;;) {
+            asm("hlt");
+        }
+    }*/
 
-    /*asm volatile (   
+    debug = 1;
+    jmp_usrmode((entry_point)program);
+
+    asm volatile (   
         "push %%eax\n"
         "push %%ebx\n"
         "push %%ecx\n"
@@ -63,7 +76,7 @@ void execute_file(void* entry, void* stack, ext_t ext) {
         "jmp *%0"               
         : 
         : "r" (program), "r" (stack)
-    );*/
+    );
 }
 
 void _exit() {
@@ -82,6 +95,8 @@ void _exit() {
         :
         : "eax", "ebx", "ecx", "edx", "esi", "edi"
     );
+
+    fs->open("/home/shell.ndf");
 
     for(;;) {
         asm("hlt");

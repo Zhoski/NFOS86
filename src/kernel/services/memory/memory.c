@@ -13,7 +13,7 @@ typedef struct {
     u32 size;
     u8 is_free;
     struct Heap* next;
-} __attribute__((packed)) Heap;
+} Heap;
 
 Heap* block_heap = (Heap*)HEAP_BASE;
 
@@ -23,13 +23,13 @@ void create_heap() {
     block_heap->next = NULL;
 }
 
-void* malloc(U32 size) {
-    U32 current_address = HEAP_BASE + sizeof(Heap) + size;
+void* malloc(u32 size) {
+    u32 current_address = HEAP_BASE + sizeof(Heap) + size;
     Heap* current = block_heap;
     
     while (current != NULL)
     {
-        U32 heap_end_address = HEAP_BASE + HEAP_SIZE;
+        u32 heap_end_address = HEAP_BASE + HEAP_SIZE;
 
         if (current_address + sizeof(Heap) >= heap_end_address) {
             return 0;
@@ -51,8 +51,8 @@ void* malloc(U32 size) {
                 new_heap.next = NULL;
             }           
 
-            U8* t = (U8*)&new_heap;
-            U8* dest = (U8*)current_address;
+            u8* t = (u8*)&new_heap;
+            u8* dest = (u8*)current_address;
             for (int i = 0; i < 12; i++) {
                 dest[i] = t[i];
             }
@@ -74,63 +74,51 @@ void* malloc(U32 size) {
 /**
  * Работает на костылях, исправить
  */
-void free(U8* __restrict__ ptr) {
-    U8* heap = ptr - sizeof(Heap);
-    U8* next = heap;
+void free(u8* ptr) {
+    u8* heap = ptr - sizeof(Heap);
+    u8* next = heap;
 
     heap[4] = FREE;
     
-    next += *(U32*)heap + sizeof(Heap);
+    next += *(u32*)heap + sizeof(Heap);
 
     while (next[4] == FREE) {
-        U32 new_size = *(U32*)next + *(U32*)heap + sizeof(Heap);
-        U8* t = (U8*)&new_size;
-        for (U32 i = 0;i < 4;i++) {
+        u32 new_size = *(u32*)next + *(u32*)heap + sizeof(Heap);
+        u8* t = (u8*)&new_size;
+        for (u32 i = 0;i < 4;i++) {
             heap[i] = t[i];
         }
          
-        for (U32 i = 0;i < 4;i++) {
+        for (u32 i = 0;i < 4;i++) {
             heap[8 + i] = next[8 + i];
         }
 
-        next += *(U32*)next + sizeof(Heap);
+        next += *(u32*)next + sizeof(Heap);
     }
 
     ptr = NULL;
 }
 
-void memset(void* __restrict__ in, U8 v, U32 c) {
+void memset(void* in, u8 v, u32 c) {
     asm volatile (
         "movl %[v], %%eax\n"
         "movl %[in], %%edi\n"
         "movl %[count], %%ecx\n"
         "rep stosb"
         :
-        : [in] "r" ((U8*)in), [v] "r" ((U32)v), [count] "r" (c)
+        : [in] "r" ((u8*)in), [v] "r" ((u32)v), [count] "r" (c)
         : "eax", "edi", "ecx", "memory"
     );
 }
 
-void memcpy(void* __restrict__ from,void* __restrict__ in, uint32_t size) {
+void memcpy(void* __restrict__ from,void* __restrict__ in, u32 size) {
     asm volatile (
         "movl %[from], %%esi\n"
         "movl %[in],   %%edi\n"
         "movl %[count],%%ecx\n"
         "rep movsb"
         :
-        : [from] "r" ((U8*)from), [in] "r" ((U8*)in), [count] "r" (size)
+        : [from] "r" ((u8*)from), [in] "r" ((u8*)in), [count] "r" (size)
         : "esi", "edi", "ecx","memory"
     );
-}
-
-U8 memread(U8* __restrict__ from) {
-    return *from;
-}
-
-U16 memread_dw(U16* __restrict__ from) {
-    return *from;
-}
-
-U32 memread_dd(U32* __restrict__ from) {
-    return *from;
 }

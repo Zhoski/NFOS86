@@ -1,8 +1,8 @@
 #include <kernel/mm.h>
 #include <drivers/video/video.h>
 
-#define KERNEL_RSV      0x10000
-#define KERNEL_ALLOC    0x10000
+#define KERNEL_RSV      0x10000     // 64 Кб
+#define KERNEL_ALLOC    0x80000     // 512 Кб
 #define SATA_ACHI       0x1000
 
 #define KRN_ALLOC_OFF   KERNEL_RSV

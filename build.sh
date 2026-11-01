@@ -44,7 +44,7 @@ gcc -m32 -ffreestanding -c src/cpu/paging.c -Werror -o paging.o \
 gcc -m32 -ffreestanding -c src/cpu/gdt.c -Werror -o gdt.o \
     -I./src/cpu/include -I./src/drivers/include -I./src/kernel/include -I./src/lib/include -I./src/fs/include
 
-gcc -m32 -ffreestanding -c src/cpu/faults_handler.c -Werror -o faults_handler.o \
+gcc -m32 -ffreestanding -c src/cpu/faults_handler.c -Werror -Os -o faults_handler.o \
     -I./src/cpu/include -I./src/drivers/include -I./src/kernel/include -I./src/lib/include -I./src/fs/include
 
 nasm -f elf32 src/cpu/interrupts.asm -o interrupts.o
