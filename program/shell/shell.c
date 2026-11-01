@@ -319,6 +319,7 @@ void execute() {
 
     u32 is_found = 0;
     for(u32 i = 0;i < COMMAND_COUNT;i++) {
+        //printf("cmp %s and %s\n", argv[0], cmd[i].cmd_name);
         if(strcmp(argv[0], cmd[i].cmd_name) == 0) {
             cmd[i].handler();
             is_found = 1;
@@ -390,6 +391,8 @@ void main() {
     cur_dir = malloc(256);
     cur_dir[0] = '/';
     command_buffer = malloc(COMMAND_BUFFER_SIZE);
+
+    //memset((void*)0x100000, 0, 0x10000);
 
     shell_main();
 }

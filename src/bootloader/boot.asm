@@ -1,9 +1,9 @@
 ; =====================================================================
-;  Atom OS Bootloader (Stage 1 / MBR)
+;  NFOS86 Bootloader (Stage 2 / Main)
 ;  Copyright (C) 2026 [Zhoski]. All rights reserved.
 ;
 ;  File: boot.asm
-;  Description: It locates stage2 on the disk and hands over control to it.
+;  Description: It locates main.asm on the disk and hands over control to it.
 ; =====================================================================
 
 

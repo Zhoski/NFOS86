@@ -1,8 +1,9 @@
 #include <kernel/memory.h>
 
+// ИСПРАВИТЬ КУЧУ
 /* ---------- Куча ---------- */
-#define HEAP_BASE           0x200000                // 2Мб
-#define HEAP_SIZE           0x100000                // 1Мб
+#define HEAP_BASE           0x050000                // 2Мб
+#define HEAP_SIZE           0x050000                // 1Мб
 
 #define FREE                 1
 #define BUSY                 0
@@ -22,6 +23,8 @@ void create_heap() {
     block_heap->size = HEAP_SIZE;
     block_heap->next = NULL;
 }
+
+#include <drivers/video/video.h>
 
 void* malloc(u32 size) {
     u32 current_address = HEAP_BASE + sizeof(Heap) + size;

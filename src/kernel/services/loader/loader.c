@@ -12,6 +12,7 @@ extern void jmp_usrmode(entry_point entry);
 volatile u32 debug = 0;
 
 void execute_file(void* entry, void* stack, ext_t ext) {
+    video->kprintf("Execute file\n");
     ndf_header_t ndf_header;
     memcpy(entry, &ndf_header, sizeof(ndf_header));
     
@@ -41,24 +42,22 @@ void execute_file(void* entry, void* stack, ext_t ext) {
     asm volatile("movl %%esp, %0":"=r" (kernel_stack_ptr));
     asm volatile("movl %%ebp, %0":"=r" (kernel_stack_base));
 
-    //video->kprintf("%x", program);
-
-    /*for(;;) {
-        asm("hlt");
-    }*/
-
-    asm volatile(
+    /*asm volatile(
         "movl %0, %%esp\n"
         "movl %0, %%ebp\n"
         :
         : "r" (stack)
-    );
+    );*/
 
     /*if(debug) {
         video->kprintf("Entry: %x\n", program);
         for(;;) {
             asm("hlt");
         }
+    }*/
+
+    /*for(;;) {
+        asm("hlt");
     }*/
 
     debug = 1;

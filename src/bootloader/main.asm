@@ -1,12 +1,17 @@
 ; =============================================================================
-;  Atom OS Bootloader (Stage 1 / MBR)
+;  NFOS86 Bootloader (Stage 1 / MBR)
 ;  Copyright (C) 2026 [Zhoski]. All rights reserved.
 ;
-;  File: stage2.asm
-;  Description: Loading the kernel, switching to PM, getting system information
+;  File: main.asm
+;  Description: Loading the nf86krn.bin, switching to PM, getting system information
 ; =============================================================================
 bits 16
 org 0x8000
+
+%macro WRITE 1
+    mov si, %1
+    call print
+%endmacro
 
 ; ========================= Инициализация ==========================
 
@@ -396,7 +401,7 @@ KERNEL_LOAD:
     mov word [LBA + 2], 64
     mov word [LBA + 4], 0x0000
     mov word [LBA + 6], 0x1000
-    mov word [LBA + 8], 64
+    mov word [LBA + 8], 72
     mov word [LBA + 10], 0x0000
 
     mov si, LBA
@@ -414,7 +419,7 @@ LBA:
     dw 2
     dw 0x0500
     dw 0x0000
-    dq 8
+    dq 16
 
 REBOOT:
     mov si, info_msg
@@ -633,7 +638,54 @@ PMentry:
     mov ecx, 10240           
     rep movsd  
 
-    xor eax, eax
-    cpuid
+    ;xor eax, eax
+    ;cpuid
 
-    jmp 0x8:0x100000
+    mov eax, 0
+    mov ebx, 0
+.fill_tbl:
+    mov ecx, ebx
+    or ecx, 7
+    mov [tbl0 + eax * 4], ecx
+    inc eax
+    add ebx, 4096
+    cmp eax, 1024
+    jne .fill_tbl
+
+    mov eax, 512
+    mov ebx, 0x100000
+.krn_to_hight:
+    mov ecx, ebx
+    or ecx, 3
+    mov [tbl0 + eax * 4], ecx
+    inc eax
+    add ebx, 4096
+    cmp eax, 1024
+    jne .krn_to_hight
+
+.end
+    mov eax, tbl0
+
+    or eax, 7
+    mov [pd], eax
+
+    mov eax, pd
+    mov cr3, eax
+ 
+    mov eax, cr0
+    or eax, 0x80000000
+    mov cr0, eax
+
+    ;jmp 0x8:.test
+
+    jmp 0x8:0x200000
+
+.test:
+    mov al, 'H'
+    out 0xE9, al
+    jmp $
+
+section .bss
+align 4096
+pd: resb 4096
+tbl0: resb 4096

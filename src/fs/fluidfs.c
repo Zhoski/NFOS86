@@ -139,7 +139,7 @@ u32 fluidfs_init() {
 
     io_disk_packet_t packet = {
         .command = IO_READ,
-        .lba_start = 8,
+        .lba_start = 16,
         .sec_count = 1,
         .buffer = super_block_buffer,
     };
@@ -265,8 +265,8 @@ u32 fluidfs_fopen(u8* file) {
     }
 
     u32 offset = 0;
-    u32 stack = 0x3FFFFF;
-    u32 entry = 0x300000;
+    u32 stack = 0x0FFFFF;
+    u32 entry = 0x000000;
 
     io_disk_packet_t packet0 = {
         .command = IO_READ,
@@ -287,7 +287,6 @@ u32 fluidfs_fopen(u8* file) {
         offset += super_block->sec_p_block * 512;
     }
 
-    
     if(*(u8*)(entry + 1) == 'N') {
         execute_file((void*)entry, (void*)stack, NDF);
     }

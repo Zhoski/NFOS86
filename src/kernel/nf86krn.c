@@ -45,13 +45,12 @@ void kmain() {
     pg_mk_alloc(g_mm.krn_alloc, g_mm.krn_alloc_len);
     gdt_init();
     pg_mapping();
+    //video->kprintf("USER: %x\n",get_physaddr((void*)0x200000));
 
     u8* disk_info = (u8*)malloc(512);
     disk_init((u16*)disk_info);
-
-    init_fs(FLUIDFS_T);    
-
-    fs->open("/home/shell.ndf");
+    init_fs(FLUIDFS_T); 
+    fs->open("/apps/shell.ndf");
 
     for(;;) {
         asm("hlt");

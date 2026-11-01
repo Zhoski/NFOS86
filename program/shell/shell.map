@@ -4,7 +4,6 @@ Discarded input sections
  .group         0x00000000        0x8 stdio.o
  .group         0x00000000        0x8 shell.o
  .group         0x00000000        0x8 shell.o
- .group         0x00000000        0x8 shell.o
  .text.__x86.get_pc_thunk.ax
                 0x00000000        0x4 shell.o
 
@@ -28,200 +27,195 @@ LOAD shell.o
  .note.gnu.build-id
                 0x00000000       0x24 entry.o
 
-.text           0x00000030     0x111c
+.text           0x00000030     0x103c
  *.entry.o(.text)
  *(.text)
  .text          0x00000030        0x5 entry.o
                 0x00000030                _start
- .text          0x00000035      0x359 stdio.o
+ .text          0x00000035      0x36d stdio.o
                 0x00000035                __strcmp
-                0x0000005e                __strlen
-                0x0000007c                fg_set_color
-                0x00000092                sequence_black
-                0x0000009d                sequence_blue
-                0x000000a8                sequence_green
-                0x000000b3                sequence_cyan
-                0x000000be                sequence_red
-                0x000000c9                sequence_magenta
-                0x000000d4                sequence_brown
-                0x000000df                sequence_light_grey
-                0x000000ea                sequence_dark_grey
-                0x000000f5                sequence_light_blue
-                0x00000100                sequence_light_green
-                0x0000010b                sequence_light_cyan
-                0x00000116                sequence_light_red
-                0x00000121                sequence_light_magenta
-                0x0000012c                sequence_light_brown
-                0x00000137                sequence_white
-                0x00000142                bg_set_color
-                0x00000158                printf
-                0x0000030a                putchar
-                0x00000320                clear_screen
-                0x00000336                set_cursor
-                0x00000356                get_cursor
-                0x00000375                get_char
- .text          0x0000038e       0xe8 string.o
-                0x0000038e                strlen
-                0x000003ac                strcmp
+                0x00000055                __strlen
+                0x00000068                fg_set_color
+                0x00000081                sequence_black
+                0x00000093                sequence_blue
+                0x000000a5                sequence_green
+                0x000000b7                sequence_cyan
+                0x000000c9                sequence_red
+                0x000000db                sequence_magenta
+                0x000000ed                sequence_brown
+                0x000000ff                sequence_light_grey
+                0x00000111                sequence_dark_grey
+                0x00000123                sequence_light_blue
+                0x00000135                sequence_light_green
+                0x00000147                sequence_light_cyan
+                0x00000159                sequence_light_red
+                0x0000016b                sequence_light_magenta
+                0x0000017d                sequence_light_brown
+                0x0000018f                sequence_white
+                0x000001a1                bg_set_color
+                0x000001ba                printf
+                0x00000310                putchar
+                0x00000329                clear_screen
+                0x00000342                set_cursor
+                0x00000364                get_cursor
+                0x00000385                get_char
+ .text          0x000003a2       0xa8 string.o
+                0x000003a2                strlen
+                0x000003b5                strcmp
                 0x000003d5                itos
-                0x00000416                strcat
-                0x00000456                strcpy
- .text          0x00000476      0x13e file.o
-                0x00000476                sys_read
-                0x00000493                sys_check
-                0x000004a5                sys_write
-                0x000004c6                sys_create
-                0x000004df                sys_delete
-                0x000004f4                write_root
-                0x00000509                sys_run
-                0x0000051e                sys_died
-                0x0000052b                fopen
-                0x00000560                fclose
-                0x00000577                fread
-                0x00000595                fwrite
- .text          0x000005b4       0x63 mmemory.o
-                0x000005b4                memset
-                0x000005d0                memcpy
-                0x000005eb                malloc
-                0x00000602                free
- .text          0x00000617      0xb29 shell.o
-                0x00000617                cmd_help
-                0x00000635                cmd_clear
-                0x00000660                cmd_read
-                0x00000751                cmd_check
-                0x00000829                cmd_write
-                0x0000090d                cmd_delete
-                0x000009d4                cmd_create
-                0x00000a9e                cmd_mkdir
-                0x00000b6b                cmd_dir
-                0x00000bb1                cmd_sys
-                0x00000c7c                cmd_cd
-                0x00000dce                execute
-                0x00000f8b                shell_main
-                0x000010f7                main
+                0x000003fb                strcat
+                0x00000422                strcpy
+ .text          0x0000044a      0x149 file.o
+                0x0000044a                sys_read
+                0x00000468                sys_check
+                0x0000047d                sys_write
+                0x0000049f                sys_create
+                0x000004ba                sys_delete
+                0x000004d2                write_root
+                0x000004ea                sys_run
+                0x00000502                sys_died
+                0x0000050f                fopen
+                0x0000053a                fclose
+                0x00000554                fread
+                0x00000573                fwrite
+ .text          0x00000593       0x6b mmemory.o
+                0x00000593                memset
+                0x000005b0                memcpy
+                0x000005cc                malloc
+                0x000005e6                free
+ .text          0x000005fe      0xa1d shell.o
+                0x000005fe                cmd_help
+                0x00000620                cmd_clear
+                0x0000064f                cmd_read
+                0x00000735                cmd_check
+                0x000007fb                cmd_write
+                0x000008cc                cmd_delete
+                0x00000982                cmd_create
+                0x00000a3a                cmd_mkdir
+                0x00000af5                cmd_dir
+                0x00000b3e                cmd_sys
+                0x00000c0b                cmd_cd
+                0x00000d42                execute
+                0x00000ecd                shell_main
  *(.text*)
  .text.__x86.get_pc_thunk.ax
-                0x00001140        0x4 stdio.o
-                0x00001140                __x86.get_pc_thunk.ax
+                0x0000101b        0x4 stdio.o
+                0x0000101b                __x86.get_pc_thunk.ax
+ .text.startup  0x0000101f       0x49 shell.o
+                0x0000101f                main
  .text.__x86.get_pc_thunk.bx
-                0x00001144        0x4 shell.o
-                0x00001144                __x86.get_pc_thunk.bx
- .text.__x86.get_pc_thunk.si
-                0x00001148        0x4 shell.o
-                0x00001148                __x86.get_pc_thunk.si
+                0x00001068        0x4 shell.o
+                0x00001068                __x86.get_pc_thunk.bx
 
-.plt            0x00001150        0x0
- .plt           0x00001150        0x0 entry.o
+.plt            0x00001070        0x0
+ .plt           0x00001070        0x0 entry.o
 
-.plt.got        0x00001150        0x0
- .plt.got       0x00001150        0x0 entry.o
+.plt.got        0x00001070        0x0
+ .plt.got       0x00001070        0x0 entry.o
 
-.rodata         0x0000114c      0x4ac
+.rodata         0x0000106c      0x480
  *(.rodata)
  *(.rodata*)
  .rodata.str1.1
-                0x0000114c      0x106 stdio.o
+                0x0000106c      0x480 stdio.o
                                  0x30 (size before relaxing)
- *fill*         0x00001252        0x2 
- .rodata.str1.4
-                0x00001254      0x3a4 shell.o
  .rodata.str1.1
-                0x000015f8       0xe8 shell.o
+                0x000014ec      0x47d shell.o
 
-.gnu.version_d  0x000015f8        0x0
+.gnu.version_d  0x000014ec        0x0
  .gnu.version_d
-                0x000015f8        0x0 entry.o
+                0x000014ec        0x0 entry.o
 
-.gnu.version    0x000015f8        0x0
- .gnu.version   0x000015f8        0x0 entry.o
+.gnu.version    0x000014ec        0x0
+ .gnu.version   0x000014ec        0x0 entry.o
 
-.gnu.version_r  0x000015f8        0x0
+.gnu.version_r  0x000014ec        0x0
  .gnu.version_r
-                0x000015f8        0x0 entry.o
+                0x000014ec        0x0 entry.o
 
-.dynsym         0x000015f8       0x10
- .dynsym        0x000015f8       0x10 entry.o
+.dynsym         0x000014ec       0x10
+ .dynsym        0x000014ec       0x10 entry.o
 
-.dynstr         0x00001608        0x1
- .dynstr        0x00001608        0x1 entry.o
+.dynstr         0x000014fc        0x1
+ .dynstr        0x000014fc        0x1 entry.o
 
-.gnu.hash       0x0000160c       0x18
- .gnu.hash      0x0000160c       0x18 entry.o
+.gnu.hash       0x00001500       0x18
+ .gnu.hash      0x00001500       0x18 entry.o
 
-.eh_frame       0x00001624        0x0
- .eh_frame      0x00001624        0x0 entry.o
- .eh_frame      0x00001624        0x0 entry.o
+.eh_frame       0x00001518        0x0
+ .eh_frame      0x00001518        0x0 entry.o
+ .eh_frame      0x00001518        0x0 entry.o
 
-.eh_frame       0x00001624      0xc10
- .eh_frame      0x00001624      0x2f0 stdio.o
- .eh_frame      0x00001914       0xc0 string.o
- .eh_frame      0x000019d4      0x1d8 file.o
- .eh_frame      0x00001bac       0xa8 mmemory.o
- .eh_frame      0x00001c54      0x5e0 shell.o
+.eh_frame       0x00001518      0x980
+ .eh_frame      0x00001518      0x3a4 stdio.o
+ .eh_frame      0x000018bc       0xc8 string.o
+ .eh_frame      0x00001984      0x1f0 file.o
+ .eh_frame      0x00001b74       0xb8 mmemory.o
+ .eh_frame      0x00001c2c      0x26c shell.o
 
-.eh_frame_hdr   0x00002234        0x0
- .eh_frame_hdr  0x00002234        0x0 stdio.o
+.eh_frame_hdr   0x00001e98        0x0
+ .eh_frame_hdr  0x00001e98        0x0 stdio.o
 
-.rel.dyn        0x00002234      0x1c8
- .rel.plt       0x00002234        0x0 entry.o
- .rel.got       0x00002234        0x0 entry.o
- .rel.bss       0x00002234        0x0 entry.o
+.rel.dyn        0x00001e98      0x1c8
+ .rel.plt       0x00001e98        0x0 entry.o
+ .rel.got       0x00001e98        0x0 entry.o
+ .rel.bss       0x00001e98        0x0 entry.o
  .rel.data.rel.ro
-                0x00002234        0x0 entry.o
- .rel.ifunc     0x00002234        0x0 entry.o
+                0x00001e98        0x0 entry.o
+ .rel.ifunc     0x00001e98        0x0 entry.o
  .rel.data.rel.ro.local
-                0x00002234      0x100 entry.o
+                0x00001e98      0x100 entry.o
  .rel.data.rel.local
-                0x00002334        0x8 entry.o
- .rel.data.rel  0x0000233c       0xc0 entry.o
+                0x00001f98        0x8 entry.o
+ .rel.data.rel  0x00001fa0       0xc0 entry.o
 
-.data           0x00002400      0x100
+.data           0x00002060      0x100
  *(.data)
- .data          0x00002400        0x0 stdio.o
- .data          0x00002400        0x0 string.o
- .data          0x00002400        0x0 file.o
- .data          0x00002400        0x0 mmemory.o
- .data          0x00002400        0x0 shell.o
+ .data          0x00002060        0x0 stdio.o
+ .data          0x00002060        0x0 string.o
+ .data          0x00002060        0x0 file.o
+ .data          0x00002060        0x0 mmemory.o
+ .data          0x00002060        0x0 shell.o
  *(.data*)
- .data.rel.ro   0x00002400        0x0 entry.o
+ .data.rel.ro   0x00002060        0x0 entry.o
  .data.rel.ro.local
-                0x00002400       0x80 stdio.o
-                0x00002400                vga_colors
+                0x00002060       0x80 stdio.o
+                0x00002060                vga_colors
  .data.rel.local
-                0x00002480        0x4 shell.o
-                0x00002480                info
- *fill*         0x00002484       0x1c 
- .data.rel      0x000024a0       0x60 shell.o
-                0x000024a0                cmd
+                0x000020e0        0x4 shell.o
+                0x000020e0                info
+ *fill*         0x000020e4       0x1c 
+ .data.rel      0x00002100       0x60 shell.o
+                0x00002100                cmd
 
-.dynamic        0x00002500       0x88
- .dynamic       0x00002500       0x88 entry.o
-                0x00002500                _DYNAMIC
+.dynamic        0x00002160       0x88
+ .dynamic       0x00002160       0x88 entry.o
+                0x00002160                _DYNAMIC
 
-.got            0x00002588        0x0
- .got           0x00002588        0x0 entry.o
+.got            0x000021e8        0x0
+ .got           0x000021e8        0x0 entry.o
 
-.got.plt        0x00002588        0xc
- .got.plt       0x00002588        0xc entry.o
-                0x00002588                _GLOBAL_OFFSET_TABLE_
+.got.plt        0x000021e8        0xc
+ .got.plt       0x000021e8        0xc entry.o
+                0x000021e8                _GLOBAL_OFFSET_TABLE_
 
-.bss            0x00002594       0x14
+.bss            0x000021f4       0x14
  *(.bss)
- .bss           0x00002594        0x0 stdio.o
- .bss           0x00002594        0x0 string.o
- .bss           0x00002594        0x0 file.o
- .bss           0x00002594        0x0 mmemory.o
- .bss           0x00002594       0x14 shell.o
-                0x00002594                cur_dir
-                0x00002598                argv
-                0x0000259c                argv_buff
-                0x000025a0                command_buffer
-                0x000025a4                command_index
+ .bss           0x000021f4        0x0 stdio.o
+ .bss           0x000021f4        0x0 string.o
+ .bss           0x000021f4        0x0 file.o
+ .bss           0x000021f4        0x0 mmemory.o
+ .bss           0x000021f4       0x14 shell.o
+                0x000021f4                cur_dir
+                0x000021f8                argv
+                0x000021fc                argv_buff
+                0x00002200                command_buffer
+                0x00002204                command_index
  *(.bss*)
 OUTPUT(shell.elf elf32-i386)
 
-.dynbss         0x000025a8        0x0
- .dynbss        0x000025a8        0x0 entry.o
+.dynbss         0x00002208        0x0
+ .dynbss        0x00002208        0x0 entry.o
 
 .comment        0x00000000       0x2d
  .comment       0x00000000       0x2d stdio.o

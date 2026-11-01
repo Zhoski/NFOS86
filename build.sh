@@ -1,7 +1,7 @@
 make
 # Загрузчик
 nasm -f bin src/bootloader/boot.asm -o boot.bin
-nasm -f bin src/bootloader/stage2.asm -o rootFS/stage2.bin
+nasm -f bin src/bootloader/main.asm -o bin/main.bin
 # ==============================================================================
 # ДРАЙВЕРЫ 
 # ==============================================================================
@@ -91,7 +91,7 @@ ld -m elf_i386 -T linker.ld -Map=kernel.map nf86krn.o vga_640_480.o video.o keyb
                  sata.o disk.o timer.o pci.o idt.o pic.o jmp_usrmode.o gdt_rel.o interrupts.o  gdt.o faults_handler.o panic.o memory.o \
                  mm.o pmm.o paging.o syscall.o fluidfs.o fs.o program.o loader.o -o nf86krn.elf
 
-objcopy -O binary nf86krn.elf rootFS/nf86krn.bin
+objcopy -O binary nf86krn.elf bin/nf86krn.bin
 
 cd program
 cd shell
@@ -105,20 +105,19 @@ cd ..
 cd ..
 
 echo '=================== Disk assembly ==================='
-./utilities/ffspack/ffspack.elf -c out.img -M 4 -bs 4096 -b boot.bin -mb rootFS/stage2.bin
-./utilities/ffspack/ffspack.elf -d out.img -p rootFS/nf86krn.bin rootFS/setup.bin -o /system/
-./utilities/ffspack/ffspack.elf -d out.img -p license.txt -o /
-./utilities/ffspack/ffspack.elf -d out.img -p about.txt -o /
-./utilities/ffspack/ffspack.elf -d out.img -p rootFS/shell.ndf rootFS/hello.ndf rootFS/notepad.bin -o /home/
+./utilities/ffspack/ffspack.elf -c out.img -M 4 -bs 4096 -b boot.bin -mb bin/main.bin
+./utilities/ffspack/ffspack.elf -d out.img -p bin/nf86krn.bin -o /system/
+./utilities/ffspack/ffspack.elf -d out.img -p license.txt about.txt bin/idt.c -o /data/
+./utilities/ffspack/ffspack.elf -d out.img -p bin/shell.ndf bin/hello.ndf bin/notepad.bin -o /apps/
 
 qemu-system-i386 -m 4M -no-reboot \
                    -device ich9-ahci,id=ahci \
                    -drive file=out.img,if=none,id=disk \
-                   -device ide-hd,bus=ahci.0,drive=disk
+                   -device ide-hd,bus=ahci.0,drive=disk -debugcon stdio
 
 make clean
 rm *.o
 rm *bin
-rm rootFS/*bin
+rm bin/*bin
 rm *elf
 #rm *img
