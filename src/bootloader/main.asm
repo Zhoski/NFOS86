@@ -624,7 +624,6 @@ switch_to_PM:
 
 bits 32
 PMentry: 
-
     mov ax, 0x10
     mov ds, ax
     mov ss, ax
@@ -638,54 +637,4 @@ PMentry:
     mov ecx, 10240           
     rep movsd  
 
-    ;xor eax, eax
-    ;cpuid
-
-    mov eax, 0
-    mov ebx, 0
-.fill_tbl:
-    mov ecx, ebx
-    or ecx, 7
-    mov [tbl0 + eax * 4], ecx
-    inc eax
-    add ebx, 4096
-    cmp eax, 1024
-    jne .fill_tbl
-
-    mov eax, 512
-    mov ebx, 0x100000
-.krn_to_hight:
-    mov ecx, ebx
-    or ecx, 3
-    mov [tbl0 + eax * 4], ecx
-    inc eax
-    add ebx, 4096
-    cmp eax, 1024
-    jne .krn_to_hight
-
-.end
-    mov eax, tbl0
-
-    or eax, 7
-    mov [pd], eax
-
-    mov eax, pd
-    mov cr3, eax
- 
-    mov eax, cr0
-    or eax, 0x80000000
-    mov cr0, eax
-
-    ;jmp 0x8:.test
-
-    jmp 0x8:0x200000
-
-.test:
-    mov al, 'H'
-    out 0xE9, al
-    jmp $
-
-section .bss
-align 4096
-pd: resb 4096
-tbl0: resb 4096
+    jmp 0x8:0x100000

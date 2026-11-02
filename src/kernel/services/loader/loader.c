@@ -9,10 +9,7 @@ typedef void (*entry_point)();
 void _exit();
 extern void jmp_usrmode(entry_point entry);
 
-volatile u32 debug = 0;
-
 void execute_file(void* entry, void* stack, ext_t ext) {
-    video->kprintf("Execute file\n");
     ndf_header_t ndf_header;
     memcpy(entry, &ndf_header, sizeof(ndf_header));
     
@@ -23,9 +20,6 @@ void execute_file(void* entry, void* stack, ext_t ext) {
     u32* patch_offset = (u32*)(entry_addr + ndf_header.reloff - sizeof(ndf_header_t));
     for(u32 k = 0; k < ndf_header.relsz / 4; k++) {
         u32* addr_patch = (u32*)(entry_addr + patch_offset[k] - sizeof(ndf_header_t));
-        if(debug) {
-            video->kprintf("[ INFO ] Patching addr: %x  Offset: %x  Data: %x\n", addr_patch, patch_offset[k], *addr_patch);
-        }
         *addr_patch = *addr_patch + entry_addr;
     }
 
@@ -42,40 +36,14 @@ void execute_file(void* entry, void* stack, ext_t ext) {
     asm volatile("movl %%esp, %0":"=r" (kernel_stack_ptr));
     asm volatile("movl %%ebp, %0":"=r" (kernel_stack_base));
 
-    /*asm volatile(
+    asm volatile(
         "movl %0, %%esp\n"
         "movl %0, %%ebp\n"
         :
         : "r" (stack)
-    );*/
-
-    /*if(debug) {
-        video->kprintf("Entry: %x\n", program);
-        for(;;) {
-            asm("hlt");
-        }
-    }*/
-
-    /*for(;;) {
-        asm("hlt");
-    }*/
-
-    debug = 1;
-    jmp_usrmode((entry_point)program);
-
-    asm volatile (   
-        "push %%eax\n"
-        "push %%ebx\n"
-        "push %%ecx\n"
-        "push %%edx\n"
-        "push %%edi\n"
-        "push %%esi\n"
-        "movl %1, %%esp\n"   
-        "movl %1, %%ebp\n"
-        "jmp *%0"               
-        : 
-        : "r" (program), "r" (stack)
     );
+
+    jmp_usrmode((entry_point)program);
 }
 
 void _exit() {

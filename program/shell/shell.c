@@ -300,7 +300,7 @@ void execute() {
         n++;
     }
 
-    argv_buff = (u32*)malloc(argc * 4);
+    argv_buff = (u32*)malloc(32 * 4);
     argv = (u8**)argv_buff;
 
     n = 0;
@@ -339,7 +339,7 @@ void execute() {
         free(full_path);
     }
 
-    free((void*)argv_buff);
+    //free((void*)argv_buff);
 
     memset((void*)command_buffer, 0, COMMAND_BUFFER_SIZE);
     command_index = 0;
@@ -391,8 +391,6 @@ void main() {
     cur_dir = malloc(256);
     cur_dir[0] = '/';
     command_buffer = malloc(COMMAND_BUFFER_SIZE);
-
-    //memset((void*)0x100000, 0, 0x10000);
 
     shell_main();
 }

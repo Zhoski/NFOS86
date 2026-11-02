@@ -2,11 +2,12 @@
 #include <drivers/video/video.h>
 #include <kernel/memory.h>
 #include <kernel/pmm.h>
+#include <cpu/io.h>
 
 #define KRN_PAGE    0x03
 #define USR_PAGE    0x07
 
-u32 *page_dir = (u32*)0x9000;
+u32 *page_dir;
 u32 *page_tbl0;
 
 void pg_enable() {
@@ -31,35 +32,32 @@ void pdbr_load(u32 pdbr) {
 
 /**
  *  Мапит 4мб памяти, устанавливает ядро в верхнюю память
- *  Все 4мб памяти теперь принадлежат ядру
  * 
- *  Хардкод ядро не видит память выше 4мб
+ *  Ядро не видит память выше 4мб
  */
 void pg_mapping() {
-    //page_dir = pg_alloc();
-    page_tbl0 = (u32*)page_dir[0];
+    page_dir = pg_alloc();;
+    page_tbl0 = pg_alloc();;
 
-    /*for(u32 k = 0; k < 1024; k++) {
+    for(u32 k = 0; k < 1024; k++) {
         page_dir[k] = 0x00;
     }
 
     for(u32 k = 0; k < 512; k++) {
-        page_tbl0[k] = (k * 0x1000) | USR_PAGE;
+        page_tbl0[k] = (k * 0x1000) | KRN_PAGE;
     }
 
-    // Перемапинг ядра наверх
-    u32 k = 0;
-    for(u32 i = 512; i < 1024; i++) {
-        page_tbl0[i] = (0x100000 + (k << 12)) | KRN_PAGE;
+    for(u32 k = 512; k < 1024; k++) {
+        page_tbl0[k] = (k << 12) | USR_PAGE;
     }
+
+    page_tbl0[1] = 0x1000 | 0x07;   // Разрешить читать всем
 
     page_dir[0] = ((u32)page_tbl0) | USR_PAGE;
 
-    video->kprintf("Phys: %x\n", (u32*)get_physaddr((void*)0x200000));
-
     pdbr_load((u32)page_dir);
 
-    pg_enable();*/
+    pg_enable();
 }
 
 void* get_physaddr(void* virtaddr) {

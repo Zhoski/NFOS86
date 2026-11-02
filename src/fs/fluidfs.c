@@ -265,8 +265,8 @@ u32 fluidfs_fopen(u8* file) {
     }
 
     u32 offset = 0;
-    u32 stack = 0x0FFFFF;
-    u32 entry = 0x000000;
+    u32 stack = 0x3FFFFF;
+    u32 entry = 0x300000;
 
     io_disk_packet_t packet0 = {
         .command = IO_READ,

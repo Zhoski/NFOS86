@@ -104,10 +104,10 @@ make clean
 cd ..
 cd ..
 
-echo '=================== Disk assembly ==================='
+echo '=================== FFSPACK ==================='
 ./utilities/ffspack/ffspack.elf -c out.img -M 4 -bs 4096 -b boot.bin -mb bin/main.bin
 ./utilities/ffspack/ffspack.elf -d out.img -p bin/nf86krn.bin -o /system/
-./utilities/ffspack/ffspack.elf -d out.img -p license.txt about.txt bin/idt.c -o /data/
+./utilities/ffspack/ffspack.elf -d out.img -p license.txt about.txt bin/nf86krn.c -o /data/
 ./utilities/ffspack/ffspack.elf -d out.img -p bin/shell.ndf bin/hello.ndf bin/notepad.bin -o /apps/
 
 qemu-system-i386 -m 4M -no-reboot \

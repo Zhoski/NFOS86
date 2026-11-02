@@ -1,6 +1,8 @@
 #include <kernel/mm.h>
 #include <drivers/video/video.h>
 
+#define KRN_BASE        0x100000
+
 #define KERNEL_RSV      0x10000     // 64 Кб
 #define KERNEL_ALLOC    0x80000     // 512 Кб
 #define SATA_ACHI       0x1000
@@ -37,15 +39,15 @@ void mm_map_mk() {
     }
 
     u32 mem_for_other = largest_bl_len - KERNEL_ALLOC - KERNEL_RSV - SATA_ACHI;
-    g_mm.krn_addr = largest_bl_addr;
+    g_mm.krn_addr = KRN_BASE;
     g_mm.krn_len = KERNEL_RSV;
 
-    g_mm.krn_alloc = largest_bl_addr + KRN_ALLOC_OFF;
+    g_mm.krn_alloc = KRN_BASE + KRN_ALLOC_OFF;
     g_mm.krn_alloc_len = KERNEL_ALLOC;
 
-    g_mm.sata_ahci = largest_bl_addr + KRN_SATA_OFF;
+    g_mm.sata_ahci = KRN_BASE + KRN_SATA_OFF;
     g_mm.sata_ahci_len = SATA_ACHI;
 
-    g_mm.other_m = largest_bl_addr + OTHER_MEM;
+    g_mm.other_m = KRN_BASE + OTHER_MEM;
     g_mm.other_m_len = mem_for_other;
 }

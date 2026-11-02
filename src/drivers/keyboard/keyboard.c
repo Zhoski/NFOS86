@@ -54,7 +54,7 @@ U8 isCaps = 0;
 keyboard_interface kb; 
 
 void init_keyboard() {
-    kb.get_last_key = &keyboard_buf_get_las_sym; 
+    kb.get_last_key = &kb_buf_get_las_sym; 
 }
 
 void keyboard_buf_insert(U8 c) {
@@ -68,7 +68,7 @@ void keyboard_buf_insert(U8 c) {
     }
 } 
 
-U8 keyboard_buf_get_las_sym() {
+U8 kb_buf_get_las_sym() {
     if(_keyboard_buf[_keyboard_buf_read]!=0) {
         U8 temp = _keyboard_buf[_keyboard_buf_read];
         _keyboard_buf[_keyboard_buf_read] = 0;

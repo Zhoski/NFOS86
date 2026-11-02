@@ -2,8 +2,8 @@
 
 // ИСПРАВИТЬ КУЧУ
 /* ---------- Куча ---------- */
-#define HEAP_BASE           0x050000                // 2Мб
-#define HEAP_SIZE           0x050000                // 1Мб
+#define HEAP_BASE           0x200000                // 2Мб
+#define HEAP_SIZE           0x100000                // 1Мб
 
 #define FREE                 1
 #define BUSY                 0
