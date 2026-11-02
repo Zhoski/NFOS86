@@ -4,9 +4,9 @@ CONV = ../../utilities/ndfconv/ndfconv
 $(TARGET): shell.elf
 	$(CONV) shell.elf $(TARGET)
 
-shell.elf : entry.o shell.o stdio.o string.o file.o mmemory.o
+shell.elf : entry.o shell.o stdio.o string.o sys.o mmemory.o
 	gcc -m32 -nostdlib -static-pie \
-	    -T ../general/user.ld entry.o stdio.o string.o file.o mmemory.o shell.o -o shell.elf
+	    -T ../general/user.ld entry.o stdio.o string.o sys.o mmemory.o shell.o -o shell.elf
 
 shell.o : shell.c
 	gcc -m32 -ffreestanding -fPIE -static-pie -fno-plt -Werror -Os -I./../libs/include -c shell.c -o shell.o
@@ -20,8 +20,8 @@ stdio.o: ../libs/stdio.c
 string.o: ../libs/string.c
 	gcc -m32 -ffreestanding -fPIE -static-pie -fno-plt -Werror -Os -I./../libs/include -c ../libs/string.c -o string.o
 
-file.o: ../libs/file.c
-	gcc -m32 -ffreestanding -fPIE -static-pie -fno-plt -Werror -Os -I./../libs/include -c ../libs/file.c -o file.o
+sys.o: ../libs/sys.c
+	gcc -m32 -ffreestanding -fPIE -static-pie -fno-plt -Werror -Os -I./../libs/include -c ../libs/sys.c -o sys.o
 
 mmemory.o: ../libs/memory.c
 	gcc -m32 -ffreestanding -fPIE -static-pie -fno-plt -Werror  -Os -I./../libs/include -c ../libs/memory.c -o mmemory.o

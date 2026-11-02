@@ -1,6 +1,6 @@
 #include <slib/stdio.h>
 #include <slib/string.h>
-#include <slib/file.h>
+#include <slib/sys.h>
 #include <slib/memory.h>
 #include <slib/types.h>
 
@@ -12,14 +12,6 @@
 #define CTRL  0x03
 #define ENTER 0x0A 
 #define BACKSPACE 0x08 
-
-typedef struct __attribute__((packed)) {
-    u8 name[8];
-    u8 ext[3];
-    u16 start_sec;
-    u16 size;
-    u8 flags;
-} _File;
 
 typedef struct Command
 {
@@ -89,20 +81,6 @@ u32 cmd_clear() {
  */
 u32 cmd_read() {
     putchar('\n');
-    /*File* f = fopen(argv[1], FREAD);
-    if(!f) {
-        printf("%[12Can't open [%s]%[15",argv[1]);
-        return;
-    }
-    if(!f->cur) {
-        printf("[File empty]");
-    }else {
-        u8* buffer = malloc(f->bytes);
-        fread(f, f->bytes, buffer);
-        buffer[f->bytes] = '\0';
-        printf("%s",buffer);
-    }
-    fclose(f);*/
 
     u8* full_path = malloc(strlen(cur_dir) + strlen(argv[1]) + 1);
     strcat(full_path, cur_dir);
@@ -145,19 +123,6 @@ u32 cmd_check() {
  */
 u32 cmd_write() {
     putchar('\n');
-    /*int size = 0;
-    File* f = fopen(argv[1], FWRITE);
-    if(!f) {
-        printf("%[12Can't write [%s]%[15",argv[1]);
-        return;
-    }else {
-        u32 s = 0;
-        while (argv[2][s++]);
-        
-        //sys_write(f->name, argv[2], s);
-        fwrite(f, s, argv[2]);
-    }
-    fclose(f);*/
 
     u8* full_path = malloc(strlen(cur_dir) + strlen(argv[1]) + 1);
     strcat(full_path, cur_dir);
