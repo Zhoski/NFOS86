@@ -33,19 +33,12 @@ void program_execute(uint32_t entry, uint32_t stack) {
 
 void exit() {
     asm volatile(
-        "sti\n"
-        "pop %%esi\n"
-        "pop %%edi\n"
-        "pop %%edx\n"
-        "pop %%ecx\n"
-        "pop %%ebx\n"
-        "pop %%eax\n"
         "mov $0x10, %%ax\n"
         "mov %%ax, %%ds\n"
         "mov %%ax, %%es\n"
         :
         :
-        : "eax", "ebx", "ecx", "edx", "esi", "edi"
+        : "eax"
     );
 
     fs->open("/apps/shell.ndf");

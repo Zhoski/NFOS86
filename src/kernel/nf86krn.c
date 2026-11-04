@@ -49,6 +49,7 @@ void kmain() {
     u8* disk_info = (u8*)malloc(512);
     disk_init((u16*)disk_info);
     init_fs(FLUIDFS_T); 
+    
     fs->open("/apps/shell.ndf");
 
     for(;;) {

@@ -80,7 +80,10 @@ Discarded input sections
  .text.__x86.get_pc_thunk.ax
                 0x00000000        0x4 fs.o
  .group         0x00000000        0x8 program.o
+ .group         0x00000000        0x8 program.o
  .text.__x86.get_pc_thunk.ax
+                0x00000000        0x4 program.o
+ .text.__x86.get_pc_thunk.dx
                 0x00000000        0x4 program.o
  .group         0x00000000        0x8 loader.o
  .group         0x00000000        0x8 loader.o
@@ -98,7 +101,7 @@ Linker script and memory map
 
                 0x00100000                        . = 0x100000
 
-.text           0x00100000     0x35a8
+.text           0x00100000     0x357b
  *(.text*)
  .text          0x00100000      0x152 nf86krn.o
                 0x00100000                kmain
@@ -225,209 +228,209 @@ Linker script and memory map
                 0x00103199                fluidfs_write_dir
  .text          0x00103425       0x1c fs.o
                 0x00103425                init_fs
- .text          0x00103441       0x80 program.o
+ .text          0x00103441       0x6e program.o
                 0x00103441                exit
-                0x00103484                program_execute
- .text          0x001034c1       0xe7 loader.o
-                0x001034c1                _exit
-                0x00103504                execute_file
+                0x00103472                program_execute
+ .text          0x001034af       0xcc loader.o
+                0x001034af                _exit
+                0x001034d7                execute_file
 
-.iplt           0x001035a8        0x0
- .iplt          0x001035a8        0x0 nf86krn.o
+.iplt           0x0010357b        0x0
+ .iplt          0x0010357b        0x0 nf86krn.o
 
-.rodata.str1.1  0x001035a8      0x11f
+.rodata.str1.1  0x0010357b      0x10f
  .rodata.str1.1
-                0x001035a8      0x11f nf86krn.o
+                0x0010357b      0x10f nf86krn.o
                                  0x10 (size before relaxing)
  .rodata.str1.1
-                0x001036c7       0x11 vga_640_480.o
+                0x0010368a       0x11 vga_640_480.o
  .rodata.str1.1
-                0x001036c7       0xd4 faults_handler.o
+                0x0010368a       0xd4 faults_handler.o
  .rodata.str1.1
-                0x001036c7        0x3 syscall.o
+                0x0010368a        0x3 syscall.o
  .rodata.str1.1
-                0x001036c7       0x1a fluidfs.o
+                0x0010368a       0x1a fluidfs.o
  .rodata.str1.1
-                0x001036c7       0x10 program.o
+                0x0010368a       0x10 program.o
  .rodata.str1.1
-                0x001036c7       0x10 loader.o
+                0x0010368a       0x10 loader.o
 
-.eh_frame       0x001036c8      0xbdc
- .eh_frame      0x001036c8       0x48 nf86krn.o
- .eh_frame      0x00103710      0x244 vga_640_480.o
+.eh_frame       0x0010368c      0xbd4
+ .eh_frame      0x0010368c       0x48 nf86krn.o
+ .eh_frame      0x001036d4      0x244 vga_640_480.o
                                 0x270 (size before relaxing)
- .eh_frame      0x00103954       0x20 video.o
+ .eh_frame      0x00103918       0x20 video.o
                                  0x4c (size before relaxing)
- .eh_frame      0x00103974       0x80 keyboard.o
+ .eh_frame      0x00103938       0x80 keyboard.o
                                  0xac (size before relaxing)
- .eh_frame      0x001039f4      0x150 sata.o
+ .eh_frame      0x001039b8      0x150 sata.o
                                 0x190 (size before relaxing)
- .eh_frame      0x00103b44       0x44 disk.o
+ .eh_frame      0x00103b08       0x44 disk.o
                                  0x70 (size before relaxing)
- .eh_frame      0x00103b88       0x54 timer.o
+ .eh_frame      0x00103b4c       0x54 timer.o
                                  0x80 (size before relaxing)
- .eh_frame      0x00103bdc       0x64 pci.o
+ .eh_frame      0x00103ba0       0x64 pci.o
                                  0x7c (size before relaxing)
- .eh_frame      0x00103c40       0x44 idt.o
+ .eh_frame      0x00103c04       0x44 idt.o
                                  0x70 (size before relaxing)
- .eh_frame      0x00103c84       0x80 pic.o
+ .eh_frame      0x00103c48       0x80 pic.o
                                  0xac (size before relaxing)
- .eh_frame      0x00103d04       0x68 gdt.o
+ .eh_frame      0x00103cc8       0x68 gdt.o
                                  0xa8 (size before relaxing)
- .eh_frame      0x00103d6c       0x38 faults_handler.o
+ .eh_frame      0x00103d30       0x38 faults_handler.o
                                  0x50 (size before relaxing)
- .eh_frame      0x00103da4       0x14 panic.o
+ .eh_frame      0x00103d68       0x14 panic.o
                                  0x2c (size before relaxing)
- .eh_frame      0x00103db8       0xbc memory.o
+ .eh_frame      0x00103d7c       0xbc memory.o
                                  0xfc (size before relaxing)
- .eh_frame      0x00103e74       0x2c mm.o
+ .eh_frame      0x00103e38       0x2c mm.o
                                  0x58 (size before relaxing)
- .eh_frame      0x00103ea0       0x70 pmm.o
+ .eh_frame      0x00103e64       0x70 pmm.o
                                  0xb0 (size before relaxing)
- .eh_frame      0x00103f10       0xa8 paging.o
+ .eh_frame      0x00103ed4       0xa8 paging.o
                                  0xe8 (size before relaxing)
- .eh_frame      0x00103fb8       0x30 syscall.o
+ .eh_frame      0x00103f7c       0x30 syscall.o
                                  0x5c (size before relaxing)
- .eh_frame      0x00103fe8      0x21c fluidfs.o
+ .eh_frame      0x00103fac      0x21c fluidfs.o
                                 0x284 (size before relaxing)
- .eh_frame      0x00104204       0x14 fs.o
+ .eh_frame      0x001041c8       0x14 fs.o
                                  0x40 (size before relaxing)
- .eh_frame      0x00104218       0x40 program.o
-                                 0x6c (size before relaxing)
- .eh_frame      0x00104258       0x4c loader.o
-                                 0x8c (size before relaxing)
+ .eh_frame      0x001041dc       0x3c program.o
+                                 0x7c (size before relaxing)
+ .eh_frame      0x00104218       0x48 loader.o
+                                 0x88 (size before relaxing)
 
-.rodata         0x001042a4      0x374
- .rodata        0x001042a4      0x100 keyboard.o
-                0x001042a4                ascii_table_shift
-                0x00104324                ascii_table
- .rodata        0x001043a4      0x22e sata.o
- *fill*         0x001045d2        0x2 
- .rodata        0x001045d4       0x44 syscall.o
+.rodata         0x00104260      0x374
+ .rodata        0x00104260      0x100 keyboard.o
+                0x00104260                ascii_table_shift
+                0x001042e0                ascii_table
+ .rodata        0x00104360      0x22e sata.o
+ *fill*         0x0010458e        0x2 
+ .rodata        0x00104590       0x44 syscall.o
 
-.rel.dyn        0x00104618        0x0
- .rel.got       0x00104618        0x0 nf86krn.o
- .rel.iplt      0x00104618        0x0 nf86krn.o
+.rel.dyn        0x001045d4        0x0
+ .rel.got       0x001045d4        0x0 nf86krn.o
+ .rel.iplt      0x001045d4        0x0 nf86krn.o
 
-.data           0x00104620     0x1080
+.data           0x001045e0     0x1080
  *(.data*)
- .data          0x00104620        0x0 nf86krn.o
- .data          0x00104620     0x1020 vga_640_480.o
-                0x00104620                terminal_fg_vbe
-                0x00104640                font8x16
- .data          0x00105640        0x0 video.o
- .data.rel      0x00105640       0x20 video.o
- .data          0x00105660        0x1 keyboard.o
-                0x00105660                _keyboard_buf_insert
- .data          0x00105661        0x0 sata.o
- .data          0x00105661        0x0 disk.o
- *fill*         0x00105661        0x3 
- .data.rel      0x00105664        0x4 disk.o
- .data          0x00105668        0x0 timer.o
- .data          0x00105668        0x0 pci.o
- .data          0x00105668        0x0 idt.o
- .data          0x00105668        0x0 pic.o
- .data          0x00105668        0x4 gdt.o
-                0x00105668                gdt_offset
- .data          0x0010566c        0x0 faults_handler.o
- .data          0x0010566c        0x0 panic.o
- .data          0x0010566c        0x4 memory.o
-                0x0010566c                block_heap
- .data          0x00105670        0x0 mm.o
- .data          0x00105670        0x0 pmm.o
- .data          0x00105670        0x0 paging.o
- .data          0x00105670        0x0 syscall.o
- .data          0x00105670        0x0 fluidfs.o
- .data          0x00105670        0x0 fs.o
- *fill*         0x00105670       0x10 
- .data.rel      0x00105680       0x20 fs.o
- .data          0x001056a0        0x0 program.o
- .data          0x001056a0        0x0 loader.o
+ .data          0x001045e0        0x0 nf86krn.o
+ .data          0x001045e0     0x1020 vga_640_480.o
+                0x001045e0                terminal_fg_vbe
+                0x00104600                font8x16
+ .data          0x00105600        0x0 video.o
+ .data.rel      0x00105600       0x20 video.o
+ .data          0x00105620        0x1 keyboard.o
+                0x00105620                _keyboard_buf_insert
+ .data          0x00105621        0x0 sata.o
+ .data          0x00105621        0x0 disk.o
+ *fill*         0x00105621        0x3 
+ .data.rel      0x00105624        0x4 disk.o
+ .data          0x00105628        0x0 timer.o
+ .data          0x00105628        0x0 pci.o
+ .data          0x00105628        0x0 idt.o
+ .data          0x00105628        0x0 pic.o
+ .data          0x00105628        0x4 gdt.o
+                0x00105628                gdt_offset
+ .data          0x0010562c        0x0 faults_handler.o
+ .data          0x0010562c        0x0 panic.o
+ .data          0x0010562c        0x4 memory.o
+                0x0010562c                block_heap
+ .data          0x00105630        0x0 mm.o
+ .data          0x00105630        0x0 pmm.o
+ .data          0x00105630        0x0 paging.o
+ .data          0x00105630        0x0 syscall.o
+ .data          0x00105630        0x0 fluidfs.o
+ .data          0x00105630        0x0 fs.o
+ *fill*         0x00105630       0x10 
+ .data.rel      0x00105640       0x20 fs.o
+ .data          0x00105660        0x0 program.o
+ .data          0x00105660        0x0 loader.o
 
-.got            0x001056a0       0x1c
- .got           0x001056a0       0x1c nf86krn.o
+.got            0x00105660       0x1c
+ .got           0x00105660       0x1c nf86krn.o
 
-.got.plt        0x001056bc        0xc
- .got.plt       0x001056bc        0xc nf86krn.o
-                0x001056bc                _GLOBAL_OFFSET_TABLE_
+.got.plt        0x0010567c        0xc
+ .got.plt       0x0010567c        0xc nf86krn.o
+                0x0010567c                _GLOBAL_OFFSET_TABLE_
 
-.igot.plt       0x001056c8        0x0
- .igot.plt      0x001056c8        0x0 nf86krn.o
+.igot.plt       0x00105688        0x0
+ .igot.plt      0x00105688        0x0 nf86krn.o
 
-.bss            0x001056e0     0x125c
+.bss            0x001056a0     0x125c
  *(.bss*)
- .bss           0x001056e0        0x0 nf86krn.o
- .bss           0x001056e0        0xc vga_640_480.o
-                0x001056e0                terminal_bg_vbe
-                0x001056e4                screen_y_off
-                0x001056e8                screen_x_off
- .bss           0x001056ec        0x4 video.o
-                0x001056ec                video
- *fill*         0x001056f0       0x10 
- .bss           0x00105700       0x40 keyboard.o
-                0x00105700                kb
-                0x00105704                isCaps
-                0x00105705                isShift
-                0x00105706                _keyboard_buf_read
-                0x00105720                _keyboard_buf
- .bss           0x00105740       0x24 sata.o
-                0x00105740                CLB_MEM_BASE
-                0x00105744                FIS_MEM_BASE
-                0x00105748                CMD_MEM_BASE
-                0x0010574c                hba_mem
-                0x00105750                cmd_header
-                0x00105754                cmd_table
-                0x00105758                fis_layout
-                0x0010575c                fis_h2d
-                0x00105760                ahci_mem_base
- .bss           0x00105764        0xc disk.o
-                0x00105764                disk
-                0x00105768                disk_bar0
- .bss           0x00105770        0x4 timer.o
-                0x00105770                tick
- *fill*         0x00105774        0xc 
- .bss           0x00105780      0x600 pci.o
-                0x00105780                pci_devices
- .bss           0x00105d80      0x800 idt.o
-                0x00105d80                IDT
- .bss           0x00106580        0x0 pic.o
- .bss           0x00106580       0x88 gdt.o
-                0x00106580                gdt_addr
-                0x00106584                ptr
-                0x001065a0                tss0
- .bss           0x00106608        0x0 faults_handler.o
- .bss           0x00106608        0x0 panic.o
- .bss           0x00106608        0x0 memory.o
- *fill*         0x00106608       0x18 
- .bss           0x00106620       0x20 mm.o
-                0x00106620                g_mm
- .bss           0x00106640      0x220 pmm.o
-                0x00106640                krn_pg_addr
-                0x00106644                krn_pg_c
-                0x00106660                krn_pg_bitmap
- .bss           0x00106860        0x8 paging.o
-                0x00106860                page_dir
-                0x00106864                page_tbl0
- .bss           0x00106868        0x0 syscall.o
- *fill*         0x00106868       0x18 
- .bss           0x00106880       0xac fluidfs.o
-                0x00106880                block_bitmap
-                0x00106884                g_cur_block
-                0x00106888                g_fcheck_buffer
-                0x0010688c                node_p_block
-                0x00106890                slash_count
-                0x00106894                path
-                0x001068a0                g_node
-                0x00106920                g_cur_node
-                0x00106924                root_node
-                0x00106928                super_block
- .bss           0x0010692c        0x4 fs.o
-                0x0010692c                fs
- .bss           0x00106930        0xc program.o
-                0x00106930                kernel_return_ptr
-                0x00106934                kernel_stack_base
-                0x00106938                kernel_stack_ptr
- .bss           0x0010693c        0x0 loader.o
+ .bss           0x001056a0        0x0 nf86krn.o
+ .bss           0x001056a0        0xc vga_640_480.o
+                0x001056a0                terminal_bg_vbe
+                0x001056a4                screen_y_off
+                0x001056a8                screen_x_off
+ .bss           0x001056ac        0x4 video.o
+                0x001056ac                video
+ *fill*         0x001056b0       0x10 
+ .bss           0x001056c0       0x40 keyboard.o
+                0x001056c0                kb
+                0x001056c4                isCaps
+                0x001056c5                isShift
+                0x001056c6                _keyboard_buf_read
+                0x001056e0                _keyboard_buf
+ .bss           0x00105700       0x24 sata.o
+                0x00105700                CLB_MEM_BASE
+                0x00105704                FIS_MEM_BASE
+                0x00105708                CMD_MEM_BASE
+                0x0010570c                hba_mem
+                0x00105710                cmd_header
+                0x00105714                cmd_table
+                0x00105718                fis_layout
+                0x0010571c                fis_h2d
+                0x00105720                ahci_mem_base
+ .bss           0x00105724        0xc disk.o
+                0x00105724                disk
+                0x00105728                disk_bar0
+ .bss           0x00105730        0x4 timer.o
+                0x00105730                tick
+ *fill*         0x00105734        0xc 
+ .bss           0x00105740      0x600 pci.o
+                0x00105740                pci_devices
+ .bss           0x00105d40      0x800 idt.o
+                0x00105d40                IDT
+ .bss           0x00106540        0x0 pic.o
+ .bss           0x00106540       0x88 gdt.o
+                0x00106540                gdt_addr
+                0x00106544                ptr
+                0x00106560                tss0
+ .bss           0x001065c8        0x0 faults_handler.o
+ .bss           0x001065c8        0x0 panic.o
+ .bss           0x001065c8        0x0 memory.o
+ *fill*         0x001065c8       0x18 
+ .bss           0x001065e0       0x20 mm.o
+                0x001065e0                g_mm
+ .bss           0x00106600      0x220 pmm.o
+                0x00106600                krn_pg_addr
+                0x00106604                krn_pg_c
+                0x00106620                krn_pg_bitmap
+ .bss           0x00106820        0x8 paging.o
+                0x00106820                page_dir
+                0x00106824                page_tbl0
+ .bss           0x00106828        0x0 syscall.o
+ *fill*         0x00106828       0x18 
+ .bss           0x00106840       0xac fluidfs.o
+                0x00106840                block_bitmap
+                0x00106844                g_cur_block
+                0x00106848                g_fcheck_buffer
+                0x0010684c                node_p_block
+                0x00106850                slash_count
+                0x00106854                path
+                0x00106860                g_node
+                0x001068e0                g_cur_node
+                0x001068e4                root_node
+                0x001068e8                super_block
+ .bss           0x001068ec        0x4 fs.o
+                0x001068ec                fs
+ .bss           0x001068f0        0xc program.o
+                0x001068f0                kernel_return_ptr
+                0x001068f4                kernel_stack_base
+                0x001068f8                kernel_stack_ptr
+ .bss           0x001068fc        0x0 loader.o
 LOAD nf86krn.o
 LOAD vga_640_480.o
 LOAD video.o

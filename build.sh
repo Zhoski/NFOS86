@@ -101,6 +101,10 @@ cd ..
 cd hello
 make
 make clean
+cd ..
+cd tasm
+make
+make clean
 #cd ..
 #cd notepad
 #make
@@ -112,7 +116,7 @@ echo '=================== FFSPACK ==================='
 ./utilities/ffspack/ffspack.elf -c out.img -M 4 -bs 4096 -b boot.bin -mb bin/main.bin
 ./utilities/ffspack/ffspack.elf -d out.img -p bin/nf86krn.bin -o /system/
 ./utilities/ffspack/ffspack.elf -d out.img -p license.txt about.txt bin/nf86krn.c -o /data/
-./utilities/ffspack/ffspack.elf -d out.img -p bin/shell.ndf bin/hello.ndf bin/notepad.bin -o /apps/
+./utilities/ffspack/ffspack.elf -d out.img -p bin/shell.ndf bin/hello.ndf bin/tasm.ndf -o /apps/
 
 qemu-system-i386 -m 4M -no-reboot \
                    -device ich9-ahci,id=ahci \

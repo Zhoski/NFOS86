@@ -47,23 +47,7 @@ void execute_file(void* entry, void* stack, ext_t ext) {
 }
 
 void _exit() {
-    asm volatile(
-        "sti\n"
-        "pop %%esi\n"
-        "pop %%edi\n"
-        "pop %%edx\n"
-        "pop %%ecx\n"
-        "pop %%ebx\n"
-        "pop %%eax\n"
-        "mov $0x10, %%ax\n"
-        "mov %%ax, %%ds\n"
-        "mov %%ax, %%es\n"
-        :
-        :
-        : "eax", "ebx", "ecx", "edx", "esi", "edi"
-    );
-
-    fs->open("/home/shell.ndf");
+    fs->open("/apps/shell.ndf");
 
     for(;;) {
         asm("hlt");
