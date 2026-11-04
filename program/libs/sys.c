@@ -23,22 +23,14 @@ unsigned int sys_check(const char* f) {
 }
 
 unsigned int sys_write(const char* f, unsigned char* src, unsigned int n) {
-    int ret = 0;
+    unsigned int ret;
     asm volatile(
-        "movl $5, %%eax\n"
-        "movl $2, %%ebx\n"
-        "movl %[c], %%ecx\n"
-        "movl %[file], %%esi\n"
-        "movl %[in], %%edi\n"
         "int $0x40"
-        :
-        : [c] "m" (n), [file] "m" ((int)f), [in] "m" ((int)src)
-        : "eax", "ebx", "ecx", "esi", "edi", "memory"
-    );
-    asm volatile(
-        "movl %0, %%eax"
         : "=a" (ret)
+        : "a" (15), "b" (f), "c"(n), "d" (src)
+        : "memory"
     );
+    return ret;
 }
 
 unsigned int sys_create(const char* f, unsigned char flag) {
@@ -46,7 +38,7 @@ unsigned int sys_create(const char* f, unsigned char flag) {
     asm volatile(
         "int $0x40"
         : "=a" (ret)
-        : "a" (5), "b" (3), "c"(flag), "S" (f)
+        : "a" (7), "b" (f), "c"(flag)
         : "memory"
     );
     return ret;
@@ -57,7 +49,7 @@ unsigned int sys_delete(const char* node) {
     asm volatile(
         "int $0x40"
         : "=a" (ret)
-        : "a" (5), "b" (4), "S" (node)
+        : "a" (8), "b" (node)
         : "memory"
     );
 
@@ -69,7 +61,7 @@ unsigned int write_root(const char* dir) {
     asm volatile(
         "int $0x40"
         : "=a" (ret)
-        : "a" (5), "b" (6), "S" (dir)
+        : "a" (16), "b" (dir)
         : "memory"
     );
 
@@ -81,7 +73,7 @@ unsigned int sys_run(const char* f) {
     asm volatile(
         "int $0x40"
         : "=a" (ret)
-        : "a" (6), "b" (1), "S" (f)
+        : "a" (9), "b" (f)
         : "memory"
     );
 
@@ -90,11 +82,10 @@ unsigned int sys_run(const char* f) {
 
 unsigned int sys_died() {
     asm volatile(
-        "movl $0x06, %%eax\n"
-        "movl $0x60, %%ebx\n"
         "int $0x40"
         :
-        : 
+        : "a" (0)
+        : "memory"
     );
 }
 
@@ -102,5 +93,22 @@ unsigned int sys_died() {
  *  Возвращает дексриптор файла
  */
 unsigned int sys_open(const char* f) {
+    unsigned int ret;
+    asm volatile(
+        "int $0x40"
+        : "=a" (ret)
+        : "a" (5), "b" (f)
+        : "memory"
+    );
     
+    return ret;
+}
+
+void sys_close(unsigned int fd) {
+    asm volatile(
+        "int $0x40"
+        :
+        : "a" (6), "b" (fd)
+        : "memory"
+    );
 }

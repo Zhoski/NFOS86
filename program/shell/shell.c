@@ -86,16 +86,14 @@ u32 cmd_read() {
     strcat(full_path, cur_dir);
     strcat(full_path, argv[1]);
 
-    u8* temp_buffer = malloc(4096);
-    memset(temp_buffer, 0, 4096);
-    u32 read_status = sys_read(full_path, 4096, temp_buffer);
-
-    if(read_status == 0) {
-        printf("%s", temp_buffer);
-    }else {
+    u32 fd = sys_open(full_path);
+    
+    if(!fd) {
         printf("[ %[04FAIL%[07 ] File %s not found", argv[1]);
+    }else {
+        printf("%s", (u8*)(fd + 4));
+        sys_close(fd);
     }
-    free(temp_buffer);
 
     free(full_path);
 }
@@ -124,9 +122,20 @@ u32 cmd_check() {
 u32 cmd_write() {
     putchar('\n');
 
+    //strlen(argv[1]);
+
+    if(!argv[1] || !argv[2]) {
+        printf("[ %[04FAIL%[07 ] Too few arguments");
+        return 0;
+    }
+    
+    //printf("\n%d\n",strlen(argv[1]));
+
     u8* full_path = malloc(strlen(cur_dir) + strlen(argv[1]) + 1);
     strcat(full_path, cur_dir);
     strcat(full_path, argv[1]);
+
+    printf("path: %s\n", full_path);
 
     if(sys_write(full_path, argv[2], strlen(argv[2])) == 0x00) {
         printf("[  %[02OK%[07  ] File %s overwrite", argv[1]);
@@ -222,7 +231,9 @@ u32 cmd_cd() {
 
         //printf("Full path: %s\n", full_path);
 
-        if(sys_check(full_path)) {
+        u32 fd = sys_open(full_path);
+
+        if(fd) {
             strcat(cur_dir, argv[1]);
             strcat(cur_dir, "/");
 
@@ -304,7 +315,7 @@ void execute() {
         free(full_path);
     }
 
-    //free((void*)argv_buff);
+    free((void*)argv_buff);
 
     memset((void*)command_buffer, 0, COMMAND_BUFFER_SIZE);
     command_index = 0;

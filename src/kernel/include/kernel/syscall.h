@@ -1,58 +1,35 @@
 #ifndef __SYSCALL__
 #define __SYSCALL__
 
-/* VIDEO */
+#include <lib/int.h>
 
-#define SYSCALL_VIDEO           0x01
+#define SYS_EXIT            0
+#define WRITE               1
+#define SCREEN              0
+#define COM_PORT            1
+#define STR                 0
+#define SYM                 1
+#define KEYBOARD            2
+#define NO_WAIT             0
+#define WAIT                1
+#define MALLOC              3
+#define FREE                4
+#define SYS_OPEN            5
+#define SYS_CLOSE           6
+#define SYS_CREATE          7
+#define SYS_DELETE          8
+#define SYS_RUN             9
+#define SET_BG              10
+#define SET_FG              11
+#define CLEAR               12
+#define SET_CURSOR          13
+#define GET_CURSOR          14
+#define SYS_WRITE           15
+#define WRITE_DIR           16
 
-#define WRITE_STRING            0x01
-#define WRITE_CHAR              0x02
-#define WRITE_INT               0x03
-#define WRITE_HEX               0x04
-#define SET_BG_COLOR            0x05
-#define SET_FG_COLOR            0x06
-#define CLEAR_SCREEN            0x07
-#define SET_CURSOR              0x08
-#define GET_CURSOR              0x09
+typedef struct {
+    u32 eax; u32 ebx; u32 ecx; u32 edx; u32 esi; u32 edi; 
+} __attribute__((packed)) syscall_ct;
 
-/* ----- Keyboard ------ */
-
-#define SYSCALL_KEYBOARD        0x02
-#define RETURN_LAST_SYM         0x01
-
-/* ------- STRING ------ */
-
-#define SYSCALL_STRING          0x03
-
-#define STRCMP                  0x01
-#define STRLEN                  0x02              
-
-/* ------- MEMORY -------*/
-
-#define SYSCALL_MEMORY          0x04
-
-#define MALLOC                  0x01
-#define FREE                    0x02
-
-/*-------- DISK --------*/      
-
-#define SYSCALL_DISK            0x05
-#define CAT_FILE                0x01
-#define OVERWRITE_FILE          0x02
-#define CREATE_FILE             0x03
-#define DELETE_FILE             0x04
-#define FILE_CHECK              0x05
-#define WRITE_DIR               0x06
-#define DISK_DISPATCH           0x07
-
-/*------- SYSTEM -------*/
-#define SYSCALL_SYSTEM          0x06
-#define SYS_RUN                 0x01
-#define SYS_DIED                0x60
-
-#define KERNEL_READ_ERROR       -1
-#define SUCCES_READ             0
-#define KERNEL_BASE             0x110000
-
-void syscall_handler(unsigned int eax, unsigned int ebx, unsigned int ecx, unsigned int edx, char* esi, char* edi);
+void syscall_handler(syscall_ct* ct);
 #endif

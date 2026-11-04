@@ -15,7 +15,7 @@ unsigned int sys_delete(const char* f);
 unsigned int sys_run(const char* f);
 unsigned int sys_died();
 unsigned int sys_open(const char* f);
-unsigned int sys_close(unsigned int fd);
 unsigned int write_root(const char* dir);
+void sys_close(unsigned int fd);
 
 #endif

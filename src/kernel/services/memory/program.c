@@ -48,7 +48,7 @@ void exit() {
         : "eax", "ebx", "ecx", "edx", "esi", "edi"
     );
 
-    fs->open("/home/shell.bin");
+    fs->open("/apps/shell.ndf");
     for(;;) {
         asm("hlt");
     }

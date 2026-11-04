@@ -25,36 +25,22 @@ void memcpy(void* src,void* dest, unsigned int n) {
 }
 
 unsigned char* malloc(unsigned int n) {
+    unsigned int ret;
     asm volatile(
-        "movl $4, %%eax\n"
-        "movl $1, %%ebx\n"
-        "movl %0, %%ecx\n"
         "int $0x40"
-        :
-        : "r"(n)
-        : "eax", "ebx", "ecx", "memory"
-    );
-
-    unsigned int free_adres;
-
-    asm volatile (
-        "movl %%eax, %0"
-        : "=r" (free_adres)
-        :
+        :  "=a" (ret)
+        : "a" (3), "b" (n)
         : "memory"
     );
 
-    return (unsigned char*)free_adres;
+    return (unsigned char*)ret;
 }
 
 void free(void* ptr) {
     asm volatile(
-        "movl $4, %%eax\n"
-        "movl $2, %%ebx\n"
-        "movl %0, %%ecx\n"
         "int $0x40"
         :
-        : "r"((unsigned int)ptr)
-        : "eax", "ebx", "ecx", "memory"
+        : "a" (4), "b" (ptr)
+        : "memory"
     );
 }

@@ -299,7 +299,6 @@ u8 ahci_sector_read_write(u64 lba, u16 sec_count, void* buffer) {
     hba_mem->port[0].ci = 1;
 
     u32 step = 0;
-
     while (hba_mem->port[0].ci & 0x01) {
         if(step == 10) {
             video->kprintf("[ %f12FAIL%f15 ] AHCI: Disk timeout\n");

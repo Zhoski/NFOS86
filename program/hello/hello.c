@@ -1,8 +1,6 @@
 #include <slib/stdio.h>
 
 void main() {
-    while (1)
-    {
-        printf("Hello\n");
-    }
+    printf("\nHello startup");
+    asm("int $0x40"::"a"(0));
 }

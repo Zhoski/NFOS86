@@ -97,6 +97,10 @@ cd program
 cd shell
 make
 make clean
+cd ..
+cd hello
+make
+make clean
 #cd ..
 #cd notepad
 #make

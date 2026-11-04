@@ -98,8 +98,11 @@ isr64:
     mov ds, ax
     mov es, ax 
 
+    mov eax, esp
+    push eax
+
     call syscall_handler
-    add esp, 4
+    add esp, 8
     
     pop ebx
     pop ecx

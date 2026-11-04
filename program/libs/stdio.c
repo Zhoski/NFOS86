@@ -108,25 +108,23 @@ int __strlen(const char s[]) {
 
 void fg_set_color(unsigned char color) {
     asm volatile(
-        "movl $1, %%eax\n"
-        "movl $6, %%ebx\n"
-        "movl %0, %%ecx\n"
+        "movl $11, %%eax\n"
+        "movl %0, %%ebx\n"
         "int $0x40"
         :
         : "r"((unsigned int)color)
-        : "eax", "ebx", "ecx", "memory"
+        : "eax", "ebx"
     );
 }
 
 void bg_set_color(unsigned char color) {
     asm volatile(
-        "movl $1, %%eax\n"
-        "movl $5, %%ebx\n"
-        "movl %0, %%ecx\n"
+        "movl $10, %%eax\n"
+        "movl %0, %%ebx\n"
         "int $0x40"
         :
         : "r"((unsigned int)color)
-        : "eax", "ebx", "ecx", "memory"
+        : "eax", "ebx"
     );
 }
 
@@ -138,12 +136,13 @@ void printf(const unsigned char *format, ...) {
         if(*p != '%') {
             asm volatile (
                 "movl $1, %%eax\n"
-                "movl $2, %%ebx\n"
+                "movl $0, %%ebx\n"
                 "movl %0, %%ecx\n"
+                "movl $1, %%edx\n"
                 "int $0x40"
                 :
                 : "r" ((unsigned int)*p)
-                : "eax", "ebx","ecx", "memory"
+                : "eax", "ebx","ecx","edx"
             );
             continue;
         }
@@ -187,12 +186,13 @@ void printf(const unsigned char *format, ...) {
             
             asm volatile (
                 "movl $1, %%eax\n"
-                "movl $1, %%ebx\n"
+                "movl $0, %%ebx\n"
                 "movl %0, %%ecx\n"
+                "movl $0, %%edx\n"
                 "int $0x40"
                 :
                 : "r" (buffer)
-                : "eax", "ebx","ecx", "memory"
+                : "eax", "ebx","ecx","edx"
             );
 
             break;
@@ -200,12 +200,13 @@ void printf(const unsigned char *format, ...) {
             char *s = va_arg(args, char*);
             asm volatile (
                 "movl $1, %%eax\n"
-                "movl $1, %%ebx\n"
+                "movl $0, %%ebx\n"
                 "movl %0, %%ecx\n"
+                "movl $0, %%edx\n"
                 "int $0x40"
                 :
                 : "r" (s)
-                : "eax", "ebx","ecx", "memory"
+                : "eax", "ebx","ecx","edx"
             );
             break;
         case '[':
@@ -227,24 +228,24 @@ void printf(const unsigned char *format, ...) {
 void putchar(unsigned char c) {
     asm volatile (
         "movl $1, %%eax\n"
-        "movl $2, %%ebx\n"
+        "movl $0, %%ebx\n"
         "movl %0, %%ecx\n"
+        "movl $1, %%edx\n"
         "int $0x40"
         :
         : "r" ((unsigned int)c)
-        : "eax", "ebx","ecx", "memory"
+        : "eax", "ebx","ecx", "edx"
     );
 }
 
 void clear_screen(unsigned char color) {
     asm volatile (
-        "movl $1, %%eax\n"
-        "movl $7, %%ebx\n"
-        "movl %0, %%edx\n"
+        "movl $12, %%eax\n"
+        "movl %0, %%ebx\n"
         "int $0x40"
         :
         : "r" ((unsigned int)color)
-        : "eax", "ebx", "edx", "memory"
+        : "eax", "ebx"
     );
 }
 
@@ -254,26 +255,21 @@ void set_cursor(const unsigned short x, const unsigned short y) {
     pos |= y;
     
     asm volatile (
-        "movl $1, %%eax\n"
-        "movl $8, %%ebx\n"
-        "movl %0, %%ecx\n"
+        "movl $13, %%eax\n"
+        "movl %0, %%ebx\n"
         "int $0x40"
         :
         : "r" (pos)
-        : "eax", "ebx", "ecx", "memory"
+        : "eax", "ebx"
     );
 }
 
 void get_cursor(unsigned int* x, unsigned int* y) { 
     asm volatile (
-        "movl $1, %%eax\n"
-        "movl $9, %%ebx\n"
-        "movl %0, %%ecx\n"
-        "movl %1, %%edx\n"
         "int $0x40"
-        :
-        : "r" (x), "r" (y)
-        : "eax", "ebx", "ecx", "edx", "memory"
+        : 
+        : "a" (14), "c" (x), "d" (y)
+        : "memory"
     );
 }
 
@@ -281,13 +277,11 @@ unsigned char get_char() {
     unsigned char out; 
     asm volatile (
         "movl $2, %%eax\n"
-        "movl $1, %%ebx\n"
-        "movl $0, %%ecx\n"
-        "movl $0, %%edx\n"
+        "movl $0, %%ebx\n"
         "int $0x40"
         : "=a"(out) 
         : 
-        : "ebx", "ecx", "edx", "memory"
+        : "ebx", "ebx"
     );
     return out;
 }
