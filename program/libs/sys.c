@@ -68,12 +68,12 @@ unsigned int write_root(const char* dir) {
     return ret;
 }
 
-unsigned int sys_run(const char* f) {
+unsigned int sys_run(const char* f, unsigned int argc, unsigned char* argv[]) {
     int ret = 0;
     asm volatile(
         "int $0x40"
         : "=a" (ret)
-        : "a" (9), "b" (f)
+        : "a" (9), "b" (f), "c" (argc), "d" (argv)
         : "memory"
     );
 

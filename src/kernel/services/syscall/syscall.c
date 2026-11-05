@@ -2,7 +2,7 @@
 #include <kernel/memory.h>
 #include <kernel/device.h>
 #include <kernel/memory.h>
-#include <kernel/program.h>
+#include <kernel/loader.h>
 #include <drivers/video/video.h>
 #include <fs/fs.h>
 
@@ -17,6 +17,7 @@ void syscall_handler(syscall_ct* ct) {
             "jmp *%[exit]"
             :
             : [exit] "r"(kernel_return_ptr), [stack_top] "r"(kernel_stack_ptr), [stack_base] "r" (kernel_stack_base)
+            : "memory"
         );
         break;
     case WRITE:
@@ -24,7 +25,8 @@ void syscall_handler(syscall_ct* ct) {
         {
             case SCREEN: 
                 if(ct->edx == STR) video->kprintf("%s", ct->ecx); 
-                else video->kputc((u8)ct->ecx);
+                else if(ct->edx == SYM) video->kputc((u8)ct->ecx);
+                else if(ct->edx == HEX) video->kprintf("%x", ct->ecx);
                 break;
             case COM_PORT: break;
         }
@@ -63,7 +65,7 @@ void syscall_handler(syscall_ct* ct) {
         ct->eax = fs->delete((u8*)ct->ebx);
         break;
     case SYS_RUN:
-        ct->eax = fs->open((u8*)ct->ebx);
+        pr_execute((u8*)ct->ebx, ct->ecx, (u8**)ct->edx);
         break;
     case SET_BG:
         video->terminal_bg_vbe_set((u8)ct->ebx);

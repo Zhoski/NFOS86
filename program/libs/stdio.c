@@ -196,6 +196,43 @@ void printf(const unsigned char *format, ...) {
             );
 
             break;
+        case 'x': {
+            unsigned int n = va_arg(args, unsigned int);
+            unsigned int i = 0;
+
+            unsigned char buffer[10] = {0};
+
+            do {
+                unsigned char* chars = "0123456789ABCDEF";
+                unsigned int hex = n % 16;
+                buffer[i++] = chars[hex];
+                n /= 16;
+            } while (n > 0);
+
+            buffer[i] = '\0';
+
+            unsigned int start = 0;
+            unsigned int end = i - 1;
+            while (start < end) {
+                unsigned char temp = buffer[start];
+                buffer[start] = buffer[end];
+                buffer[end] = temp;
+                start++;
+                end--;
+            }
+            
+            asm volatile (
+                "movl $1, %%eax\n"
+                "movl $0, %%ebx\n"
+                "movl %0, %%ecx\n"
+                "movl $0, %%edx\n"
+                "int $0x40"
+                :
+                : "r" (buffer)
+                : "eax", "ebx","ecx","edx"
+            );
+            break;
+        }
         case 's':
             char *s = va_arg(args, char*);
             asm volatile (

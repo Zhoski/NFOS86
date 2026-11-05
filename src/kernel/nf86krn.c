@@ -14,6 +14,7 @@
 #include <cpu/paging.h>
 #include <kernel/mm.h>
 #include <kernel/pmm.h>
+#include <kernel/loader.h>
 
 extern void isr8();
 extern void isr13();
@@ -49,8 +50,10 @@ void kmain() {
     u8* disk_info = (u8*)malloc(512);
     disk_init((u16*)disk_info);
     init_fs(FLUIDFS_T); 
-    
-    fs->open("/apps/shell.ndf");
+
+    pr_execute("/apps/shell.ndf", 0, 0);
+
+    //fs->open("/apps/shell.ndf");
 
     for(;;) {
         asm("hlt");

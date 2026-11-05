@@ -89,7 +89,7 @@ gcc -m32 -ffreestanding -c src/fs/fluidfs.c -Werror -Os -o fluidfs.o \
 # ==============================================================================
 ld -m elf_i386 -T linker.ld -Map=kernel.map nf86krn.o vga_640_480.o video.o keyboard.o \
                  sata.o disk.o timer.o pci.o idt.o pic.o jmp_usrmode.o gdt_rel.o interrupts.o  gdt.o faults_handler.o panic.o memory.o \
-                 mm.o pmm.o paging.o syscall.o fluidfs.o fs.o program.o loader.o -o nf86krn.elf
+                 mm.o pmm.o paging.o syscall.o fluidfs.o fs.o loader.o -o nf86krn.elf
 
 objcopy -O binary nf86krn.elf bin/nf86krn.bin
 
@@ -115,7 +115,7 @@ cd ..
 echo '=================== FFSPACK ==================='
 ./utilities/ffspack/ffspack.elf -c out.img -M 4 -bs 4096 -b boot.bin -mb bin/main.bin
 ./utilities/ffspack/ffspack.elf -d out.img -p bin/nf86krn.bin -o /system/
-./utilities/ffspack/ffspack.elf -d out.img -p license.txt about.txt bin/nf86krn.c -o /data/
+./utilities/ffspack/ffspack.elf -d out.img -p license.txt about.txt bin/nf86krn.c bin/test.asm -o /data/
 ./utilities/ffspack/ffspack.elf -d out.img -p bin/shell.ndf bin/hello.ndf bin/tasm.ndf -o /apps/
 
 qemu-system-i386 -m 4M -no-reboot \
@@ -127,5 +127,6 @@ make clean
 rm *.o
 rm *bin
 rm bin/*bin
+rm bin/*ndf
 rm *elf
 #rm *img

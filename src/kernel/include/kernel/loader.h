@@ -3,6 +3,10 @@
 
 #include <lib/int.h>
 
+extern uint32_t kernel_stack_ptr;
+extern uint32_t kernel_stack_base;
+extern uint32_t kernel_return_ptr;
+
 typedef struct {
     u8 magic[4];
     u32 entry;
@@ -20,6 +24,6 @@ typedef enum {
     NDF,
 } ext_t;
 
-void execute_file(void* entry, void* stack, ext_t ext);
+u32 pr_execute(u8* f, u32 argc, u8* argv[]);
 
 #endif

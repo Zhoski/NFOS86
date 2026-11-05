@@ -1,7 +1,6 @@
 #include <fs/fluidfs.h>
 #include <drivers/disk/disk.h>
 #include <kernel/memory.h>
-#include <kernel/program.h>
 #include <drivers/video/video.h>
 #include <lib/string.h>
 #include <kernel/loader.h>
@@ -268,29 +267,9 @@ u32 fluidfs_fopen(u8* file) {
     u32 stack = 0x3FFFFF;
     u32 entry = 0x300000;
 
-    io_disk_packet_t packet0 = {
-        .command = IO_READ,
-        .buffer = (void*)entry,
-        .sec_count = super_block->sec_p_block
-    };
+    fluidfs_fread(file, (void*)entry, g_node.size);
 
-    for(u32 k = 0; k < 16; k++) {
-        if(g_node.p_block[k] == 0) {
-            break;
-        }
-
-        packet0.lba_start = g_node.p_block[k] * super_block->sec_p_block;
-        packet0.buffer = (void*)(entry + offset);
-
-        disk->dispather(&packet0);
-
-        offset += super_block->sec_p_block * 512;
-    }
-
-    if(*(u8*)(entry + 1) == 'N') {
-        execute_file((void*)entry, (void*)stack, NDF);
-    }
-    program_execute(entry, stack);
+    //pr_execute(file, 0, 0);
 }
 
 /**
@@ -324,6 +303,7 @@ u32 fluidfs_fread(u8* file, u8* dest, u32 n) {
         if(n > super_block->block_size) {
             memcpy(temp_buffer, dest, super_block->block_size);
             n -= super_block->block_size;
+            dest += super_block->block_size;
         }else {
             memcpy(temp_buffer, dest, n % super_block->block_size);
             break;

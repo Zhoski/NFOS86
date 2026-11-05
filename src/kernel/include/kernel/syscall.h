@@ -9,6 +9,7 @@
 #define COM_PORT            1
 #define STR                 0
 #define SYM                 1
+#define HEX                 2
 #define KEYBOARD            2
 #define NO_WAIT             0
 #define WAIT                1

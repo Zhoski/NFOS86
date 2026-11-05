@@ -307,7 +307,7 @@ void execute() {
         u8* full_path = malloc(strlen(cur_dir) + strlen(argv[0]) + 1);
         strcat(full_path, cur_dir);
         strcat(full_path, argv[0]);
-        u32 err = sys_run(full_path);
+        u32 err = sys_run(full_path, argc, argv);
         if(err) {
             printf("\n%[04NFOS86: Unknown command %s%[07",argv[0]);
         }
@@ -363,7 +363,7 @@ void shell_main() {
     }
 }
 
-void main() {
+void main(u32 argc) {
     cur_dir = malloc(256);
     cur_dir[0] = '/';
     command_buffer = malloc(COMMAND_BUFFER_SIZE);
