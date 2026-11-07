@@ -1,5 +1,5 @@
-#ifndef INT
-#define INT
+#ifndef INT_H
+#define INT_H
 
 #include <stdint.h>
 

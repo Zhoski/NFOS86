@@ -24,7 +24,7 @@ void memcpy(void* src,void* dest, unsigned int n) {
     ); 
 }
 
-unsigned char* malloc(unsigned int n) {
+void* malloc(unsigned int n) {
     unsigned int ret;
     asm volatile(
         "int $0x40"
@@ -33,7 +33,7 @@ unsigned char* malloc(unsigned int n) {
         : "memory"
     );
 
-    return (unsigned char*)ret;
+    return (void*)ret;
 }
 
 void free(void* ptr) {
@@ -43,4 +43,17 @@ void free(void* ptr) {
         : "a" (4), "b" (ptr)
         : "memory"
     );
+}
+
+unsigned int memcmp(void* p1, void* p2, unsigned int n) {
+    unsigned int i = 0;
+    while (i < n)
+    {
+        if(*(unsigned char*)(p1 + i) != *(unsigned char*)(p2 + i)) {
+            return 0;
+        }
+        i++;
+    }
+
+    return 1;
 }

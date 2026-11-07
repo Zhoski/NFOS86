@@ -51,6 +51,8 @@ void kmain() {
     disk_init((u16*)disk_info);
     init_fs(FLUIDFS_T); 
 
+    video->clear_screen(0);
+
     pr_execute("/apps/shell.ndf", 0, 0);
 
     //fs->open("/apps/shell.ndf");

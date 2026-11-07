@@ -18,7 +18,7 @@ VideoDriver_t* video;
 void init_vga(U8 mode) {
     switch (mode)
     {
-        case VGA_640_480: video = &vga_640_480; break;
+        case VGA_640_480: video = &vga_640_480; video->terminal_fg_vbe_set(7); break;
         default: break;
     }
 };

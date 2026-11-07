@@ -29,6 +29,20 @@ void itos(int num, char* out) {
     }
 }
 
+int stoi(char* src) {
+    int n = 0;
+    int sign = 1;
+    if(*src == '-') {
+        sign = -1;
+    }
+    while (*src >= '0' && *src <= '9') {
+        n = n * 10 + (*src - '0');
+        src++;
+    }
+
+    return sign * n;
+}
+
 void strcat(char* dest, char* src) {
     int i = 0, j = 0;
 

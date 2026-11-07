@@ -16,9 +16,6 @@ typedef void (*entry_point)();
 void _exit();
 extern void jmp_usrmode(u32 entry, u32 stack);
 
-#define ENTRY       (void*)0x300000
-#define STACK       (void*)0x3FFFF0
-
 u32 program;
 
 u32 g_argc;
@@ -51,10 +48,13 @@ u32 pr_execute(u8* f, u32 argc, u8* argv[]) {
 
     //memset((void*)0x300000, 0, 0xFFFFF);
 
-    fs->read(f, (u8*)ENTRY, g_node.size);
+    void* entry = (void*)0x300000;
+    void* stack = (void*)0x3FFFF0;
+ 
+    fs->read(f, entry, g_node.size);
 
-    patch((void*)ENTRY, (void*)STACK);
-
+    if(*(u8*)entry == 0x77) patch((void*)entry, (void*)stack);
+    
     kernel_return_ptr = (uint32_t)&_exit;
     asm volatile("movl %%esp, %0":"=r" (kernel_stack_ptr));
     asm volatile("movl %%ebp, %0":"=r" (kernel_stack_base));
@@ -64,27 +64,27 @@ u32 pr_execute(u8* f, u32 argc, u8* argv[]) {
     for(u32 i = 0; i < argc; i++) {
         u32 arg_len = strlen(argv[i]) + 1;
         offset += arg_len;
-        memcpy(argv[i], STACK - offset, arg_len);
-        g_argv[i] = STACK - offset;
+        memcpy(argv[i], stack - offset, arg_len);
+        g_argv[i] = stack - offset;
         offset += offset % 4;
     }
 
     for(u32 i = argc; i > 0; i--) {
         offset += 4;
-        u32* push_add = (u32*)(STACK - offset);
+        u32* push_add = (u32*)(stack - offset);
         *push_add = (u32)g_argv[i - 1];
     }
 
-    g_argv = (u8**)(STACK - offset);
+    g_argv = (u8**)(stack - offset);
 
     offset += 4;
-    u32* push_add = (u32*)(STACK - offset);
+    u32* push_add = (u32*)(stack - offset);
     *push_add = (u32)g_argv;
     offset += 4;
-    push_add = (u32*)(STACK - offset);
+    push_add = (u32*)(stack - offset);
     *push_add = argc;
 
-    jmp_usrmode(program, (u32)STACK - offset - 4);
+    jmp_usrmode(program, (u32)stack - offset - 4);
 }
 
 void _exit() {

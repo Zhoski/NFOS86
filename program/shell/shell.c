@@ -324,7 +324,7 @@ void execute() {
 void shell_main() {
     bg_set_color(0);
     fg_set_color(7);
-    clear_screen(0);
+    //clear_screen(0);
 
     printf(info);
     printf("NFOS86$%s> ", cur_dir);

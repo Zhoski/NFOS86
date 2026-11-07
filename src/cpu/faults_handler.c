@@ -1,6 +1,8 @@
 #include <drivers/video/video.h>
-#include <cpu/registers.h>
+#include <fs/fs.h>
 #include <lib/int.h>
+#include <kernel/device.h>
+#include <kernel/loader.h>
 
 #define DF  8
 #define GP  13
@@ -13,7 +15,6 @@ typedef struct {
 } __attribute__((packed)) stack;
 
 void c_faults_handler(stack* st) {
-    asm volatile("cli");
     video->clear_screen(0);
     switch (st->fn)
     {
@@ -31,6 +32,15 @@ void c_faults_handler(stack* st) {
     //video->kprintf("ESI: %x\nEDI: %x\n", st->esi, st->edi);
     video->kprintf("CR0: %x\nCR2: %x\nCR3: %x\nCR4: %x\n", st->cr0, st->cr2, st->cr3, st->cr4);
     //video->kprintf("CR0: %x\n", st->cr0);
+
+    video->kprintf("press any key to restart shell\n");
+
+    u8 c = 0;
+    while (!c) c = kb.get_last_key();
+
+    video->clear_screen(0);
+    pr_execute("/apps/shell.ndf",0,0);
+
     for(;;) {
         asm("hlt");
     }
