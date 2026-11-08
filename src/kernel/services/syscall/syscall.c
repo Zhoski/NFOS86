@@ -5,9 +5,20 @@
 #include <kernel/loader.h>
 #include <drivers/video/video.h>
 #include <fs/fs.h>
+#include <cpu/gdt.h>
 
+/**
+ *  Исправить добавив базу сегмента данных ко всему что надо
+ */
 void syscall_handler(syscall_ct* ct) { 
     asm volatile("sti");
+
+    desc_t* cur_ldt_desc = gdt_addr + 48;
+    u32 cur_ldt_base = cur_ldt_desc->base_high << 24 | cur_ldt_desc->base_mid << 16 | cur_ldt_desc->base_low;
+
+    desc_t* data_desc = (desc_t*)(cur_ldt_base + 8);
+    u32 cur_data_base = data_desc->base_high << 24 | data_desc->base_mid << 16 | data_desc->base_low;
+
     switch (ct->eax)
     {
     case  SYS_EXIT:
@@ -24,7 +35,7 @@ void syscall_handler(syscall_ct* ct) {
         switch (ct->ebx)
         {
             case SCREEN: 
-                if(ct->edx == STR) video->kprintf("%s", ct->ecx); 
+                if(ct->edx == STR) video->kprintf("%s", (u8*)(ct->ecx + cur_data_base)); 
                 else if(ct->edx == SYM) video->kputc((u8)ct->ecx);
                 else if(ct->edx == HEX) video->kprintf("%x", ct->ecx);
                 break;

@@ -60,7 +60,7 @@ align 4
 lba:
     db 0x10
     db 0x00
-    dw 6
+    dw 15
     dw 0x8000
     dw 0x0000
     dq 1          

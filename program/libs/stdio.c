@@ -191,7 +191,7 @@ void printf(const unsigned char *format, ...) {
                 "movl $0, %%edx\n"
                 "int $0x40"
                 :
-                : "r" (buffer)
+                : "r" ((unsigned int)buffer)
                 : "eax", "ebx","ecx","edx"
             );
 

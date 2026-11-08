@@ -3,7 +3,7 @@
 #include <lib/int.h>
 #include <stdarg.h>
 
-void init_vga(U8 mode);
+void init_video();
 
 enum vga_color {
     VGA_COLOR_BLACK = 0,
@@ -25,9 +25,7 @@ enum vga_color {
 };
 
 enum graphics_mode {
-    VGA_80_25 = 0x03,          // VGA текстовый 80x25 16 цветов
-    VGA_640_480 = 0x12,        // VGA графический 640x480 16 цветов
-    VGA_320_200 = 0x13,        // VGA графический 320x200 256 цветов
+    VESA_800_600_8,
 };
 
 typedef struct VideoDriver{
@@ -40,6 +38,7 @@ typedef struct VideoDriver{
 	void (*terminal_set_cursor_position)(const u16 x, const u16 y);
 	void (*terminal_get_cursor_position)(u16* x, u16* y);
 	void (*kprintf)(const u8 *format, ...);
+	void (*putpixel)(u32 x, u32 y, u8 color);
 }VideoDriver_t;
 
 extern VideoDriver_t* video;

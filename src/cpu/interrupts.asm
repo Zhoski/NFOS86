@@ -22,6 +22,10 @@ global isr64
 %macro EXCEPTIONS_NO_ERR_CODE 1
 global isr%1
 isr%1:
+    mov ax, 0x10
+    mov ds, ax
+    mov es, ax
+    mov fs, ax
     push 0
     PUSHALL
     jmp faults_handler
@@ -30,6 +34,10 @@ isr%1:
 %macro EXCEPTIONS_ERR_CODE 1
 global isr%1
 isr%1:
+    mov ax, 0x10
+    mov ds, ax
+    mov es, ax
+    mov fs, ax
     push %1
     PUSHALL
     jmp faults_handler

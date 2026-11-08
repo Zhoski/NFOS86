@@ -12,6 +12,11 @@ org 0x8000
     mov si, %1
     call print
 %endmacro
+%macro WRITE_CHAR 1
+    mov al, %1
+    mov ah, 0x0E
+    int 0x10
+%endmacro
 
 ; ========================= Инициализация ==========================
 
@@ -34,6 +39,8 @@ start:
     call cpuid          ; Получаем модель процессора
 
     call KERNEL_LOAD
+
+    call set_vbe_mode
 
     call kernel_launch  ; Запуск ядра
 
@@ -87,6 +94,158 @@ cpuid:
     mov byte [edi + 48], 0
 
     ret
+
+; ============================= VBE ==================================
+struc VesaInfoBlock				
+	.Signature		        resb 4	
+	.Version		        resw 1
+	.OEMNamePtr		        resd 1
+	.Capabilities		    resd 1
+
+	.VideoModesOffset	    resw 1
+	.VideoModesSegment	    resw 1
+
+	.CountOf64KBlocks	    resw 1
+	.OEMSoftwareRevision	resw 1
+	.OEMVendorNamePtr	    resd 1
+	.OEMProductNamePtr	    resd 1
+	.OEMProductRevisionPtr	resd 1
+	.Reserved		        resb 222
+	.OEMData		        resb 256
+endstruc
+
+struc VesaModeInfoBlock				
+	.ModeAttributes		    resw 1
+	.FirstWindowAttributes	resb 1
+	.SecondWindowAttributes	resb 1
+	.WindowGranularity	    resw 1
+	.WindowSize		        resw 1
+	.FirstWindowSegment	    resw 1
+	.SecondWindowSegment	resw 1
+	.WindowFunctionPtr	    resd 1
+	.BytesPerScanLine	    resw 1
+
+	.Width			        resw 1
+	.Height			        resw 1
+	.CharWidth		        resb 1
+	.CharHeight		        resb 1
+	.PlanesCount		    resb 1
+	.BitsPerPixel		    resb 1
+	.BanksCount		        resb 1
+	.MemoryModel		    resb 1
+	.BankSize		        resb 1
+	.ImagePagesCount	    resb 1
+	.Reserved1		        resb 1
+
+	.RedMaskSize		    resb 1
+	.RedFieldPosition	    resb 1
+	.GreenMaskSize		    resb 1
+	.GreenFieldPosition	    resb 1
+	.BlueMaskSize		    resb 1
+	.BlueFieldPosition	    resb 1
+	.ReservedMaskSize	    resb 1
+	.ReservedMaskPosition	resb 1
+	.DirectColorModeInfo	resb 1
+
+	.LFBAddress		        resd 1
+	.OffscreenMemoryOffset	resd 1
+	.OffscreenMemorySize	resw 1
+	.Reserved2		        resb 206
+endstruc
+
+vbe_error: db "vbe error",13,10,0
+vbe_mode_found: db "vbe target mode found",13,10,0
+vbe_mode_not_found: db "vbe target mode not found",13,10,0
+
+lfb_addr: dd 0
+target_w: dw 800
+target_h: dw 600
+target_b: db 8
+lfb:      db 1
+
+align 4
+VesaInfoBlockBuffer:        resb 512
+align 4
+VesaModeInfoBlockBuffer:    resb 256
+
+set_vbe_mode:
+    xor ax, ax
+    mov es, ax
+    mov di, VesaInfoBlockBuffer
+
+    mov ax, 0x4F00
+    int 0x10
+    cmp ax, 0x004F
+    jne .fail
+
+    push word [VesaInfoBlockBuffer + VesaInfoBlock.VideoModesSegment]
+    pop es
+
+    mov bx, [VesaInfoBlockBuffer + VesaInfoBlock.VideoModesOffset]
+    mov dx, 0
+.loop_vbe_mode:
+    mov cx, [es:bx]
+
+    cmp cx, 0xFFFF
+    je .end
+    
+    mov di, VesaModeInfoBlockBuffer
+    mov ax, 0x4F01
+    int 0x10
+    cmp ax, 0x004F
+    jne .fail
+
+    mov ax, [VesaModeInfoBlockBuffer + VesaModeInfoBlock.Width]
+    cmp ax, [target_w]
+    jne .vbe_incorrect
+    mov ax, [VesaModeInfoBlockBuffer + VesaModeInfoBlock.Height]
+    cmp ax, [target_h]
+    jne .vbe_incorrect
+    xor ax, ax
+    mov al, byte [VesaModeInfoBlockBuffer + VesaModeInfoBlock.BitsPerPixel]
+    cmp al, [target_b]
+    jne .vbe_incorrect
+    mov al, byte [VesaModeInfoBlockBuffer]
+    and al, 0x80
+    cmp al, 0
+    je .vbe_incorrect
+
+    jmp .found
+
+.vbe_incorrect:
+    inc dx
+    add bx, 2
+    jmp .loop_vbe_mode
+
+.found:
+    WRITE vbe_mode_found
+
+    mov eax, [VesaModeInfoBlockBuffer + VesaModeInfoBlock.LFBAddress]
+    mov edi, bootInfo
+    mov [edi + 64], eax
+    mov ax, [VesaModeInfoBlockBuffer + VesaModeInfoBlock.Width]
+    mov [edi + 68], eax
+    mov ax, [VesaModeInfoBlockBuffer + VesaModeInfoBlock.Height]
+    mov [edi + 70], eax
+    mov al, [VesaModeInfoBlockBuffer + VesaModeInfoBlock.BitsPerPixel]
+    mov [edi + 72], al
+    mov ax, [VesaModeInfoBlockBuffer + VesaModeInfoBlock.BytesPerScanLine]
+    mov [edi + 74], eax
+
+    or cx, 0x4000
+    mov bx, cx
+    mov ax, 0x4F02
+    int 0x10
+
+    ret
+
+.fail:
+    WRITE vbe_error
+    jmp $
+
+.end:
+    WRITE vbe_mode_not_found
+    jmp $
 
 ; ============================= RAM ==================================
 get_memmap:
@@ -534,7 +693,7 @@ pm: db "Switch to Protect Mode",13,10,0
 bootMsg: db "================================ ATOM-BOOT v0.1 ================================",13,10,0
 
 ; Массив для информации о системе
-bootInfo: times 256 dw 0
+bootInfo: resb 512
 
 section .data
 
@@ -606,11 +765,6 @@ kernel_launch:
     cld
 
     repe movsw
-
-    ; Переключение видеорежима на 640x480 16 цветов 
-    mov ah, 0x00
-    mov al, 0x12
-    int 0x10 
 
 ; Переключение в защищенный режим
 switch_to_PM:

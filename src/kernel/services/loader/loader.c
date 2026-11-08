@@ -1,7 +1,7 @@
 #include <kernel/loader.h>
 #include <drivers/video/video.h>
-#include <kernel/program.h>
 #include <kernel/memory.h>
+#include  <cpu/gdt.h>
 #include <fs/fs.h>
 #include <lib/string.h>
 
@@ -21,21 +21,21 @@ u32 program;
 u32 g_argc;
 u8** g_argv;
 
-void patch(void* entry, void* stack) {
+void patch(void* load_entry, u32 entry) {
     ndf_header_t ndf_header;
-    memcpy(entry, &ndf_header, sizeof(ndf_header));
+    memcpy(load_entry, &ndf_header, sizeof(ndf_header));
     
-    u32 entry_addr = (u32)entry;
+    u32 load_addr = (u32)load_entry;
 
-    memcpy((void*)(entry_addr + sizeof(ndf_header_t)), (void*)(entry_addr), ndf_header.fsize - sizeof(ndf_header_t));
+    memcpy((void*)(load_addr + sizeof(ndf_header_t)), (void*)(load_addr), ndf_header.fsize - sizeof(ndf_header_t));
     
-    u32* patch_offset = (u32*)(entry_addr + ndf_header.reloff - sizeof(ndf_header_t));
+    u32* patch_offset = (u32*)(load_addr + ndf_header.reloff - sizeof(ndf_header_t));
     for(u32 k = 0; k < ndf_header.relsz / 4; k++) {
-        u32* addr_patch = (u32*)(entry_addr + patch_offset[k] - sizeof(ndf_header_t));
-        *addr_patch = *addr_patch + entry_addr;
+        u32* addr_patch = (u32*)(load_addr + patch_offset[k] - sizeof(ndf_header_t));
+        *addr_patch = *addr_patch + entry;
     }
 
-    program = (u32)(entry_addr + ndf_header.entry - sizeof(ndf_header_t) + 28);
+    program = (u32)(entry + ndf_header.entry - sizeof(ndf_header_t) + 28);
 }
 
 u32 pr_execute(u8* f, u32 argc, u8* argv[]) {
@@ -46,14 +46,12 @@ u32 pr_execute(u8* f, u32 argc, u8* argv[]) {
     g_argc = argc;
     g_argv = argv;
 
-    //memset((void*)0x300000, 0, 0xFFFFF);
-
-    void* entry = (void*)0x300000;
-    void* stack = (void*)0x3FFFF0;
+    void* load_entry = (void*)0x200000;
+    void* stack = (void*)0x2FFFF0;
  
-    fs->read(f, entry, g_node.size);
+    fs->read(f, load_entry, g_node.size);
 
-    if(*(u8*)entry == 0x77) patch((void*)entry, (void*)stack);
+    if(*(u8*)load_entry == 0x77) patch((void*)load_entry, 0x00);
     
     kernel_return_ptr = (uint32_t)&_exit;
     asm volatile("movl %%esp, %0":"=r" (kernel_stack_ptr));
@@ -84,7 +82,9 @@ u32 pr_execute(u8* f, u32 argc, u8* argv[]) {
     push_add = (u32*)(stack - offset);
     *push_add = argc;
 
-    jmp_usrmode(program, (u32)stack - offset - 4);
+    ldt_mk_and_push((u32)load_entry, 0xFFFFF);
+
+    jmp_usrmode(program, 0xFFFF0 - offset - 4);
 }
 
 void _exit() {

@@ -1,9 +1,6 @@
 #include <kernel/memory.h>
-
-// ИСПРАВИТЬ КУЧУ
-/* ---------- Куча ---------- */
-#define HEAP_BASE           0x200000                // 2Мб
-#define HEAP_SIZE           0x100000                // 1Мб
+#include <kernel/pmm.h>
+#include <lib/debug.h>
 
 #define FREE                 1
 #define BUSY                 0
@@ -16,23 +13,33 @@ typedef struct {
     struct Heap* next;
 } Heap;
 
-Heap* block_heap = (Heap*)HEAP_BASE;
+Heap* block_heap;
 
-void create_heap() {
+void* g_heap_base;
+u32   g_heap_sz;
+
+void create_heap(u32 pg_c) {
+    g_heap_base = pg_alloc();
+    for(u32 i = 1; i < pg_c; i++) {
+        pg_alloc();
+    }
+
+    block_heap = (Heap*)g_heap_base;
+    g_heap_sz = pg_c << 12;
+
     block_heap->is_free = FREE;
-    block_heap->size = HEAP_SIZE;
+    block_heap->size = g_heap_sz;
     block_heap->next = NULL;
+    block_heap = (Heap*)g_heap_base;
 }
 
-#include <drivers/video/video.h>
-
 void* malloc(u32 size) {
-    u32 current_address = HEAP_BASE + sizeof(Heap) + size;
+    u32 current_address = (u32)g_heap_base + sizeof(Heap) + size;
     Heap* current = block_heap;
     
     while (current != NULL)
     {
-        u32 heap_end_address = HEAP_BASE + HEAP_SIZE;
+        u32 heap_end_address = (u32)g_heap_base + g_heap_sz;
 
         if (current_address + sizeof(Heap) >= heap_end_address) {
             return 0;

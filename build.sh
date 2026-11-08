@@ -5,7 +5,7 @@ nasm -f bin src/bootloader/main.asm -o bin/main.bin
 # ==============================================================================
 # ДРАЙВЕРЫ 
 # ==============================================================================
-gcc -m32 -ffreestanding -c src/drivers/video/vga_640_480.c -Werror -Os -o vga_640_480.o \
+gcc -m32 -ffreestanding -c src/drivers/video/vesa_lfb_8bpp.c -Werror -Os -o vesa_lfb_8bpp.o \
     -I./src/cpu/include -I./src/drivers/include -I./src/kernel/include -I./src/lib/include -I./src/fs/include
 
 gcc -m32 -ffreestanding -c src/drivers/video/video.c -Werror -Os -o video.o \
@@ -66,9 +66,6 @@ gcc -m32 -ffreestanding -c src/kernel/services/memory/mm.c -Werror -Os -o mm.o \
 gcc -m32 -ffreestanding -c src/kernel/services/memory/pmm.c -Werror -Os -o pmm.o \
     -I./src/cpu/include -I./src/drivers/include -I./src/kernel/include -I./src/lib/include -I./src/fs/include
 
-gcc -m32 -ffreestanding -c src/kernel/services/memory/program.c -Werror -Os -o program.o \
-    -I./src/cpu/include -I./src/drivers/include -I./src/kernel/include -I./src/lib/include -I./src/fs/include
-
 gcc -m32 -ffreestanding -c src/kernel/services/loader/loader.c -Werror -Os -o loader.o \
     -I./src/cpu/include -I./src/drivers/include -I./src/kernel/include -I./src/lib/include -I./src/fs/include
 
@@ -87,7 +84,7 @@ gcc -m32 -ffreestanding -c src/fs/fluidfs.c -Werror -Os -o fluidfs.o \
 # ==============================================================================
 # ЛИНКОВКА 
 # ==============================================================================
-ld -m elf_i386 -T linker.ld -Map=kernel.map nf86krn.o vga_640_480.o video.o keyboard.o \
+ld -m elf_i386 -T linker.ld -Map=kernel.map nf86krn.o vesa_lfb_8bpp.o video.o keyboard.o \
                  sata.o disk.o timer.o pci.o idt.o pic.o jmp_usrmode.o gdt_rel.o interrupts.o  gdt.o faults_handler.o panic.o memory.o \
                  mm.o pmm.o paging.o syscall.o fluidfs.o fs.o loader.o -o nf86krn.elf
 

@@ -1,30 +1,9 @@
-#include <drivers/video/vga_640_480.h>
-#include <cpu/io.h>
-#include <kernel/device.h>
+#include <drivers/video/vesa_lfb_8bpp.h>
 #include <kernel/memory.h>
+#include <lib/debug.h>
 
 #define FONT8x16_IMPLEMENTATION
 #include "../../font/font8x16.h"
-
-#define VGA_640_480_MEMORY (u8*)0xA0000
-
-#define INDEX_REGISTER             0x3CE
-#define DATA_REGISTER              0x3CF
-
-#define SEQUENCER_CONTROLLER       0x3C4
-
-#define MAP_MASK_REGISTER           0x02
-#define SET_RESET_REGISTER          0x00
-#define ENABLE_SET_RESET_REGISTER   0x01
-
-#define GRAPHICS_MODE               0x05
-#define BIT_MASK                    0x08
-
-#define VGA_640_480_WIDTH            640
-#define VGA_640_480_HEIGHT           480
-
-#define VESA_1024_768_WIDTH         1024
-#define VESA_1024_768_HEIGHT         768
 
 u32 screen_x_off = 0;
 u32 screen_y_off = 0;
@@ -32,128 +11,86 @@ u32 screen_y_off = 0;
 u8 terminal_fg_vbe = 15;
 u8 terminal_bg_vbe = 0;
 
-void vga_640_480_fg_opcode(u32 code) {
-    vga_640_480_fg_set(code);
+u8* LFBaddr;
+u16 vesa_lfb_8bpp_width;
+u16 vesa_lfb_8bpp_hight;
+u16 vesa_lfb_8bpp_pitch;
+
+void vesa_lfb_8bpp_fg_opcode(u32 code) {
+    vesa_lfb_8bpp_fg_set(code);
 }
 
-void vga_640_480_bg_opcode(u32 code) {
-    vga_640_480_bg_set(code);
+void vesa_lfb_8bpp_bg_opcode(u32 code) {
+    vesa_lfb_8bpp_bg_set(code);
 }
 
 /**
  *  Очищает экран в цвет color
  */
-void vga_640_480_screen_clear(u8 color) {
+void vesa_lfb_8bpp_screen_clear(u8 color) {
     screen_x_off = 0;
     screen_y_off = 0;
 
-    outb(SEQUENCER_CONTROLLER, MAP_MASK_REGISTER);
-    outb(DATA_REGISTER, 0x0F);
-
-    outb(INDEX_REGISTER, GRAPHICS_MODE);
-    outb(DATA_REGISTER, 0x02);
-
-    outb(INDEX_REGISTER, 0x08); 
-    outb(DATA_REGISTER, 0xFF);
-
-    memset(VGA_640_480_MEMORY, color, 640*80);
-
-    outb(INDEX_REGISTER, GRAPHICS_MODE);
-    outb(DATA_REGISTER, 0x00); 
+    memset(LFBaddr, color, vesa_lfb_8bpp_width * vesa_lfb_8bpp_hight);
 }
 
-void vga_640_480_write_row(u32 x, u32 y, u8 b, u8 fg, u8 bg) {
-    u32 offset = ((y << 6) + (y << 4)) + (x >> 3);
-    
-    volatile u8 *address = VGA_640_480_MEMORY + offset;
-
-    outb(INDEX_REGISTER, GRAPHICS_MODE);
-    outb(DATA_REGISTER, 0x00);
-
-    outb(0x03C4, 0x02);
-    outb(0x03C5, 0x0F);
-
-    outb(INDEX_REGISTER, 0x00);
-    outb(DATA_REGISTER, bg);
-
-    outb(0x03CE, 0x01); 
-    outb(0x03CF, 0x0F);
-
-    outb(INDEX_REGISTER, 0x08);
-    outb(DATA_REGISTER, ~b);
-
-    volatile u8 dummy = *address;
-    
-    *address = 0xFF;
-
-    outb(INDEX_REGISTER, 0x00);
-    outb(DATA_REGISTER, fg);
-
-    outb(INDEX_REGISTER, 0x08);
-    outb(DATA_REGISTER, b);
-
-    dummy = *address;
-
-    *address = 0xFF;
+void vesa_lfb_8bpp_write_row(u32 x, u32 y, u8 b, u8 fg, u8 bg) {
+    u32 pixel_offset = y * vesa_lfb_8bpp_pitch + x;
+    u32 j = 7;
+    for(u32 i = 0; i < 8; i++) {
+        if(b & (1 << j)) LFBaddr[pixel_offset + i] = fg;
+        else LFBaddr[pixel_offset + i] = bg;
+        j--;
+    }
 }
 
 /**
  *  Закрашивает пиксель (x, y) в цвет color
  */
-void vga_640_480_putpixel(u32 x, u32 y, u8 color) { 
-    u32 offset = ((y << 6) + (y << 4)) + (x >> 3);
-    u8 bit_mask = 0x80 >> (x & 7);
-    
-    volatile u8 *address = VGA_640_480_MEMORY + offset;
-
-    outb(INDEX_REGISTER, GRAPHICS_MODE);
-    outb(DATA_REGISTER, 0x02);
-    outb(INDEX_REGISTER, BIT_MASK);
-    outb(DATA_REGISTER, bit_mask);
-
-    u8 dummy = *address;
-    
-    *address = color;
+void vesa_lfb_8bpp_putpixel(u32 x, u32 y, u8 color) { 
+    u32 pixel_offset = y * vesa_lfb_8bpp_pitch + (x * (8/8));
+    LFBaddr[pixel_offset] = color;
 }
 
 /**
  *  Прокручивает экран вниз на один символ
  */
-void vga_640_480_scroll() {
-    memcpy((VGA_640_480_MEMORY + 80 * 16), (VGA_640_480_MEMORY), 80 * 480);
+void vesa_lfb_8bpp_scroll() {
+    //memcpy((vesa_lfb_8bpp_MEMORY + 80 * 16), (vesa_lfb_8bpp_MEMORY), 80 * 480);
+    memcpy(LFBaddr + vesa_lfb_8bpp_pitch * 16, LFBaddr, vesa_lfb_8bpp_width * vesa_lfb_8bpp_hight);
 
-    //service.memory->memset((VGA_640_480_MEMORY + 80), terminal_bg_vbe, 80);
+    //service.memory->memset((vesa_lfb_8bpp_MEMORY + 80), terminal_bg_vbe, 80);
 }
 
 /**
  *  Выводит символ, прокручивает экран
  */
-void vga_640_480_draw_char(u8 c) {
-    if(c == '\n' || screen_x_off == 640) {
+void vesa_lfb_8bpp_draw_char(u8 c) {
+    if(c == '\n' || screen_x_off == vesa_lfb_8bpp_width) {
         screen_x_off = 0;
         screen_y_off += 16;
-        if(screen_y_off == 464) {
-            vga_640_480_scroll();
+        if(screen_y_off >= vesa_lfb_8bpp_hight - 16) {
+            vesa_lfb_8bpp_scroll();
             screen_y_off -= 16;
         }
         return;
     }
     for(u32 row = 0; row < 16;row++) {
         u8 row_byte = font8x16[c][row];
-        vga_640_480_write_row(screen_x_off, screen_y_off + row, row_byte, terminal_fg_vbe, terminal_bg_vbe);
+        vesa_lfb_8bpp_write_row(screen_x_off, screen_y_off + row, row_byte, terminal_fg_vbe, terminal_bg_vbe);
     }
 
     screen_x_off+=8;
 }
 
-void vga_640_480_draw_string(const u8* s) {
+void vesa_lfb_8bpp_draw_string(const u8* s) {
     while(*s) {
-        vga_640_480_draw_char(*s);
+        vesa_lfb_8bpp_draw_char(*s);
         s++; 
     }
 }
 
-void vga_640_480_draw_int(u32 x) {
+void vesa_lfb_8bpp_draw_int(u32 x) {
     u32 i = 0;
     u32 isNegative = 0;
 
@@ -185,37 +122,37 @@ void vga_640_480_draw_int(u32 x) {
         end--;
     }
 
-    vga_640_480_draw_string(buffer);
+    vesa_lfb_8bpp_draw_string(buffer);
 }
 
-void vga_640_480_cursor_set_position(const u16 x, const u16 y) {
+void vesa_lfb_8bpp_cursor_set_position(const u16 x, const u16 y) {
     screen_x_off = x << 3;
     screen_y_off = y << 4;
 }
 
-void vga_640_480_cursor_get_position(u16* x, u16* y)  {
+void vesa_lfb_8bpp_cursor_get_position(u16* x, u16* y)  {
     *x = screen_x_off >> 3;
     *y = screen_y_off >> 4;
 }
 
-void vga_640_480_fg_set(u8 color) {
+void vesa_lfb_8bpp_fg_set(u8 color) {
     terminal_fg_vbe = color;
 }
 
-void vga_640_480_bg_set(u8 color) {
+void vesa_lfb_8bpp_bg_set(u8 color) {
     terminal_bg_vbe = color;
 }
 
 /**
  *  Форматированный вывод бесконечного числа аргументов
  */
-void vga_640_480_kprintf(const u8 *format, ...) {
+void vesa_lfb_8bpp_kprintf(const u8 *format, ...) {
     va_list args;
     va_start(args, format);
 
     for(const i8 *p = format; *p != '\0'; p++) {
         if(*p != '%') {
-            vga_640_480_draw_char(*p);
+            vesa_lfb_8bpp_draw_char(*p);
             continue;
         }
 
@@ -256,7 +193,7 @@ void vga_640_480_kprintf(const u8 *format, ...) {
                 end--;
             }
             
-            vga_640_480_draw_string(buffer);
+            vesa_lfb_8bpp_draw_string(buffer);
 
             break;
         }
@@ -285,30 +222,25 @@ void vga_640_480_kprintf(const u8 *format, ...) {
                 end--;
             }
             
-            vga_640_480_draw_string(buffer);
+            vesa_lfb_8bpp_draw_string(buffer);
             break;
         }
         case 's':
             u8 *s = va_arg(args, u8*);
-            vga_640_480_draw_string(s);
+            vesa_lfb_8bpp_draw_string(s);
             break;
         case 'c':
             u8 *c = va_arg(args, u8*);
-            vga_640_480_draw_char(*c);
+            vesa_lfb_8bpp_draw_char(*c);
             break;
         case 'f': {
             const u8 code[2] = {*(p+1), *(p+2)};
             u32 result = 0;
             u8 c = code[0];
-
             result = result * 10 + (c - '0');
-
             c = code[1];
-
             result = result * 10 + (c - '0');
-
-            vga_640_480_fg_opcode(result);
-
+            vesa_lfb_8bpp_fg_opcode(result);
             p += 2;
 
             break;
@@ -317,15 +249,10 @@ void vga_640_480_kprintf(const u8 *format, ...) {
             const u8 code[2] = {*(p+1), *(p+2)};
             u32 result = 0;
             u8 c = code[0];
-
             result = result * 10 + (c - '0');
-
             c = code[1];
-
             result = result * 10 + (c - '0');
-
-            vga_640_480_bg_opcode(result);
-
+            vesa_lfb_8bpp_bg_opcode(result);
             p += 2;
 
             break;

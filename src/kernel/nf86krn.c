@@ -15,6 +15,7 @@
 #include <kernel/mm.h>
 #include <kernel/pmm.h>
 #include <kernel/loader.h>
+#include <lib/debug.h>
 
 extern void isr8();
 extern void isr13();
@@ -24,7 +25,7 @@ extern void isr33();
 extern void isr64();
 extern void isr46();
 
-void kmain() {
+void kmain() { 
     idt_load();                    
     idt_set(0x08, 0x08, TRAP, (uint32_t)isr8); 
     idt_set(0x0D, 0x08, TRAP, (uint32_t)isr13); 
@@ -38,24 +39,21 @@ void kmain() {
     pic_irq_mask(0xA1, 0b10111111); 
     init_timer(100);
     sti();
-    pci_scan_bus0();               
-    create_heap();
-    init_keyboard();                         
-    init_vga(VGA_640_480);
     mm_map_mk();
     pg_mk_alloc(g_mm.krn_alloc, g_mm.krn_alloc_len);
+    create_heap(16);
     gdt_init();
     pg_mapping();
+    init_video();
+    pci_scan_bus0();               
+    init_keyboard();                         
 
     u8* disk_info = (u8*)malloc(512);
     disk_init((u16*)disk_info);
+    
     init_fs(FLUIDFS_T); 
 
-    video->clear_screen(0);
-
-    pr_execute("/apps/shell.ndf", 0, 0);
-
-    //fs->open("/apps/shell.ndf");
+    pr_execute("/apps/hello.ndf", 0, 0);
 
     for(;;) {
         asm("hlt");

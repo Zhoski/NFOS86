@@ -3,7 +3,7 @@
 
 #include <lib/int.h>
 
-struct gdt_entry {
+struct descriptor {
     u16 limit_low;
     u16 base_low;
     u8  base_mid;
@@ -12,7 +12,7 @@ struct gdt_entry {
     u8  base_high;
 } __attribute__((packed));
 
-struct gdt_ptr {
+struct desc_ptr {
     u16 limit;
     u32 base;
 } __attribute__((packed));
@@ -47,11 +47,14 @@ struct tss_entry {
 	u16 iomap_base;
 } __attribute__((packed));
 
-typedef struct gdt_entry gdt_t;
+typedef struct descriptor desc_t;
 typedef struct tss_entry tss_t;
-typedef struct gdt_ptr gdt_ptr_t;
+typedef struct desc_ptr desc_ptr_t;
 
 void gdt_init();
 void gdt_add_seg(u32 base, u32 limit, u32 acess, u32 flag);
+void ldt_mk_and_push(u32 base, u32 limit);
+
+extern void* gdt_addr;
 
 #endif

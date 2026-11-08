@@ -3,6 +3,7 @@
 #include <lib/int.h>
 #include <kernel/device.h>
 #include <kernel/loader.h>
+#include <lib/debug.h>
 
 #define DF  8
 #define GP  13
@@ -15,6 +16,7 @@ typedef struct {
 } __attribute__((packed)) stack;
 
 void c_faults_handler(stack* st) {
+    asm("cli");
     video->clear_screen(0);
     switch (st->fn)
     {

@@ -4,15 +4,16 @@
 #include <kernel/memory.h>
 
 void* gdt_addr;
+void* ldt_addr;
 u32 gdt_offset = 8;
 
-gdt_ptr_t ptr;
-volatile tss_t tss0;
+desc_ptr_t ptr;
+tss_t tss0;
 
 extern void gdt_reload_addr(void* gdt_addr);
 
 void gdt_add_seg(u32 base, u32 limit, u32 acess, u32 flag) {
-    gdt_t descriptor = {
+    desc_t descriptor = {
         .base_low = base,
         .base_mid = ((base >> 16) & 0xFF),
         .base_high = ((base >> 24) & 0xFF),
@@ -21,8 +22,17 @@ void gdt_add_seg(u32 base, u32 limit, u32 acess, u32 flag) {
         .flags = (limit >> 16) << 4 | flag,
     };
 
-    memcpy(&descriptor, gdt_addr + gdt_offset, sizeof(gdt_t));
+    memcpy(&descriptor, gdt_addr + gdt_offset, sizeof(desc_t));
     gdt_offset += 8;
+}
+
+void mk_descriptor(desc_t* desc_t, u32 base, u32 limit, u32 acess, u32 flag) {
+    desc_t->base_low = base;
+    desc_t->base_mid = ((base >> 16) & 0xFF);
+    desc_t->base_high = ((base >> 24) & 0xFF);
+    desc_t->limit_low = limit;
+    desc_t->acces = acess;
+    desc_t->flags = (limit >> 16) << 4 | flag;
 }
 
 void ltr(u16 selector) {
@@ -30,10 +40,33 @@ void ltr(u16 selector) {
         "movw %0, %%ax\n"
         "ltr %%ax"
         :
-        : "r" ((u16)((selector << 3) | 0))
+        : "r" ((u16)((selector << 3)))
         : "eax"
     );
 }
+
+void lldt(u16 selector) {
+    asm volatile(
+        "movw %0, %%ax\n"
+        "lldt %%ax"
+        :
+        : "r" ((u16)((selector << 3)))
+        : "eax"
+    );
+}
+
+void ldt_mk_and_push(u32 base, u32 limit) {
+    void* ldt = malloc(16);
+
+    desc_t* ds = (desc_t*)ldt;
+    mk_descriptor(ds, base, limit, 0xFA, 0x0C);
+    mk_descriptor((desc_t*)(ds + 1), base, limit, 0xF2, 0x0C);
+    
+    gdt_add_seg((u32)ldt, 15, 0x82, 0x00);
+
+    lldt(6);
+}
+
 
 void gdt_init() {
     gdt_addr = pg_alloc();
@@ -46,8 +79,8 @@ void gdt_init() {
 
     gdt_add_seg(0, 0xFFFFF, 0x9A, 0x0C);                        // Kernel code segment
     gdt_add_seg(0, 0xFFFFF, 0x92, 0x0C);                        // Kernel data segment
-    gdt_add_seg(0, 0xFFFFF, 0xFA, 0x0C);                        // User code segment
-    gdt_add_seg(0, 0xFFFFF, 0xF2, 0x0C);                        // User data segment
+    gdt_add_seg(0x200000, 0xFFFFF, 0xFA, 0x0C);                        // User code segment
+    gdt_add_seg(0x200000, 0xFFFFF, 0xF2, 0x0C);                        // User data segment
     gdt_add_seg((u32)&tss0, sizeof(tss_t) - 1, 0x89, 0x00);     // TSS
 
     gdt_reload_addr(&ptr);

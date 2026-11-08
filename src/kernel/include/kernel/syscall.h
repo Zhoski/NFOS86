@@ -29,7 +29,7 @@
 #define WRITE_DIR           16
 
 typedef struct {
-    u32 eax; u32 ebx; u32 ecx; u32 edx; u32 esi; u32 edi; 
+    u32 eax; u32 ebx; u32 ecx; u32 edx; u32 esi; u32 edi; u32 gs; u32 fs; u32 es; u32 ds;
 } __attribute__((packed)) syscall_ct;
 
 void syscall_handler(syscall_ct* ct);
