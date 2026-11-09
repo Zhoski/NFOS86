@@ -158,8 +158,8 @@ vbe_mode_found: db "vbe target mode found",13,10,0
 vbe_mode_not_found: db "vbe target mode not found",13,10,0
 
 lfb_addr: dd 0
-target_w: dw 800
-target_h: dw 600
+target_w: dw 640
+target_h: dw 480
 target_b: db 8
 lfb:      db 1
 

@@ -47,7 +47,7 @@ u32 pr_execute(u8* f, u32 argc, u8* argv[]) {
     g_argv = argv;
 
     void* load_entry = (void*)0x200000;
-    void* stack = (void*)0x2FFFF0;
+    void* stack = (void*)0x210000;
  
     fs->read(f, load_entry, g_node.size);
 
@@ -82,9 +82,9 @@ u32 pr_execute(u8* f, u32 argc, u8* argv[]) {
     push_add = (u32*)(stack - offset);
     *push_add = argc;
 
-    ldt_mk_and_push((u32)load_entry, 0xFFFFF);
+    ldt_mk_and_push((u32)load_entry, 15);
 
-    jmp_usrmode(program, 0xFFFF0 - offset - 4);
+    jmp_usrmode(program, 0x10000 - offset - 4);
 }
 
 void _exit() {

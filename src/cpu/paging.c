@@ -2,7 +2,6 @@
 #include <drivers/video/video.h>
 #include <kernel/memory.h>
 #include <kernel/pmm.h>
-#include <cpu/io.h>
 
 #define KRN_PAGE    0x03
 #define USR_PAGE    0x07
@@ -38,25 +37,18 @@ void pdbr_load(u32 pdbr) {
 void pg_mapping() {
     page_dir = pg_alloc();;
     page_tbl0 = pg_alloc();;
-
     for(u32 k = 0; k < 1024; k++) {
         page_dir[k] = 0x00;
     }
-
     for(u32 k = 0; k < 512; k++) {
         page_tbl0[k] = (k * 0x1000) | KRN_PAGE;
     }
-
     for(u32 k = 512; k < 1024; k++) {
         page_tbl0[k] = (k << 12) | USR_PAGE;
     }
-
     page_tbl0[1] = 0x1000 | 0x07;   // Разрешить читать всем
-
     page_dir[0] = ((u32)page_tbl0) | USR_PAGE;
-
     pdbr_load((u32)page_dir);
-
     pg_enable();
 }
 
@@ -71,7 +63,7 @@ void* get_physaddr(void* virtaddr) {
 }
 
 /**
- *  Мапит физический адрес к виртуальному
+ *  Мапит виртуальный адрес к физическому
  */
 void pg_map(void* physaddr, void* virtaddr, u32 flag) {
     u32 dir = (u32)physaddr >> 22;
@@ -82,22 +74,8 @@ void pg_map(void* physaddr, void* virtaddr, u32 flag) {
         pg_tbl[page] = (u32)physaddr | flag;
 
         page_dir[dir] = ((u32)pg_tbl) | flag;
-        //video->kprintf("pg dir: %x\n", page_dir[dir]);
-        //video->kprintf("pg tbl: %x\n", pg_tbl[page]);
     }
 
     u32* ptr = (u32*)(page_dir[dir] & ~0xFFF);
-
-    //video->kprintf("%x", *(ptr + page));
-
     *(ptr + page) = (u32)physaddr | flag;
-
-    //video->kprintf("Dir: %d     Page: %d\n", dir, page);
-
-    /*u32* test = page_dir[dir] & ~0xFFF;
-    video->kprintf("Virtaddr: %x\n", *(test + page));*/
-
-    /*for(;;) {
-        asm("hlt");
-    }*/
 }

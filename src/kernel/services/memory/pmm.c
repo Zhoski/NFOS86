@@ -5,6 +5,9 @@ u8 krn_pg_bitmap[512];      // 16Мб максимум
 u32 krn_pg_c = 0;
 u32 krn_pg_addr = 0;
 
+u32 usr_pg_c = 0;
+u32 usr_pg_addr = 0;
+
 /**
  *  Заполняет облась памяти начиная с addr и размером len 4КиБ страницами
  */
@@ -15,7 +18,7 @@ void pg_mk_alloc(u32 addr, u32 len) {
     for(u32 i = 0; i < 512; i++) {
         krn_pg_bitmap[i] = 0;
     }
-}
+ }
 
 /**
  *  Возвращает адрес свободной страницы
@@ -45,4 +48,8 @@ void pg_free(void* pg) {
     u32 bit = bit_in_bitmap % 8;
 
     krn_pg_bitmap[byte] &= ~(1 << bit);
+}
+
+void usr_pg_mk_alloc(void* addr, u32 len) {
+    
 }

@@ -22,6 +22,7 @@ global isr64
 %macro EXCEPTIONS_NO_ERR_CODE 1
 global isr%1
 isr%1:
+    cli
     mov ax, 0x10
     mov ds, ax
     mov es, ax
@@ -137,3 +138,4 @@ faults_handler:
     mov eax, esp
     push eax
     call c_faults_handler
+    sti

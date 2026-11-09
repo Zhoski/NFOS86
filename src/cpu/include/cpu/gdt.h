@@ -8,7 +8,8 @@ struct descriptor {
     u16 base_low;
     u8  base_mid;
     u8  acces;
-    u8  flags;
+    u8  limit_hight:4;
+    u8  flag:4;
     u8  base_high;
 } __attribute__((packed));
 

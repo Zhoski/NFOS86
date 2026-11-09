@@ -123,7 +123,7 @@ echo '=================== FFSPACK ==================='
 qemu-system-i386 -m 4M -no-reboot \
                    -device ich9-ahci,id=ahci \
                    -drive file=out.img,if=none,id=disk \
-                   -device ide-hd,bus=ahci.0,drive=disk -debugcon stdio
+                   -device ide-hd,bus=ahci.0,drive=disk -debugcon stdio -enable-kvm
 
 make clean
 rm *.o
