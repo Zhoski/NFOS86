@@ -98,7 +98,7 @@ Linker script and memory map
 
                 0x00100000                        . = 0x100000
 
-.text           0x00100000     0x3a5d
+.text           0x00100000     0x3a58
  *(.text*)
  .text          0x00100000      0x145 nf86krn.o
                 0x00100000                kmain
@@ -213,107 +213,107 @@ Linker script and memory map
                 0x001022f4                pg_mapping
                 0x001023e8                get_physaddr
                 0x0010244e                pg_map_virt_phys
- .text          0x00102502      0x266 syscall.o
+ .text          0x00102502      0x261 syscall.o
                 0x00102502                syscall_handler
- .text          0x00102768      0xf3b fluidfs.o
-                0x00102786                get_block
-                0x001027dd                free_block
-                0x00102805                raw_filename_to_std_format
-                0x0010290f                fluidfs_init
-                0x001029d9                fluidfs_fcheck
-                0x00102c2c                fluidfs_fread
-                0x00102d4a                fluidfs_fopen
-                0x00102d90                fluidfs_fwrite
-                0x00102ffa                fluidfs_fdel
-                0x00103166                fluidfs_cnode
-                0x00103417                fluidfs_write_dir
- .text          0x001036a3       0x1c fs.o
-                0x001036a3                init_fs
- .text          0x001036bf      0x247 loader.o
-                0x001036bf                align
-                0x001036d7                patch
-                0x00103749                pr_execute
-                0x001038e0                _exit
- .text          0x00103906      0x157 process.o
-                0x00103906                process_mk_tbl
-                0x00103943                tbl_add_process
-                0x00103982                tbl_rm_process
-                0x001039a2                process_spawn
+ .text          0x00102763      0xf3b fluidfs.o
+                0x00102781                get_block
+                0x001027d8                free_block
+                0x00102800                raw_filename_to_std_format
+                0x0010290a                fluidfs_init
+                0x001029d4                fluidfs_fcheck
+                0x00102c27                fluidfs_fread
+                0x00102d45                fluidfs_fopen
+                0x00102d8b                fluidfs_fwrite
+                0x00102ff5                fluidfs_fdel
+                0x00103161                fluidfs_cnode
+                0x00103412                fluidfs_write_dir
+ .text          0x0010369e       0x1c fs.o
+                0x0010369e                init_fs
+ .text          0x001036ba      0x247 loader.o
+                0x001036ba                align
+                0x001036d2                patch
+                0x00103744                pr_execute
+                0x001038db                _exit
+ .text          0x00103901      0x157 process.o
+                0x00103901                process_mk_tbl
+                0x0010393e                tbl_add_process
+                0x0010397d                tbl_rm_process
+                0x0010399d                process_spawn
 
-.iplt           0x00103a5d        0x0
- .iplt          0x00103a5d        0x0 nf86krn.o
+.iplt           0x00103a58        0x0
+ .iplt          0x00103a58        0x0 nf86krn.o
 
-.rodata.str1.1  0x00103a5d      0x157
+.rodata.str1.1  0x00103a58      0x167
  .rodata.str1.1
-                0x00103a5d      0x157 nf86krn.o
+                0x00103a58      0x167 nf86krn.o
                                  0x10 (size before relaxing)
  .rodata.str1.1
-                0x00103bb4       0x11 vesa_lfb_8bpp.o
+                0x00103bbf       0x11 vesa_lfb_8bpp.o
  .rodata.str1.1
-                0x00103bb4      0x104 faults_handler.o
+                0x00103bbf      0x104 faults_handler.o
  .rodata.str1.1
-                0x00103bb4        0x6 syscall.o
+                0x00103bbf        0x6 syscall.o
  .rodata.str1.1
-                0x00103bb4       0x1a fluidfs.o
+                0x00103bbf       0x1a fluidfs.o
  .rodata.str1.1
-                0x00103bb4       0x35 loader.o
+                0x00103bbf       0x35 loader.o
 
-.eh_frame       0x00103bb4      0xd08
- .eh_frame      0x00103bb4       0x48 nf86krn.o
- .eh_frame      0x00103bfc      0x22c vesa_lfb_8bpp.o
+.eh_frame       0x00103bc0      0xd08
+ .eh_frame      0x00103bc0       0x48 nf86krn.o
+ .eh_frame      0x00103c08      0x22c vesa_lfb_8bpp.o
                                 0x258 (size before relaxing)
- .eh_frame      0x00103e28       0x30 video.o
+ .eh_frame      0x00103e34       0x30 video.o
                                  0x5c (size before relaxing)
- .eh_frame      0x00103e58       0x80 keyboard.o
+ .eh_frame      0x00103e64       0x80 keyboard.o
                                  0xac (size before relaxing)
- .eh_frame      0x00103ed8      0x150 sata.o
+ .eh_frame      0x00103ee4      0x150 sata.o
                                 0x190 (size before relaxing)
- .eh_frame      0x00104028       0x44 disk.o
+ .eh_frame      0x00104034       0x44 disk.o
                                  0x70 (size before relaxing)
- .eh_frame      0x0010406c       0x54 timer.o
+ .eh_frame      0x00104078       0x54 timer.o
                                  0x80 (size before relaxing)
- .eh_frame      0x001040c0       0x64 pci.o
+ .eh_frame      0x001040cc       0x64 pci.o
                                  0x7c (size before relaxing)
- .eh_frame      0x00104124       0x44 idt.o
+ .eh_frame      0x00104130       0x44 idt.o
                                  0x70 (size before relaxing)
- .eh_frame      0x00104168       0x80 pic.o
+ .eh_frame      0x00104174       0x80 pic.o
                                  0xac (size before relaxing)
- .eh_frame      0x001041e8       0xf4 gdt.o
+ .eh_frame      0x001041f4       0xf4 gdt.o
                                 0x134 (size before relaxing)
- .eh_frame      0x001042dc       0x38 faults_handler.o
+ .eh_frame      0x001042e8       0x38 faults_handler.o
                                  0x50 (size before relaxing)
- .eh_frame      0x00104314       0x14 panic.o
+ .eh_frame      0x00104320       0x14 panic.o
                                  0x2c (size before relaxing)
- .eh_frame      0x00104328       0xc8 memory.o
+ .eh_frame      0x00104334       0xc8 memory.o
                                 0x108 (size before relaxing)
- .eh_frame      0x001043f0       0x2c mm.o
+ .eh_frame      0x001043fc       0x2c mm.o
                                  0x58 (size before relaxing)
- .eh_frame      0x0010441c       0x70 pmm.o
+ .eh_frame      0x00104428       0x70 pmm.o
                                  0xb0 (size before relaxing)
- .eh_frame      0x0010448c       0xa8 paging.o
+ .eh_frame      0x00104498       0xa8 paging.o
                                  0xd4 (size before relaxing)
- .eh_frame      0x00104534       0x30 syscall.o
+ .eh_frame      0x00104540       0x30 syscall.o
                                  0x5c (size before relaxing)
- .eh_frame      0x00104564      0x218 fluidfs.o
+ .eh_frame      0x00104570      0x218 fluidfs.o
                                 0x280 (size before relaxing)
- .eh_frame      0x0010477c       0x14 fs.o
+ .eh_frame      0x00104788       0x14 fs.o
                                  0x40 (size before relaxing)
- .eh_frame      0x00104790       0x98 loader.o
+ .eh_frame      0x0010479c       0x98 loader.o
                                  0xd8 (size before relaxing)
- .eh_frame      0x00104828       0x94 process.o
+ .eh_frame      0x00104834       0x94 process.o
                                  0xd4 (size before relaxing)
 
-.rodata         0x001048bc      0x378
- .rodata        0x001048bc      0x100 keyboard.o
-                0x001048bc                ascii_table_shift
-                0x0010493c                ascii_table
- .rodata        0x001049bc      0x22e sata.o
- *fill*         0x00104bea        0x2 
- .rodata        0x00104bec       0x48 syscall.o
+.rodata         0x001048c8      0x378
+ .rodata        0x001048c8      0x100 keyboard.o
+                0x001048c8                ascii_table_shift
+                0x00104948                ascii_table
+ .rodata        0x001049c8      0x22e sata.o
+ *fill*         0x00104bf6        0x2 
+ .rodata        0x00104bf8       0x48 syscall.o
 
-.rel.dyn        0x00104c34        0x0
- .rel.got       0x00104c34        0x0 nf86krn.o
- .rel.iplt      0x00104c34        0x0 nf86krn.o
+.rel.dyn        0x00104c40        0x0
+ .rel.got       0x00104c40        0x0 nf86krn.o
+ .rel.iplt      0x00104c40        0x0 nf86krn.o
 
 .data           0x00104c40     0x1080
  *(.data*)

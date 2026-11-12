@@ -80,7 +80,7 @@ void kmain() {
 
     //video->kprintf("%s", process_tbl[0].name);
 
-    pr_execute("/apps/shell.ndf", 0, 0);
+    pr_execute("/apps/hello.ndf", 0, 0);
 
     for(;;) {
         asm("hlt");

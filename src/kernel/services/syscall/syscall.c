@@ -55,7 +55,7 @@ void syscall_handler(syscall_ct* ct) {
         free((u8*)ct->ebx); 
         break;
     case SYS_OPEN: {
-        u32 status = fs->check((u8*)(ct->ebx+process_tbl[cur_pid].base));
+        u32 status = fs->check((u8*)ct->ebx);
         if(status) {
             u8* descriptor = (u8*)malloc(g_node.size + 5);
             u32* fsize = (u32*)descriptor;
@@ -90,7 +90,7 @@ void syscall_handler(syscall_ct* ct) {
         video->terminal_set_cursor_position((u16)(ct->ebx >> 16), (u16)(ct->ebx));
         break;
     case GET_CURSOR:
-        video->terminal_get_cursor_position((u16*)(ct->ecx+process_tbl[cur_pid].base), (u16*)(ct->edx+process_tbl[cur_pid].base));
+        video->terminal_get_cursor_position((u16*)ct->ecx, (u16*)ct->edx);
         break;
     case SYS_WRITE:
         ct->eax = fs->update((u8*)ct->ebx, (u8*)ct->edx, ct->ecx);
