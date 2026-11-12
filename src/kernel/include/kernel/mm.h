@@ -11,6 +11,12 @@ typedef struct {
     u32 krn_alloc_len;
     u32 sata_ahci;
     u32 sata_ahci_len;
+    u32 sata_cmd;
+    u32 sata_cmd_len;
+    u32 sata_fis;
+    u32 sata_fis_len;
+    u32 sata_clb;
+    u32 sata_clb_len;
     u32 other_m;
     u32 other_m_len;
 } g_memory_map;

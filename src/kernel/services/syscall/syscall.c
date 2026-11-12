@@ -6,6 +6,7 @@
 #include <drivers/video/video.h>
 #include <fs/fs.h>
 #include <cpu/gdt.h>
+#include <kernel/process.h>
 
 /**
  *  Исправить добавив базу сегмента данных ко всему что надо
@@ -13,11 +14,8 @@
 void syscall_handler(syscall_ct* ct) { 
     asm volatile("sti");
 
-    desc_t* cur_ldt_desc = gdt_addr + 48;
-    u32 cur_ldt_base = cur_ldt_desc->base_high << 24 | cur_ldt_desc->base_mid << 16 | cur_ldt_desc->base_low;
-
-    desc_t* data_desc = (desc_t*)(cur_ldt_base + 8);
-    u32 cur_data_base = data_desc->base_high << 24 | data_desc->base_mid << 16 | data_desc->base_low;
+    //video->kprintf("%x", process_tbl[0].base)
+    u32 heap = (u32)process_tbl[cur_pid].heap_border - (u32)process_tbl[cur_pid].base; // Колхоз говнокод
 
     switch (ct->eax)
     {
@@ -35,11 +33,12 @@ void syscall_handler(syscall_ct* ct) {
         switch (ct->ebx)
         {
             case SCREEN: 
-                if(ct->edx == STR) video->kprintf("%s", (u8*)(ct->ecx + cur_data_base)); 
+                if(ct->edx == STR) video->kprintf("%s", (u8*)(ct->ecx + process_tbl[cur_pid].base)); 
                 else if(ct->edx == SYM) video->kputc((u8)ct->ecx);
                 else if(ct->edx == HEX) video->kprintf("%x", ct->ecx);
                 break;
             case COM_PORT: break;
+            default: break;
         }
         break;
     case KEYBOARD:
@@ -56,7 +55,7 @@ void syscall_handler(syscall_ct* ct) {
         free((u8*)ct->ebx); 
         break;
     case SYS_OPEN: {
-        u32 status = fs->check((u8*)ct->ebx);
+        u32 status = fs->check((u8*)(ct->ebx+process_tbl[cur_pid].base));
         if(status) {
             u8* descriptor = (u8*)malloc(g_node.size + 5);
             u32* fsize = (u32*)descriptor;
@@ -91,7 +90,7 @@ void syscall_handler(syscall_ct* ct) {
         video->terminal_set_cursor_position((u16)(ct->ebx >> 16), (u16)(ct->ebx));
         break;
     case GET_CURSOR:
-        video->terminal_get_cursor_position((u16*)(ct->ecx), (u16*)ct->edx);
+        video->terminal_get_cursor_position((u16*)(ct->ecx+process_tbl[cur_pid].base), (u16*)(ct->edx+process_tbl[cur_pid].base));
         break;
     case SYS_WRITE:
         ct->eax = fs->update((u8*)ct->ebx, (u8*)ct->edx, ct->ecx);
@@ -99,9 +98,14 @@ void syscall_handler(syscall_ct* ct) {
     case WRITE_DIR:
         fs->write_dir((u8*)ct->ebx);
         break;
+    case INIT_HEAP:
+        ct->eax = heap;
+        //for(;;);
+        //video->kprintf("%x",process_tbl[cur_pid].limit);//(u32)process_tbl[cur_pid].heap_border;
+        break;
     default:
         break;
     }
-
+    
     asm volatile(""::"a"(ct->eax));
 }

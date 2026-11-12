@@ -27,6 +27,7 @@
 #define GET_CURSOR          14
 #define SYS_WRITE           15
 #define WRITE_DIR           16
+#define INIT_HEAP           17
 
 typedef struct {
     u32 eax; u32 ebx; u32 ecx; u32 edx; u32 esi; u32 edi; u32 gs; u32 fs; u32 es; u32 ds;

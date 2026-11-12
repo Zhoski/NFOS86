@@ -324,7 +324,7 @@ void execute() {
 void shell_main() {
     bg_set_color(0);
     fg_set_color(7);
-    //clear_screen(0);
+    clear_screen(0);
 
     printf(info);
     printf("NFOS86$%s> ", cur_dir);
@@ -364,6 +364,8 @@ void shell_main() {
 }
 
 void main(u32 argc) {
+    printf("Mopsik");
+    //for(;;);
     cur_dir = malloc(256);
     cur_dir[0] = '/';
     command_buffer = malloc(COMMAND_BUFFER_SIZE);

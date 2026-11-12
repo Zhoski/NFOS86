@@ -24,7 +24,7 @@ void init_video() {
     LFBaddr = (u8*)lfb;
 
     for(u32 i = 0; i < 1024; i++) {
-        pg_map(lfb + (i << 12), (void*)(i << 12), 3);
+        pg_map_virt_phys(krn_pg_dir, lfb + (i << 12), (void*)(i << 12), 3);
     }
 
     video = &vesa_lfb_8pbb;

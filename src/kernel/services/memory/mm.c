@@ -6,10 +6,16 @@
 #define KERNEL_RSV      0x10000     // 64 Кб
 #define KERNEL_ALLOC    0x80000     // 512 Кб
 #define SATA_ACHI       0x1000
+#define SATA_CMD        0x1000
+#define SATA_FIS        0x1000
+#define SATA_CLB        0x1000
 
 #define KRN_ALLOC_OFF   KERNEL_RSV
 #define KRN_SATA_OFF    KERNEL_RSV + KRN_ALLOC_OFF
-#define OTHER_MEM       KERNEL_RSV + KRN_ALLOC_OFF + SATA_ACHI
+#define KRN_SATA_CMD    KRN_SATA_OFF + SATA_ACHI
+#define KRN_SATA_FIS    KRN_SATA_CMD + SATA_CMD
+#define KRN_SATA_CLB    KRN_SATA_FIS + SATA_FIS
+#define OTHER_MEM       KRN_SATA_CLB + SATA_CLB
 
 #define BOOT_INFO_ADDR  0x1000
 

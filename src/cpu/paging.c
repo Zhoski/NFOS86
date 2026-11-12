@@ -3,10 +3,12 @@
 #include <kernel/memory.h>
 #include <kernel/pmm.h>
 
-#define KRN_PAGE    0x03
-#define USR_PAGE    0x07
+#define KRN_PAGE_RW_P    0x03
+#define KRN_PAGE_RW      0x02
+#define USR_PAGE_RW_P    0x07
+#define USR_PAGE_RW      0x06
 
-u32 *page_dir;
+u32 *krn_pg__dir;
 u32 *page_tbl0;
 
 void pg_enable() {
@@ -30,34 +32,34 @@ void pdbr_load(u32 pdbr) {
 }
 
 /**
- *  Мапит 4мб памяти, устанавливает ядро в верхнюю память
+ *  Мапит память нижние 2мб под ядро, верхние под программы
  * 
  *  Ядро не видит память выше 4мб
  */
 void pg_mapping() {
-    page_dir = pg_alloc();;
-    page_tbl0 = pg_alloc();;
+    krn_pg_dir = (u32*)0x1A5000;
+    page_tbl0 = (u32*)0x1A6000;
     for(u32 k = 0; k < 1024; k++) {
-        page_dir[k] = 0x00;
+        krn_pg_dir[k] = 0x00;
     }
     for(u32 k = 0; k < 512; k++) {
-        page_tbl0[k] = (k * 0x1000) | KRN_PAGE;
+        page_tbl0[k] = (k * 0x1000) | KRN_PAGE_RW_P;
     }
     for(u32 k = 512; k < 1024; k++) {
-        page_tbl0[k] = (k << 12) | USR_PAGE;
+        page_tbl0[k] = (k << 12) | USR_PAGE_RW_P;
     }
     page_tbl0[1] = 0x1000 | 0x07;   // Разрешить читать всем
-    page_dir[0] = ((u32)page_tbl0) | USR_PAGE;
-    pdbr_load((u32)page_dir);
-    pg_enable();
+    krn_pg_dir[0] = ((u32)page_tbl0) | USR_PAGE_RW_P;
+    pdbr_load((u32)krn_pg_dir);
+    //pg_enable();
 }
 
-void* get_physaddr(void* virtaddr) {
+void* get_physaddr(u32* pg_dir, void* virtaddr) {
     u32 dir = (u32)virtaddr >> 22;
     u32 page = (u32)virtaddr >> 12 & 0x3FF;
     u32 offset = (u32)virtaddr & 0xFFF;
 
-    u32* physaddr = (u32*)(page_dir[dir] & ~0xFFF);
+    u32* physaddr = (u32*)(pg_dir[dir] & ~0xFFF);
 
     return (void*)(*(u32*)(physaddr + page) & ~0xFFF | offset);
 }
@@ -65,17 +67,17 @@ void* get_physaddr(void* virtaddr) {
 /**
  *  Мапит виртуальный адрес к физическому
  */
-void pg_map(void* physaddr, void* virtaddr, u32 flag) {
-    u32 dir = (u32)physaddr >> 22;
-    u32 page = (u32)physaddr >> 12 & 0x3FF;
+void pg_map_virt_phys(u32* pg_dir, void* virtaddr, void* physaddr, u32 flag) {
+    u32 dir = (u32)virtaddr >> 22;
+    u32 page = (u32)virtaddr >> 12 & 0x3FF;
 
-    if(page_dir[dir] == 0x00) {
-        u32* pg_tbl = pg_alloc();
-        pg_tbl[page] = (u32)physaddr | flag;
+    if(pg_dir[dir] == 0x00) {
+        u32* pg_tbl = pg_alloc(1);
+        pg_tbl[page] = (u32)virtaddr | flag;
 
-        page_dir[dir] = ((u32)pg_tbl) | flag;
+        pg_dir[dir] = ((u32)pg_tbl) | flag;
     }
 
-    u32* ptr = (u32*)(page_dir[dir] & ~0xFFF);
-    *(ptr + page) = (u32)physaddr | flag;
+    u32* ptr = (u32*)(pg_dir[dir] & ~0xFFF);
+    *(ptr + page) = (u32)virtaddr | flag;
 }

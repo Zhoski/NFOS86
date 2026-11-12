@@ -252,9 +252,9 @@ void anci_identify_device(void* buffer, u32 ncs) {
 u32 init_sata(void* buffer) {
     video->kprintf("AHCI driver v %d.%d.%d\n", AHCI_DRIVER_V_MAJOR, AHCI_DRIVER_V_MINOR, AHCI_DRIVER_V_PATCH);
 
-    CLB_MEM_BASE = (u32)pg_alloc();
-    FIS_MEM_BASE = (u32)pg_alloc();
-    CMD_MEM_BASE = (u32)pg_alloc();
+    CLB_MEM_BASE = 0x1A0000;//(u32)pg_alloc(1);
+    FIS_MEM_BASE = 0x1A1000;//(u32)pg_alloc(1);
+    CMD_MEM_BASE = 0x1A2000;//(u32)pg_alloc(1);
 
     hba_mem = (HBA_mem_t*)ahci_mem_base;
     cmd_header = (HBA_cmd_header_t*)CLB_MEM_BASE;

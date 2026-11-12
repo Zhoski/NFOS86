@@ -69,6 +69,9 @@ gcc -m32 -ffreestanding -c src/kernel/services/memory/pmm.c -Werror -Os -o pmm.o
 gcc -m32 -ffreestanding -c src/kernel/services/loader/loader.c -Werror -Os -o loader.o \
     -I./src/cpu/include -I./src/drivers/include -I./src/kernel/include -I./src/lib/include -I./src/fs/include
 
+gcc -m32 -ffreestanding -c src/kernel/process/process.c -Werror -Os -o process.o \
+    -I./src/cpu/include -I./src/drivers/include -I./src/kernel/include -I./src/lib/include -I./src/fs/include
+
 gcc -m32 -ffreestanding -c src/kernel/services/syscall/syscall.c -Werror -Os -o syscall.o \
     -I./src/cpu/include -I./src/drivers/include -I./src/kernel/include -I./src/lib/include -I./src/fs/include
 
@@ -86,7 +89,7 @@ gcc -m32 -ffreestanding -c src/fs/fluidfs.c -Werror -Os -o fluidfs.o \
 # ==============================================================================
 ld -m elf_i386 -T linker.ld -Map=kernel.map nf86krn.o vesa_lfb_8bpp.o video.o keyboard.o \
                  sata.o disk.o timer.o pci.o idt.o pic.o jmp_usrmode.o gdt_rel.o interrupts.o  gdt.o faults_handler.o panic.o memory.o \
-                 mm.o pmm.o paging.o syscall.o fluidfs.o fs.o loader.o -o nf86krn.elf
+                 mm.o pmm.o paging.o syscall.o fluidfs.o fs.o loader.o process.o -o nf86krn.elf
 
 objcopy -O binary nf86krn.elf bin/nf86krn.bin
 

@@ -4,6 +4,7 @@
 #include  <cpu/gdt.h>
 #include <fs/fs.h>
 #include <lib/string.h>
+#include <kernel/process.h>
 
 uint32_t kernel_stack_ptr;
 uint32_t kernel_stack_base;
@@ -15,6 +16,11 @@ typedef void (*entry_point)();
 
 void _exit();
 extern void jmp_usrmode(u32 entry, u32 stack);
+
+u32 align(u32 x, u32 n) {
+    while(x%n!=0) x++;
+    return x;
+}
 
 u32 program;
 
@@ -39,19 +45,26 @@ void patch(void* load_entry, u32 entry) {
 }
 
 u32 pr_execute(u8* f, u32 argc, u8* argv[]) {
-    if(!fs->check(f)) {
-        return 0;
-    }
-
+    video->kprintf("Execute\n");
     g_argc = argc;
     g_argv = argv;
 
-    void* load_entry = (void*)0x200000;
-    void* stack = (void*)0x210000;
+    u32 pid = process_spawn(f);
+    if(pid == 0xFFFFFFFF) {
+        return 0;
+    }
+
+    Process* process = process_tbl + pid;
+
+    void* load_entry = process->eip;//(void*)0x200000;
+    void* stack = process->stack;//(void*)0x210000;
+
+    video->kprintf("Base %x\nStack: %x\nHeap: %x\n", load_entry, stack, (u32)process->heap_border);
+    //for(;;);
  
     fs->read(f, load_entry, g_node.size);
 
-    if(*(u8*)load_entry == 0x77) patch((void*)load_entry, 0x00);
+    if(*(u8*)load_entry == 0x77) patch((void*)load_entry, 0x000000);
     
     kernel_return_ptr = (uint32_t)&_exit;
     asm volatile("movl %%esp, %0":"=r" (kernel_stack_ptr));
@@ -64,7 +77,7 @@ u32 pr_execute(u8* f, u32 argc, u8* argv[]) {
         offset += arg_len;
         memcpy(argv[i], stack - offset, arg_len);
         g_argv[i] = stack - offset;
-        offset += offset % 4;
+        offset = align(offset, 4);
     }
 
     for(u32 i = argc; i > 0; i--) {
@@ -82,9 +95,11 @@ u32 pr_execute(u8* f, u32 argc, u8* argv[]) {
     push_add = (u32*)(stack - offset);
     *push_add = argc;
 
-    ldt_mk_and_push((u32)load_entry, 15);
+    //ldt_mk_and_push((u32)load_entry, 15);
 
-    jmp_usrmode(program, 0x10000 - offset - 4);
+    //for(;;) asm("hlt");
+
+    jmp_usrmode(program, (u32)stack - offset - 4 - (u32)load_entry);
 }
 
 void _exit() {

@@ -18,30 +18,34 @@ Heap* block_heap;
 void* g_heap_base;
 u32   g_heap_sz;
 
-void create_heap(u32 pg_c) {
-    g_heap_base = pg_alloc();
-    for(u32 i = 1; i < pg_c; i++) {
-        pg_alloc();
-    }
+void create_heap(u32 base, u32 len) {
+    //g_heap_base = pg_alloc(1);
+    //for(u32 i = 1; i < pg_c; i++) {
+    //    pg_alloc(1);
+    //}
 
-    block_heap = (Heap*)g_heap_base;
-    g_heap_sz = pg_c << 12;
+    block_heap = (Heap*)base;
+    g_heap_sz = len;
+    g_heap_base = (void*)base;
 
     block_heap->is_free = FREE;
     block_heap->size = g_heap_sz;
     block_heap->next = NULL;
-    block_heap = (Heap*)g_heap_base;
+    block_heap = (Heap*)base;
 }
 
 void* malloc(u32 size) {
-    u32 current_address = (u32)g_heap_base + sizeof(Heap) + size;
+    while(size%4!=0) size++;
+    //video->kprintf("%x %x\n", g_heap_base, g_heap_sz);
+    u32 current_addres = (u32)g_heap_base + sizeof(Heap) + size;
+    //current_addres += current_addres % 4;
     Heap* current = block_heap;
     
     while (current != NULL)
     {
-        u32 heap_end_address = (u32)g_heap_base + g_heap_sz;
+        u32 heap_end_addres = (u32)g_heap_base + g_heap_sz;
 
-        if (current_address + sizeof(Heap) >= heap_end_address) {
+        if (current_addres + sizeof(Heap) >= heap_end_addres) {
             return 0;
         }
 
@@ -62,19 +66,19 @@ void* malloc(u32 size) {
             }           
 
             u8* t = (u8*)&new_heap;
-            u8* dest = (u8*)current_address;
+            u8* dest = (u8*)current_addres;
             for (int i = 0; i < 12; i++) {
                 dest[i] = t[i];
             }
 
-            current->next = (struct Heap*)current_address;
+            current->next = (struct Heap*)current_addres;
 
-            memset((void*)(current_address - size), 0, size);
+            memset((void*)(current_addres - size), 0, size);
             
-            return (void*)(current_address - size);
+            return (void*)(current_addres - size);
         }
 
-        current_address += (current->size + sizeof(Heap));
+        current_addres += (current->size + sizeof(Heap));
         current = (Heap*)current->next;
     }
 

@@ -53,8 +53,8 @@ typedef struct tss_entry tss_t;
 typedef struct desc_ptr desc_ptr_t;
 
 void gdt_init();
-void gdt_add_seg(u32 base, u32 limit, u32 acess, u32 flag);
-void ldt_mk_and_push(u32 base, u32 limit);
+u32  gdt_descriptor_add(u32 base, u32 limit, u32 acess, u32 flag);
+u32 ldt_mk_and_push(u32 base, u32 limit);
 
 extern void* gdt_addr;
 
