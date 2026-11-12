@@ -22,30 +22,43 @@ u32 align(u32 x, u32 n) {
     return x;
 }
 
-u32 program;
+u32 virt_entry_point;
 
 u32 g_argc;
 u8** g_argv;
 
-void patch(void* load_entry, u32 entry) {
+u32 ndf_load(u8* f,void* phys_entry, u32 virt_entry) {
+    u32 st = fs->read(f, phys_entry, g_node.size);
+    if(!st) return 0;
+    
     ndf_header_t ndf_header;
-    memcpy(load_entry, &ndf_header, sizeof(ndf_header));
+    memcpy(phys_entry, &ndf_header, sizeof(ndf_header));
     
-    u32 load_addr = (u32)load_entry;
+    u32 phys_addr = (u32)phys_entry;
 
-    memcpy((void*)(load_addr + sizeof(ndf_header_t)), (void*)(load_addr), ndf_header.fsize - sizeof(ndf_header_t));
+    memcpy((void*)(phys_addr + sizeof(ndf_header_t)), (void*)(phys_addr), ndf_header.fsize - sizeof(ndf_header_t));
     
-    u32* patch_offset = (u32*)(load_addr + ndf_header.reloff - sizeof(ndf_header_t));
+    u32* patch_offset = (u32*)(phys_addr + ndf_header.reloff - sizeof(ndf_header_t));
     for(u32 k = 0; k < ndf_header.relsz / 4; k++) {
-        u32* addr_patch = (u32*)(load_addr + patch_offset[k] - sizeof(ndf_header_t));
-        *addr_patch = *addr_patch + entry;
+        u32* addr_patch = (u32*)(phys_addr + patch_offset[k] - sizeof(ndf_header_t));
+        *addr_patch = *addr_patch + virt_entry;
     }
 
-    program = (u32)(entry + ndf_header.entry - sizeof(ndf_header_t) + 28);
+    virt_entry_point = (u32)(virt_entry + ndf_header.entry - sizeof(ndf_header_t) + 28);
 }
 
-u32 pr_execute(u8* f, u32 argc, u8* argv[]) {
-    video->kprintf("Execute\n");
+u32 execute(u8* f, u32 argc, u8* argv[]) {
+    Process* process = process_spawn(f);
+    if(!process) return 0;
+
+    void* phys_entry = (void*)process->base;
+    void* phys_stack = (void*)(process->base + 0x8000);
+    void* virt_stack = (void*)(phys_stack - phys_entry);
+    if(strcmp(g_node.ext, "ndf") == 0) ndf_load(f, phys_entry, 0);
+
+    jmp_usrmode(virt_entry_point, (u32)virt_stack);
+    
+    /*video->kprintf("Execute\n");
     g_argc = argc;
     g_argv = argv;
 
@@ -99,11 +112,11 @@ u32 pr_execute(u8* f, u32 argc, u8* argv[]) {
 
     //for(;;) asm("hlt");
 
-    jmp_usrmode(program, (u32)stack - offset - 4 - (u32)load_entry);
+    jmp_usrmode(program, (u32)stack - offset - 4 - (u32)load_entry);*/
 }
 
 void _exit() {
-    pr_execute("/apps/shell.ndf",0,0);
+    execute("/apps/shell.ndf",0,0);
 
     for(;;) {
         asm("hlt");

@@ -49,7 +49,7 @@ void kmain() {
     gdt_init();
     //pg_mapping();
     init_video();
-    process_mk_tbl();
+    prcs_tbl_init();
     pci_scan_bus0();               
     init_keyboard();                         
 
@@ -79,8 +79,12 @@ void kmain() {
     }*/
 
     //video->kprintf("%s", process_tbl[0].name);
+    //
+    //process_spawn("/apps/shell.ndf");
+    Process* process = process_spawn("/apps/hello.ndf");
+    video->kprintf("%x %x", process->base, process->limit);
 
-    pr_execute("/apps/hello.ndf", 0, 0);
+    execute("/apps/hello.ndf", 0, 0);
 
     for(;;) {
         asm("hlt");

@@ -14,8 +14,7 @@
 void syscall_handler(syscall_ct* ct) { 
     asm volatile("sti");
 
-    //video->kprintf("%x", process_tbl[0].base)
-    u32 heap = (u32)process_tbl[cur_pid].heap_border - (u32)process_tbl[cur_pid].base; // Колхоз говнокод
+    Process* process = &prcs_tbl[cur_prcs];
 
     switch (ct->eax)
     {
@@ -33,7 +32,7 @@ void syscall_handler(syscall_ct* ct) {
         switch (ct->ebx)
         {
             case SCREEN: 
-                if(ct->edx == STR) video->kprintf("%s", (u8*)(ct->ecx + process_tbl[cur_pid].base)); 
+                if(ct->edx == STR) video->kprintf("%s", (u8*)(ct->ecx + process->base)); 
                 else if(ct->edx == SYM) video->kputc((u8)ct->ecx);
                 else if(ct->edx == HEX) video->kprintf("%x", ct->ecx);
                 break;
@@ -75,7 +74,7 @@ void syscall_handler(syscall_ct* ct) {
         ct->eax = fs->delete((u8*)ct->ebx);
         break;
     case SYS_RUN:
-        pr_execute((u8*)ct->ebx, ct->ecx, (u8**)ct->edx);
+        execute((u8*)ct->ebx, ct->ecx, (u8**)ct->edx);
         break;
     case SET_BG:
         video->terminal_bg_vbe_set((u8)ct->ebx);
@@ -99,7 +98,6 @@ void syscall_handler(syscall_ct* ct) {
         fs->write_dir((u8*)ct->ebx);
         break;
     case INIT_HEAP:
-        ct->eax = heap;
         //for(;;);
         //video->kprintf("%x",process_tbl[cur_pid].limit);//(u32)process_tbl[cur_pid].heap_border;
         break;

@@ -13,20 +13,17 @@ typedef enum {
 
 typedef struct {
   u32 pid;
-  u32 ldt;
-  u8*   name;
-  void* stack;
-  void* eip;
-  void* heap_border;
-  void* base;
+  u32 ldt_sel;
+  u32 base;
   u32 limit;
   State state;
 } Process;
 
-void process_mk_tbl();
-u32 process_spawn(u8* f);
 
-extern Process* process_tbl;
-extern u32 cur_pid;
+void prcs_tbl_init();
+Process* process_spawn(u8* f);
+
+extern Process prcs_tbl[MAX_PROCESS];
+extern u32 cur_prcs;
 
 #endif

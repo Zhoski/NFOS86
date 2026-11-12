@@ -24,6 +24,6 @@ typedef enum {
     NDF,
 } ext_t;
 
-u32 pr_execute(u8* f, u32 argc, u8* argv[]);
+u32 execute(u8* f, u32 argc, u8* argv[]);
 
 #endif

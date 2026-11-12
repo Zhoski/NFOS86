@@ -41,7 +41,7 @@ void c_faults_handler(stack* st) {
     while (!c) c = kb.get_last_key();
 
     video->clear_screen(0);
-    pr_execute("/apps/shell.ndf",0,0);
+    execute("/apps/shell.ndf",0,0);
 
     for(;;) {
         asm("hlt");
