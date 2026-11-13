@@ -1,4 +1,5 @@
 #include <slib/memory.h>
+#include <slib/stdio.h>
 
 #define FREE                 1
 #define BUSY                 0
@@ -49,6 +50,7 @@ void init_heap() {
         : "a" (17)
         : "memory"
     );
+  
     block_heap = (Heap*)g_heap_base;
     g_heap_sz = 32 * 1024;
     g_heap_base = (void*)g_heap_base;
@@ -69,9 +71,7 @@ void* malloc(unsigned int size) {
     );*/            
 
     while(size%4!=0) size++;
-    //video->kprintf("%x %x\n", g_heap_base, g_heap_sz);
         u32 current_addres = (u32)g_heap_base + sizeof(Heap) + size;
-    //current_addres += current_addres % 4;
         Heap* current = block_heap;
     
         while (current != NULL)

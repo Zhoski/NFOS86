@@ -1,0 +1,5 @@
+memory: guest=4, host=256
+romimage: file=/usr/share/seabios/bios.bin
+vgaromimage: file=/usr/share/seabios/vgabios.bin
+ata0-master: type=disk, path="../out.img", cylinders=8, heads=16, spt=63
+boot: disk

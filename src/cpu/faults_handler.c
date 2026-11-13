@@ -6,6 +6,7 @@
 #include <lib/debug.h>
 
 #define DF  8
+#define SS  12
 #define GP  13
 #define PF  14
 
@@ -21,6 +22,7 @@ void c_faults_handler(stack* st) {
     switch (st->fn)
     {
         case DF: video->kprintf("Double Fault #DF\n"); break;
+        case SS: video->kprintf("Stack-Segment Fault #SS\n"); break;
         case GP: video->kprintf("General Protection Fault #GP\n"); break;
         case PF: video->kprintf("Page Fault #PF\n"); break;
         default: break;

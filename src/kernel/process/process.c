@@ -4,6 +4,7 @@
 #include <fs/fs.h>
 #include <drivers/video/video.h>
 #include <lib/string.h>
+#include <lib/align.h>
 
 #define USR_RW_P   0x07
 #define USR_RW     0x06
@@ -44,12 +45,15 @@ Process* process_spawn(u8* f) {
   }
   
   Process process;
-  u32 limit = 64 << 10;
+  u32 limit = (64 << 10)-1;
   u32 base = (u32)malloc(limit);
+  u32 stack_limit = (8 << 10)-1;
+  process.heap_base = align(stack_limit + 1 + g_node.size, 1024, HIGHTER);
+  process.stack_limit = stack_limit;
   process.limit = limit;
   process.base = base;
   process.state = ACTIVE;
-  process.ldt_sel = ldt_mk_and_push(base, limit);
+  process.ldt_sel = ldt_mk_and_push(base, limit, stack_limit);
 
   tbl_add_process(&process);
   return &prcs_tbl[process.pid];

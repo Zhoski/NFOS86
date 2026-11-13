@@ -5,6 +5,7 @@
 #include <fs/fs.h>
 #include <lib/string.h>
 #include <kernel/process.h>
+#include <lib/align.h>
 
 uint32_t kernel_stack_ptr;
 uint32_t kernel_stack_base;
@@ -17,11 +18,6 @@ typedef void (*entry_point)();
 void _exit();
 extern void jmp_usrmode(u32 entry, u32 stack);
 
-u32 align(u32 x, u32 n) {
-    while(x%n!=0) x++;
-    return x;
-}
-
 u32 virt_entry_point;
 
 u32 g_argc;
@@ -29,8 +25,8 @@ u8** g_argv;
 
 u32 ndf_load(u8* f,void* phys_entry, u32 virt_entry) {
     u32 st = fs->read(f, phys_entry, g_node.size);
-    if(!st) return 0;
-    
+    if(st != 0) return 0;
+
     ndf_header_t ndf_header;
     memcpy(phys_entry, &ndf_header, sizeof(ndf_header));
     
@@ -52,9 +48,13 @@ u32 execute(u8* f, u32 argc, u8* argv[]) {
     if(!process) return 0;
 
     void* phys_entry = (void*)process->base;
-    void* phys_stack = (void*)(process->base + 0x8000);
-    void* virt_stack = (void*)(phys_stack - phys_entry);
-    if(strcmp(g_node.ext, "ndf") == 0) ndf_load(f, phys_entry, 0);
+    void* virt_stack = (void*)process->stack_limit;
+
+    virt_stack = (void*)align((u32)virt_stack, 16, LOWER);
+
+    void* load_entry = phys_entry + process->stack_limit + 1;
+
+    ndf_load(f, load_entry, align(process->stack_limit + 1, 1024, 1));
 
     jmp_usrmode(virt_entry_point, (u32)virt_stack);
     

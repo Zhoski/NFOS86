@@ -19,6 +19,7 @@
 #include <lib/debug.h>
 
 extern void isr8();
+extern void isr12();
 extern void isr13();
 extern void isr14();
 extern void isr32();
@@ -30,7 +31,8 @@ u32* krn_pg_dir;
 
 void kmain() { 
     idt_load();                    
-    idt_set(0x08, 0x08, TRAP, (uint32_t)isr8); 
+    idt_set(0x08, 0x08, TRAP, (uint32_t)isr8);
+    idt_set(0x0C, 0x08, TRAP, (uint32_t)isr12); 
     idt_set(0x0D, 0x08, TRAP, (uint32_t)isr13); 
     idt_set(0x0E, 0x08, TRAP, (uint32_t)isr14); 
     idt_set(0x20, 0x08, 0x8E, (uint32_t)isr32); 
@@ -81,10 +83,7 @@ void kmain() {
     //video->kprintf("%s", process_tbl[0].name);
     //
     //process_spawn("/apps/shell.ndf");
-    Process* process = process_spawn("/apps/hello.ndf");
-    video->kprintf("%x %x", process->base, process->limit);
-
-    execute("/apps/hello.ndf", 0, 0);
+    execute("/apps/shell.ndf", 0, 0);
 
     for(;;) {
         asm("hlt");

@@ -79,15 +79,15 @@ void lldt(u16 selector) {
     );
 }
 
-u32 ldt_mk_and_push(u32 base, u32 limit) {
-    void* ldt = malloc(16);
+u32 ldt_mk_and_push(u32 base, u32 limit, u32 stack_limit) {
+    void* ldt = malloc(24);
 
     desc_t* ds = (desc_t*)ldt;
     mk_descriptor(ds, base, limit, 0xFA, 0x04);
     mk_descriptor((desc_t*)(ds + 1), base, limit, 0xF3, 0x04);
-    //mk_descriptor((desc_t*)(ds + 2), stack, stack_limit, 0xF3, 0x0C);
+    mk_descriptor((desc_t*)(ds + 2), base, stack_limit, 0xF3, 0x04);
     
-    u32 sel = gdt_descriptor_add((u32)ldt, 15, 0x82, 0x00);
+    u32 sel = gdt_descriptor_add((u32)ldt, 23, 0x82, 0x00);
 
     lldt(sel);
 

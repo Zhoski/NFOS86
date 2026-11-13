@@ -32,7 +32,7 @@ void syscall_handler(syscall_ct* ct) {
         switch (ct->ebx)
         {
             case SCREEN: 
-                if(ct->edx == STR) video->kprintf("%s", (u8*)(ct->ecx + process->base)); 
+                if(ct->edx == STR) video->kprintf("%s", (u8*)(ct->ecx + process->base));
                 else if(ct->edx == SYM) video->kputc((u8)ct->ecx);
                 else if(ct->edx == HEX) video->kprintf("%x", ct->ecx);
                 break;
@@ -98,8 +98,7 @@ void syscall_handler(syscall_ct* ct) {
         fs->write_dir((u8*)ct->ebx);
         break;
     case INIT_HEAP:
-        //for(;;);
-        //video->kprintf("%x",process_tbl[cur_pid].limit);//(u32)process_tbl[cur_pid].heap_border;
+        ct->eax = process->heap_base;
         break;
     default:
         break;

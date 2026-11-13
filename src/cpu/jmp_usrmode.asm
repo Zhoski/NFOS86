@@ -11,7 +11,7 @@ jmp_usrmode:
     mov gs, ax
  
     mov eax, edx
-    push 0xF ;(4 * 8) | 3
+    push 0x17 ;(4 * 8) | 3
     push eax
     pushf
     push 0x07 ;(3 * 8) | 3

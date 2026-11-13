@@ -364,8 +364,7 @@ void shell_main() {
 }
 
 void main(u32 argc) {
-    printf("Mopsik");
-    //for(;;);
+    init_heap();
     cur_dir = malloc(256);
     cur_dir[0] = '/';
     command_buffer = malloc(COMMAND_BUFFER_SIZE);

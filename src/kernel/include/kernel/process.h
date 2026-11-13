@@ -16,6 +16,8 @@ typedef struct {
   u32 ldt_sel;
   u32 base;
   u32 limit;
+  u32 stack_limit;
+  u32 heap_base;
   State state;
 } Process;
 

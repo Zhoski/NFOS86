@@ -79,6 +79,7 @@ IRQINT 33, keyboard_handler
 IRQINT 46, disk_handler
 
 EXCEPTIONS_ERR_CODE         8
+EXCEPTIONS_ERR_CODE         12
 EXCEPTIONS_ERR_CODE         13
 EXCEPTIONS_ERR_CODE         14
 
