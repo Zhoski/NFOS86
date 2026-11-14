@@ -48,13 +48,19 @@ u32 execute(u8* f, u32 argc, u8* argv[]) {
     if(!process) return 0;
 
     void* phys_entry = (void*)process->base;
-    void* virt_stack = (void*)process->stack_limit;
+    void* virt_stack = (void*)process->regs.esp;//process->stack_limit;
 
-    virt_stack = (void*)align((u32)virt_stack, 16, LOWER);
+    //video->kprintf("%x\n", virt_stack);
+
+    //for(;;);
+
+    //virt_stack = (void*)align((u32)virt_stack, 16, LOWER);
 
     void* load_entry = phys_entry + process->stack_limit + 1;
 
-    ndf_load(f, load_entry, align(process->stack_limit + 1, 1024, 1));
+    ndf_load(f, load_entry, process->regs.eip);//align(process->stack_limit + 1, 1024, 1));
+
+    //prcs_start_executing = 1;
 
     jmp_usrmode(virt_entry_point, (u32)virt_stack);
     

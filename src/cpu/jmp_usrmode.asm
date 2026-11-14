@@ -9,10 +9,9 @@ jmp_usrmode:
     mov es, ax
     mov fs, ax
     mov gs, ax
- 
-    mov eax, edx
+
     push 0x17 ;(4 * 8) | 3
-    push eax
+    push edx
     pushf
     push 0x07 ;(3 * 8) | 3
     push ebx

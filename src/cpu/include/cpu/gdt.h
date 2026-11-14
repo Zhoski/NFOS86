@@ -55,6 +55,7 @@ typedef struct desc_ptr desc_ptr_t;
 void gdt_init();
 u32  gdt_descriptor_add(u32 base, u32 limit, u32 acess, u32 flag);
 u32 ldt_mk_and_push(u32 base, u32 limit, u32 stack_limit);
+void lldt(u16 sel);
 
 extern void* gdt_addr;
 

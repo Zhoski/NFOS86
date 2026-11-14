@@ -12,10 +12,12 @@
  *  Исправить добавив базу сегмента данных ко всему что надо
  */
 void syscall_handler(syscall_ct* ct) { 
-    asm volatile("sti");
+    //asm volatile("sti");
 
     Process* process = &prcs_tbl[cur_prcs];
-
+    u32 phys_ebx = ct->ebx + process->base;
+    u32 phys_ecx = ct->ecx + process->base;
+    u32 phys_edx = ct->edx + process->base;
     switch (ct->eax)
     {
     case  SYS_EXIT:
@@ -32,7 +34,7 @@ void syscall_handler(syscall_ct* ct) {
         switch (ct->ebx)
         {
             case SCREEN: 
-                if(ct->edx == STR) video->kprintf("%s", (u8*)(ct->ecx + process->base));
+                if(ct->edx == STR) video->kprintf("%s", (u8*)phys_ecx);
                 else if(ct->edx == SYM) video->kputc((u8)ct->ecx);
                 else if(ct->edx == HEX) video->kprintf("%x", ct->ecx);
                 break;
@@ -74,7 +76,7 @@ void syscall_handler(syscall_ct* ct) {
         ct->eax = fs->delete((u8*)ct->ebx);
         break;
     case SYS_RUN:
-        execute((u8*)ct->ebx, ct->ecx, (u8**)ct->edx);
+        //execute((u8*)ct->ebx, ct->ecx, (u8**)ct->edx);
         break;
     case SET_BG:
         video->terminal_bg_vbe_set((u8)ct->ebx);

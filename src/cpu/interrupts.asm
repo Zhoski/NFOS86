@@ -52,24 +52,29 @@ isr%1:
     pushad
     push ds
     push es
-    push fs
-    push gs
 
     mov ax, 0x10
     mov es, ax
     mov ds, ax
 
+    mov eax, esp
+    push eax
+
     call %2
+
+    add esp, 4
 
     mov al, 0x20
     out 0x20, al
     out 0xA0, al
 
-    pop gs
-    pop fs
+    ;pop gs
+    ;pop fs
     pop es
     pop ds
     popad
+
+    sti
 
     iret
 %endmacro

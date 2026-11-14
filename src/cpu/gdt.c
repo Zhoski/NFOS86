@@ -91,7 +91,7 @@ u32 ldt_mk_and_push(u32 base, u32 limit, u32 stack_limit) {
 
     lldt(sel);
 
-    return sel << 3;
+    return sel;
 }
 
 void gdt_init() {
